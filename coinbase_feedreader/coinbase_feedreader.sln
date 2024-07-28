@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34728.123
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "coinbase_feedreader", "coinbase_feedreader\coinbase_feedreader.csproj", "{432178F5-8EF1-4A27-8318-0AD4D2F5922E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D54A92AA-1C9F-459A-A649-84ED596AE556} = {D54A92AA-1C9F-459A-A649-84ED596AE556}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "coinbase_connection", "..\coinbase_connection\coinbase_connection\coinbase_connection.csproj", "{D54A92AA-1C9F-459A-A649-84ED596AE556}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{432178F5-8EF1-4A27-8318-0AD4D2F5922E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{432178F5-8EF1-4A27-8318-0AD4D2F5922E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{432178F5-8EF1-4A27-8318-0AD4D2F5922E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{432178F5-8EF1-4A27-8318-0AD4D2F5922E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D54A92AA-1C9F-459A-A649-84ED596AE556}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D54A92AA-1C9F-459A-A649-84ED596AE556}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D54A92AA-1C9F-459A-A649-84ED596AE556}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D54A92AA-1C9F-459A-A649-84ED596AE556}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4E2E91AA-9409-4A0C-9CE2-948461F6FDC0}
+	EndGlobalSection
+EndGlobal
