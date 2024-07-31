@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace coinbase_connection
@@ -91,6 +92,51 @@ namespace coinbase_connection
             {
                 return;
             }
+        }
+
+        static public string findSymbol(string str)
+        {
+            string target = "\"product_id\":";
+            int start = str.IndexOf(target) + target.Length + 1;
+            if(start > 0)
+            {
+                int end = str.IndexOf("\"", start);
+                return str.Substring(start, end - start);
+            }
+            else
+            {
+                return "";
+            }
+        }
+
+        static public void parseUpdate(string str,ref cbMsg.jsUpdate obj)
+        {
+            obj = JsonSerializer.Deserialize<cbMsg.jsUpdate>(str);
+        }
+        static public void parseTrades(string str, ref cbMsg.jsTrades obj)
+        {
+            obj = JsonSerializer.Deserialize<cbMsg.jsTrades>(str);
+        }
+
+        static public void jsUpdateToTrades(string symbol,cbMsg.jsUpdate jsup, ref cbMsg.trades obj)
+        {
+            obj.msg_type = "update";
+            obj.product_id = symbol;
+            obj.time = jsup.event_time;
+            obj.price = double.Parse(jsup.price_level);
+            obj.side = jsup.side;
+            obj.size = double.Parse(jsup.new_quantity);
+            obj.trade_id = "";
+        }
+        static public void jsTradesToTrades(cbMsg.jsTrades jstr, ref cbMsg.trades obj)
+        {
+            obj.msg_type = "trades";
+            obj.product_id = jstr.product_id;
+            obj.time = jstr.time;
+            obj.price = double.Parse(jstr.price);
+            obj.side = jstr.side;
+            obj.size = double.Parse(jstr.size);
+            obj.trade_id = jstr.trade_id;
         }
 
         static public void strToList(string org,ref List<string> lis)
@@ -204,19 +250,19 @@ namespace cbMsg
 
     public struct heartbeats
     {
-        public string current_time;
-        public string heartbeat_counter;
+        public string current_time { get; set; }
+        public string heartbeat_counter { get; set; }
     }
 
     public struct jsCandle
     {
-        public string start;
-        public string high;
-        public string low;
-        public string open;
-        public string close;
-        public string volume;
-        public string product_id;
+        public string start { get; set; }
+        public string high { get; set; }
+        public string low { get; set; }
+        public string open { get; set; }
+        public string close { get; set; }
+        public string volume { get; set; }
+        public string product_id { get; set; }
     }
     public struct candle
     {
@@ -241,17 +287,18 @@ namespace cbMsg
 
     public struct jsTrades
     {
-        public string trade_id;
-        public string product_id;
-        public string price;
-        public string size;
-        public string side;
-        public string time;
+        public string trade_id { get; set; }
+        public string product_id { get; set; }
+        public string price { get; set; }
+        public string size { get; set; }
+        public string side { get; set; }
+        public string time { get; set; }
     }
     public struct trades
     {
         public trades(jsTrades jst)
         {
+            this.msg_type = "";
             this.trade_id = jst.trade_id;
             this.product_id = jst.product_id;
             this.price = Double.Parse(jst.price);
@@ -259,6 +306,7 @@ namespace cbMsg
             this.side = jst.side;
             this.time = jst.time;
         }
+        public string msg_type;
         public string trade_id;
         public string product_id;
         public double price;
@@ -269,33 +317,33 @@ namespace cbMsg
 
     public struct product_status
     {
-        public string product_type;
-        public string id;
-        public string base_currency;
-        public string quote_currency;
-        public string base_increment;
-        public string quote_increment;
-        public string display_name;
-        public string status;
-        public string status_message;
-        public string min_market_funds;
+        public string product_type { get; set; }
+        public string id { get; set; }
+        public string base_currency { get; set; }
+        public string quote_currency { get; set; }
+        public string base_increment { get; set; }
+        public string quote_increment { get; set; }
+        public string display_name { get; set; }
+        public string status { get; set; }
+        public string status_message { get; set; }
+        public string min_market_funds { get; set; }
     }
 
     public struct jsTicker
     {
-        public string type;
-        public string product_id;
-        public string price;
-        public string volume_24_h;
-        public string low_24_h;
-        public string high_24_h;
-        public string low_52_w;
-        public string high_52_w;
-        public string price_percent_chg_24_h;
-        public string best_bid;
-        public string best_bid_quantity;
-        public string best_ask;
-        public string best_ask_quantity;
+        public string type { get; set; }
+        public string product_id { get; set; }
+        public string price { get; set; }
+        public string volume_24_h { get; set; }
+        public string low_24_h { get; set; }
+        public string high_24_h { get; set; }
+        public string low_52_w { get; set; }
+        public string high_52_w { get; set; }
+        public string price_percent_chg_24_h { get; set; }
+        public string best_bid { get; set; }
+        public string best_bid_quantity { get; set; }
+        public string best_ask { get; set; }
+        public string best_ask_quantity { get; set; }
     }
 
     public struct ticker
@@ -333,10 +381,10 @@ namespace cbMsg
 
     public struct jsUpdate
     {
-        public string side;
-        public string event_time;
-        public string price_level;
-        public string new_quantity;
+        public string side { get; set; }
+        public string event_time { get; set; }
+        public string price_level { get; set; }
+        public string new_quantity { get; set; }
     }
     public struct update
     {
@@ -354,35 +402,35 @@ namespace cbMsg
     }
     public struct jsOrder
     {
-        public string avg_price;
-        public string cancel_reason;
-        public string client_order_id;
-        public string completion_percentage;
-        public string contract_expiry_type;
-        public string cumulative_quantity;
-        public string filled_value;
-        public string leaves_quantity;
-        public string limit_price;
-        public string number_of_fills;
-        public string order_id;
-        public string order_side;
-        public string order_type;
-        public string outstanding_hold_amount;
-        public string post_only;
-        public string product_id;
-        public string product_type;
-        public string reject_reason;
-        public string retail_portfolio_id;
-        public string risk_managed_by;
-        public string status;
-        public string stop_price;
-        public string time_in_force;
-        public string total_fees;
-        public string total_value_after_fees;
-        public string trigger_status;
-        public string creation_time;
-        public string end_time;
-        public string start_time;
+        public string avg_price{ get; set; }
+        public string cancel_reason{ get; set; }
+        public string client_order_id{ get; set; }
+        public string completion_percentage{ get; set; }
+        public string contract_expiry_type{ get; set; }
+        public string cumulative_quantity{ get; set; }
+        public string filled_value{ get; set; }
+        public string leaves_quantity{ get; set; }
+        public string limit_price{ get; set; }
+        public string number_of_fills{ get; set; }
+        public string order_id{ get; set; }
+        public string order_side{ get; set; }
+        public string order_type{ get; set; }
+        public string outstanding_hold_amount{ get; set; }
+        public string post_only{ get; set; }
+        public string product_id{ get; set; }
+        public string product_type{ get; set; }
+        public string reject_reason{ get; set; }
+        public string retail_portfolio_id{ get; set; }
+        public string risk_managed_by{ get; set; }
+        public string status{ get; set; }
+        public string stop_price{ get; set; }
+        public string time_in_force{ get; set; }
+        public string total_fees{ get; set; }
+        public string total_value_after_fees{ get; set; }
+        public string trigger_status{ get; set; }
+        public string creation_time{ get; set; }
+        public string end_time{ get; set; }
+        public string start_time{ get; set; }
     }
 
     public struct order

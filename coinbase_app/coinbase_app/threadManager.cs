@@ -10,6 +10,7 @@ using System.Collections.Concurrent;
 using cbMsg;
 using System.Runtime.Remoting;
 using System.Security.AccessControl;
+using coinbase_connection;
 
 namespace coinbase_app
 {
@@ -54,6 +55,7 @@ namespace coinbase_app
         //Decoding thread should be single thread
         public ConcurrentQueue<string> strQueue;
         public ConcurrentQueue<cbMsg.trades> feedQueue;
+        public ConcurrentStack<cbMsg.trades> feedStack;
 
         public decodingThread()
         {
@@ -82,26 +84,13 @@ namespace coinbase_app
         public void decoding()
         {
             string str;
-            cbMsg.trades tr = new trades();
-            cbMsg.jsTrades jstr = new jsTrades();
-            cbMsg.jsUpdate jsup = new jsUpdate();
-            cbMsg.message msg = new message();
             int trycount = 0;
+            
             while(true)
             {
                 if(this.strQueue.TryDequeue(out str))
                 {
-                    coinbase_connection.parser.parseMsg(str,ref msg);
-                    switch (msg.channel)
-                    {
-                        case "l2_data":
-                            break;
-                        case "market_trades":
-                            break;
-                        default:
-                            break;
-                            //Do nothing
-                    }
+                    this.decodeMain(str);
                 }
                 else
                 {
@@ -112,6 +101,69 @@ namespace coinbase_app
                         System.Threading.Thread.Sleep(0);
                     }
                 }
+            }
+        }
+
+        public void decodeMain(string str)
+        {
+            string symbol;
+            string msg_Type;
+            cbMsg.trades tr;
+            cbMsg.jsTrades jstr = new jsTrades();
+            cbMsg.jsUpdate jsup = new jsUpdate();
+            cbMsg.message msg = new message();
+            int start = 0;
+            int end = 0;
+            string targetStr = "";
+            string temp;
+
+            coinbase_connection.parser.parseMsg(str, ref msg);
+            msg_Type = msg.channel;
+            symbol = coinbase_connection.parser.findSymbol(msg.events);
+            switch (msg.channel)
+            {
+                case "l2_data":
+                    targetStr = "\"updates\":[";
+                    start = msg.events.IndexOf(targetStr) + targetStr.Length;
+                    while (start > 0)
+                    {
+                        end = msg.events.IndexOf("}", start) + 1;
+                        temp = msg.events.Substring(start, end - start);
+                        coinbase_connection.parser.parseUpdate(temp, ref jsup);
+                        if (this.feedStack.TryPop(out tr))
+                        {
+                            coinbase_connection.parser.jsUpdateToTrades(symbol, jsup, ref tr);
+                            feedQueue.Enqueue(tr);
+                        }
+                        else
+                        {
+                            //Add more objects
+                        }
+                        start = msg.events.IndexOf("{", end);
+                    }
+                    break;
+                case "market_trades":
+                    targetStr = "\"trades\":[";
+                    start = msg.events.IndexOf(targetStr) + targetStr.Length;
+                    while (start > 0)
+                    {
+                        end = msg.events.IndexOf("}", start) + 1;
+                        coinbase_connection.parser.parseTrades(msg.events.Substring(start, end - start), ref jstr);
+                        if (this.feedStack.TryPop(out tr))
+                        {
+                            coinbase_connection.parser.jsTradesToTrades(jstr, ref tr);
+                            feedQueue.Enqueue(tr);
+                        }
+                        else
+                        {
+                            //Add more objects
+                        }
+                        start = msg.events.IndexOf("{", end);
+                    }
+                    break;
+                default:
+                    break;
+                    //Do nothing
             }
         }
         public override void threadStop() { }

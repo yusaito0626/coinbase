@@ -1,13 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-
 namespace coinbase_app
 {
     public partial class Form1 : Form
@@ -15,11 +5,6 @@ namespace coinbase_app
         public Form1()
         {
             InitializeComponent();
-        }
-
-        private void button_feed_Click(object sender, EventArgs e)
-        {
-
         }
     }
 }
