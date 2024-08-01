@@ -11,6 +11,7 @@ using cbMsg;
 using System.Runtime.Remoting;
 using System.Security.AccessControl;
 using coinbase_connection;
+using coinbase_main;
 
 namespace coinbase_app
 {
@@ -53,15 +54,25 @@ namespace coinbase_app
     public class decodingThread : absThread
     {
         //Decoding thread should be single thread
+        private int STACK_SIZE = 1000000;
+
         public ConcurrentQueue<string> strQueue;
-        public ConcurrentQueue<cbMsg.trades> feedQueue;
         public ConcurrentStack<cbMsg.trades> feedStack;
+        public ConcurrentQueue<string> symbolQueue;
+
+        public Dictionary<string, crypto> cryptos;
 
         public decodingThread()
         {
             this.aborting = 0;
             this.active = 0;
             this.mutex = new Mutex(true);
+            this.feedStack = new ConcurrentStack<trades>();
+            int i;
+            for(i = 0;i<this.STACK_SIZE;i++)
+            {
+                this.feedStack.Push(new trades());
+            }
         }
         public override void threadStart()
         {
@@ -117,63 +128,71 @@ namespace coinbase_app
             string targetStr = "";
             string temp;
 
+            crypto cp;
+
             coinbase_connection.parser.parseMsg(str, ref msg);
             msg_Type = msg.channel;
             symbol = coinbase_connection.parser.findSymbol(msg.events);
-            switch (msg.channel)
+            if(this.cryptos.ContainsKey(symbol))
             {
-                case "l2_data":
-                    targetStr = "\"updates\":[";
-                    start = msg.events.IndexOf(targetStr) + targetStr.Length;
-                    while (start > 0)
-                    {
-                        end = msg.events.IndexOf("}", start) + 1;
-                        temp = msg.events.Substring(start, end - start);
-                        coinbase_connection.parser.parseUpdate(temp, ref jsup);
-                        if (this.feedStack.TryPop(out tr))
+                cp = this.cryptos[symbol];
+                switch (msg.channel)
+                {
+                    case "l2_data":
+                        targetStr = "\"updates\":[";
+                        start = msg.events.IndexOf(targetStr) + targetStr.Length;
+                        while (start > 0)
                         {
-                            coinbase_connection.parser.jsUpdateToTrades(symbol, jsup, ref tr);
-                            feedQueue.Enqueue(tr);
+                            end = msg.events.IndexOf("}", start) + 1;
+                            temp = msg.events.Substring(start, end - start);
+                            coinbase_connection.parser.parseUpdate(temp, ref jsup);
+                            if (this.feedStack.TryPop(out tr))
+                            {
+                                coinbase_connection.parser.jsUpdateToTrades(symbol, jsup, ref tr);
+                                cp.qtQueue.Enqueue(tr);
+                                this.symbolQueue.Enqueue(symbol);
+                            }
+                            else
+                            {
+                                //Add more objects
+                            }
+                            start = msg.events.IndexOf("{", end);
                         }
-                        else
+                        break;
+                    case "market_trades":
+                        targetStr = "\"trades\":[";
+                        start = msg.events.IndexOf(targetStr) + targetStr.Length;
+                        while (start > 0)
                         {
-                            //Add more objects
+                            end = msg.events.IndexOf("}", start) + 1;
+                            coinbase_connection.parser.parseTrades(msg.events.Substring(start, end - start), ref jstr);
+                            if (this.feedStack.TryPop(out tr))
+                            {
+                                coinbase_connection.parser.jsTradesToTrades(jstr, ref tr);
+                                cp.qtQueue.Enqueue(tr);
+                                this.symbolQueue.Enqueue(symbol);
+                            }
+                            else
+                            {
+                                //Add more objects
+                            }
+                            start = msg.events.IndexOf("{", end);
                         }
-                        start = msg.events.IndexOf("{", end);
-                    }
-                    break;
-                case "market_trades":
-                    targetStr = "\"trades\":[";
-                    start = msg.events.IndexOf(targetStr) + targetStr.Length;
-                    while (start > 0)
-                    {
-                        end = msg.events.IndexOf("}", start) + 1;
-                        coinbase_connection.parser.parseTrades(msg.events.Substring(start, end - start), ref jstr);
-                        if (this.feedStack.TryPop(out tr))
-                        {
-                            coinbase_connection.parser.jsTradesToTrades(jstr, ref tr);
-                            feedQueue.Enqueue(tr);
-                        }
-                        else
-                        {
-                            //Add more objects
-                        }
-                        start = msg.events.IndexOf("{", end);
-                    }
-                    break;
-                default:
-                    break;
-                    //Do nothing
+                        break;
+                    default:
+                        break;
+                        //Do nothing
+                }
             }
         }
         public override void threadStop() { }
 
-        public bool activate(ConcurrentQueue<string> reciever, ConcurrentQueue<cbMsg.trades> sender)
+        public bool activate(ConcurrentQueue<string> receiver, ConcurrentQueue<string> sender)
         {
-            if(Interlocked.Exchange(ref this.active, 1) == 1) 
+            if(Interlocked.Exchange(ref this.active, 1) == 0) 
             {
-                this.strQueue = reciever;
-                this.feedQueue = sender;
+                this.strQueue = receiver;
+                this.symbolQueue = sender;
                 this.mutex.ReleaseMutex();
                 return true;
             }
@@ -190,18 +209,81 @@ namespace coinbase_app
 
     public class updateQuotesThread : absThread
     {
-        public ConcurrentQueue<cbMsg.trades> feedQueue;
-        public ConcurrentQueue<string> symbolQueue;
+        public ConcurrentQueue<string> feedQueue;
+        public ConcurrentQueue<string> optimizingQueue;
 
+        public Dictionary<string, crypto> cryptos;
         public override void threadStart()
         {
-            base.threadStart();
+            while (true)
+            {
+                this.mutex.WaitOne();
+                if (this.active > 0)
+                {
+                    this.updatingQuotes();
+                    this.mutex.ReleaseMutex();
+                }
+                if (this.aborting > 0)
+                {
+                    break;
+                }
+                this.mutex.WaitOne(0);
+            }
+        }
+        public void updatingQuotes()
+        {
+            string symbol;
+            int trycount = 0;
+            crypto cp;
+            bool optimization;
+
+            while (true)
+            {
+                if (this.feedQueue.TryDequeue(out symbol))
+                {
+                    if(this.cryptos.ContainsKey(symbol))
+                    {
+                        cp = this.cryptos[symbol];
+                        if(Interlocked.Exchange(ref cp.updating,1) == 0)
+                        {
+                            optimization = cp.updateQuote_Main();
+                            if(cp.qtQueue.Count > 0)
+                            {
+                                this.feedQueue.Enqueue(symbol);
+                            }
+                            if(optimization)
+                            {
+                                this.optimizingQueue.Enqueue(symbol);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    ++trycount;
+                    if (trycount > 1000000)
+                    {
+                        trycount = 0;
+                        System.Threading.Thread.Sleep(0);
+                    }
+                }
+            }
         }
         public override void threadStop() { }
 
-        public bool activate(ConcurrentQueue<string> receiver)
+        public bool activate(ConcurrentQueue<string> receiver, ConcurrentQueue<string> sender)
         {
-
+            if (Interlocked.Exchange(ref this.active, 1) == 0)
+            {
+                this.feedQueue = receiver;
+                this.optimizingQueue = sender;
+                this.mutex.ReleaseMutex();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 
@@ -217,7 +299,7 @@ namespace coinbase_app
 
         public bool activate(ConcurrentQueue<string> receiver)
         {
-
+            return true;
         }
     }
 }

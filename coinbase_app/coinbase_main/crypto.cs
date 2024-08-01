@@ -1,4 +1,6 @@
-﻿using coinbase_connection;
+﻿using cbMsg;
+using coinbase_connection;
+using System.Collections.Concurrent;
 namespace coinbase_main
 {
     public class quote
@@ -24,9 +26,8 @@ namespace coinbase_main
     }
     public class crypto
     {
-        public void updateQuote(cbMsg.trades qt)
+        public void updateOneQuote(cbMsg.trades qt)
         {
-            //Add how to find tob
             int pr = (int)(qt.price * this.quote_increment);
             if (this.quotesInitialized)
             {
@@ -48,6 +49,18 @@ namespace coinbase_main
                     this.quotes[pr].update(qt, this.quote_increment);
                 }
             }
+        }
+
+        public bool updateQuote_Main()
+        {
+            trades td;
+            while(this.qtQueue.Count > 0)
+            {
+                td = this.qtQueue.Dequeue();
+                this.updateOneQuote(td);
+            }
+            this.updating = 0;
+            return true;
         }
 
         public void findToB(int updated_pr)
@@ -141,6 +154,9 @@ namespace coinbase_main
         public string status { get; set; }
         public string status_message { get; set; }
         public string min_market_funds { get; set; }
+
+        public Queue<cbMsg.trades> qtQueue;
+        public int updating;
 
         public bool quotesInitialized;
         public Dictionary<int, quote> quotes;

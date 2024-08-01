@@ -1,0 +1,17 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/coinbase_app/.vs
+/coinbase_app/coinbase_app/bin/Debug/net8.0-windows
+/coinbase_app/coinbase_app/obj
+/coinbase_app/coinbase_main/obj
+/coinbase_connection/.vs
+/coinbase_connection/coinbase_connection/bin
+/coinbase_connection/coinbase_connection/obj/Debug
+/coinbase_connection/coinbase_connection/obj/Release
+/coinbase_connection/coinbase_connection/obj
+/coinbase_feedreader/.vs
+/coinbase_feedreader/coinbase_feedreader/bin
+/coinbase_feedreader/coinbase_feedreader/obj/Debug/net8.0
+/coinbase_feedreader/coinbase_feedreader/obj/Release/net8.0
