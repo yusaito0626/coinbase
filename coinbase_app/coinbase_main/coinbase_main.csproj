@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\coinbase_connection\coinbase_connection\coinbase_connection.csproj" />
+  </ItemGroup>
+
 </Project>

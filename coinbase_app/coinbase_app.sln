@@ -3,14 +3,18 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "coinbase_app", "coinbase_app\coinbase_app.csproj", "{087CD90E-F109-4357-B405-BFCA7FEDD332}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "coinbase_app", "coinbase_app\coinbase_app.csproj", "{087CD90E-F109-4357-B405-BFCA7FEDD332}"
 	ProjectSection(ProjectDependencies) = postProject
-		{BA2B8692-1110-4B72-A346-E89D2FB71940} = {BA2B8692-1110-4B72-A346-E89D2FB71940}
+		{3D269D12-A772-451B-B0B5-501ADE20DD75} = {3D269D12-A772-451B-B0B5-501ADE20DD75}
+		{8245D1D0-CD1E-44D7-8E17-55983D8E4E64} = {8245D1D0-CD1E-44D7-8E17-55983D8E4E64}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "coinbase_connection", "..\coinbase\coinbase_connection\coinbase_connection\coinbase_connection.csproj", "{BA2B8692-1110-4B72-A346-E89D2FB71940}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "coinbase_main", "coinbase_main\coinbase_main.csproj", "{8245D1D0-CD1E-44D7-8E17-55983D8E4E64}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3D269D12-A772-451B-B0B5-501ADE20DD75} = {3D269D12-A772-451B-B0B5-501ADE20DD75}
+	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "coinbase_main", "coinbase_main\coinbase_main.csproj", "{8245D1D0-CD1E-44D7-8E17-55983D8E4E64}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "coinbase_connection", "..\coinbase_connection\coinbase_connection\coinbase_connection.csproj", "{3D269D12-A772-451B-B0B5-501ADE20DD75}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -22,14 +26,14 @@ Global
 		{087CD90E-F109-4357-B405-BFCA7FEDD332}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{087CD90E-F109-4357-B405-BFCA7FEDD332}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{087CD90E-F109-4357-B405-BFCA7FEDD332}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BA2B8692-1110-4B72-A346-E89D2FB71940}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BA2B8692-1110-4B72-A346-E89D2FB71940}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BA2B8692-1110-4B72-A346-E89D2FB71940}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BA2B8692-1110-4B72-A346-E89D2FB71940}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8245D1D0-CD1E-44D7-8E17-55983D8E4E64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8245D1D0-CD1E-44D7-8E17-55983D8E4E64}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8245D1D0-CD1E-44D7-8E17-55983D8E4E64}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8245D1D0-CD1E-44D7-8E17-55983D8E4E64}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D269D12-A772-451B-B0B5-501ADE20DD75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D269D12-A772-451B-B0B5-501ADE20DD75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D269D12-A772-451B-B0B5-501ADE20DD75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D269D12-A772-451B-B0B5-501ADE20DD75}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

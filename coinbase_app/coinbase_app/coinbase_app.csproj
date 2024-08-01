@@ -10,6 +10,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\coinbase\coinbase_connection\coinbase_connection\coinbase_connection.csproj" />
+    <ProjectReference Include="..\..\coinbase_connection\coinbase_connection\coinbase_connection.csproj" />
+    <ProjectReference Include="..\coinbase_main\coinbase_main.csproj" />
   </ItemGroup>
 
 </Project>
