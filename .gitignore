@@ -15,3 +15,9 @@
 /coinbase_feedreader/coinbase_feedreader/bin
 /coinbase_feedreader/coinbase_feedreader/obj/Debug/net8.0
 /coinbase_feedreader/coinbase_feedreader/obj/Release/net8.0
+/coinbase_app/coinbase_app/Properties/AssemblyInfo.cs
+/coinbase_feedreader/coinbase_feedreader/obj/coinbase_feedreader.csproj.nuget.dgspec.json
+/coinbase_feedreader/coinbase_feedreader/obj/coinbase_feedreader.csproj.nuget.g.props
+/coinbase_feedreader/coinbase_feedreader/obj/coinbase_feedreader.csproj.nuget.g.targets
+/coinbase_feedreader/coinbase_feedreader/obj/project.assets.json
+/coinbase_feedreader/coinbase_feedreader/obj/project.nuget.cache
