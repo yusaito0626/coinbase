@@ -1,5 +1,7 @@
 
 
+using System.Security.Policy;
+
 namespace coinbase_app
 {
     internal static class Program
@@ -15,5 +17,6 @@ namespace coinbase_app
             ApplicationConfiguration.Initialize();
             Application.Run(new Form1());
         }
+
     }
 }

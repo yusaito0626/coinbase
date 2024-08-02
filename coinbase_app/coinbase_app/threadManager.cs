@@ -17,7 +17,89 @@ namespace coinbase_app
 {
     public class threadManager
     {
+        public threadManager(int decoding,int quotes,int opt)
+        {
+            this.NofDecodingTh = decoding;
+            if(this.NofDecodingTh > 1)
+            {
+                this.NofDecodingTh = 1;
+            }
+            this.NofQuotesTh = quotes;
+            this.NofOptTh = opt;
 
+            this.decodingThreads = new List<decodingThread>();
+            this.updateQuotesThreads = new List<updateQuotesThread>();
+            this.optimizingThreads = new List<optimizingThread>();
+
+            this.quotesQueue = new ConcurrentQueue<string>();
+            this.optimizingQueues = new List<ConcurrentQueue<string>>();
+
+            int i;
+            for(i = 0;i < this.NofDecodingTh;++i)
+            {
+                this.decodingThreads.Add(new decodingThread());
+            }
+            for (i = 0; i < this.NofQuotesTh; ++i)
+            {
+                this.updateQuotesThreads.Add(new updateQuotesThread());
+                
+            }
+            for (i = 0; i < this.NofOptTh; ++i)
+            {
+                this.optimizingThreads.Add(new optimizingThread());
+                this.optimizingQueues.Add(new ConcurrentQueue<string>());
+            }
+        }
+        public void setCryptoList(Dictionary<string, crypto> dic)
+        {
+            this.cryptos = dic;
+            foreach(var th in this.decodingThreads)
+            {
+                th.cryptos = this.cryptos;
+            }
+            foreach (var th in this.updateQuotesThreads)
+            {
+                th.cryptos = this.cryptos;
+            }
+            foreach (var th in this.optimizingThreads)
+            {
+                th.cryptos = this.cryptos;
+            }
+        }
+        public void startThreads()
+        {
+            foreach (var th in this.decodingThreads)
+            {
+                th.threadStart();
+            }
+            foreach (var th in this.updateQuotesThreads)
+            {
+                th.threadStart();
+            }
+            foreach (var th in this.optimizingThreads)
+            {
+                th.threadStart();
+            }
+        }
+
+        public void setQueues(ConcurrentQueue<string> fqueue)
+        {
+            this.feedQueue = fqueue;
+        }
+
+        int NofDecodingTh;
+        int NofQuotesTh;
+        int NofOptTh;
+
+        List<decodingThread> decodingThreads;
+        List<updateQuotesThread> updateQuotesThreads;
+        List<optimizingThread> optimizingThreads;
+
+        ConcurrentQueue<string> feedQueue;
+        ConcurrentQueue<string> quotesQueue;
+        List<ConcurrentQueue<string>> optimizingQueues;
+
+        public Dictionary<string, crypto> cryptos;
     }
     public abstract class absThread
     {
@@ -289,7 +371,8 @@ namespace coinbase_app
 
     public class optimizingThread : absThread
     {
-        public ConcurrentQueue<string> symbolQueue;
+        public List<ConcurrentQueue<string>> symbolQueues;
+        public Dictionary<string, crypto> cryptos;
 
         public override void threadStart()
         {
