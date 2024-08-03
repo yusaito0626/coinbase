@@ -144,6 +144,19 @@ namespace coinbase_main
             }
         }
 
+        public void setStatus(cbMsg.product_status status)
+        {
+            this.product_type = status.product_type;
+            this.id = status.id;
+            this.base_currency = status.base_currency;
+            this.quote_currency = status.quote_currency;
+            this.base_increment = double.Parse(status.base_increment);
+            this.quote_increment = double.Parse(status.quote_increment);
+            this.display_name = status.display_name;
+            this.status = status.status;
+            this.status_message = status.status_message;
+            this.min_market_funds = status.min_market_funds;
+        }
         public string product_type { get; set; }
         public string id { get; set; }
         public string base_currency { get; set; }

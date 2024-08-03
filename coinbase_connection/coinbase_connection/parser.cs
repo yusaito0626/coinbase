@@ -117,6 +117,10 @@ namespace coinbase_connection
         {
             obj = JsonSerializer.Deserialize<cbMsg.jsTrades>(str);
         }
+        static public void parseStatus(string str,ref cbMsg.product_status obj)
+        {
+            obj = JsonSerializer.Deserialize<cbMsg.product_status>(str);
+        }
 
         static public void jsUpdateToTrades(string symbol,cbMsg.jsUpdate jsup, ref cbMsg.trades obj)
         {

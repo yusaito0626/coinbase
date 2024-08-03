@@ -72,6 +72,27 @@
             label_sumBuyOrd = new Label();
             label_sumBuyExeAmt = new Label();
             tabProduct = new TabPage();
+            groupBox5 = new GroupBox();
+            label_minMktFund = new Label();
+            label_statusMsg = new Label();
+            label_status = new Label();
+            label_displayName = new Label();
+            label_quoteInc = new Label();
+            label_baseInc = new Label();
+            label_quoteCurr = new Label();
+            label_baseCurr = new Label();
+            label_id = new Label();
+            label_productType = new Label();
+            label26 = new Label();
+            label25 = new Label();
+            label24 = new Label();
+            label23 = new Label();
+            label22 = new Label();
+            label21 = new Label();
+            label20 = new Label();
+            label19 = new Label();
+            label18 = new Label();
+            label17 = new Label();
             comboBox_symbols = new ComboBox();
             tabConfig = new TabPage();
             groupBox4 = new GroupBox();
@@ -89,6 +110,7 @@
             groupBox1.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
             tabProduct.SuspendLayout();
+            groupBox5.SuspendLayout();
             tabConfig.SuspendLayout();
             groupBox4.SuspendLayout();
             SuspendLayout();
@@ -639,6 +661,7 @@
             // 
             // tabProduct
             // 
+            tabProduct.Controls.Add(groupBox5);
             tabProduct.Controls.Add(comboBox_symbols);
             tabProduct.Location = new Point(4, 24);
             tabProduct.Name = "tabProduct";
@@ -648,6 +671,215 @@
             tabProduct.Text = "Product";
             tabProduct.UseVisualStyleBackColor = true;
             // 
+            // groupBox5
+            // 
+            groupBox5.Controls.Add(label_minMktFund);
+            groupBox5.Controls.Add(label_statusMsg);
+            groupBox5.Controls.Add(label_status);
+            groupBox5.Controls.Add(label_displayName);
+            groupBox5.Controls.Add(label_quoteInc);
+            groupBox5.Controls.Add(label_baseInc);
+            groupBox5.Controls.Add(label_quoteCurr);
+            groupBox5.Controls.Add(label_baseCurr);
+            groupBox5.Controls.Add(label_id);
+            groupBox5.Controls.Add(label_productType);
+            groupBox5.Controls.Add(label26);
+            groupBox5.Controls.Add(label25);
+            groupBox5.Controls.Add(label24);
+            groupBox5.Controls.Add(label23);
+            groupBox5.Controls.Add(label22);
+            groupBox5.Controls.Add(label21);
+            groupBox5.Controls.Add(label20);
+            groupBox5.Controls.Add(label19);
+            groupBox5.Controls.Add(label18);
+            groupBox5.Controls.Add(label17);
+            groupBox5.Location = new Point(14, 46);
+            groupBox5.Name = "groupBox5";
+            groupBox5.Size = new Size(228, 309);
+            groupBox5.TabIndex = 3;
+            groupBox5.TabStop = false;
+            groupBox5.Text = "Status";
+            // 
+            // label_minMktFund
+            // 
+            label_minMktFund.AutoSize = true;
+            label_minMktFund.Location = new Point(120, 259);
+            label_minMktFund.Name = "label_minMktFund";
+            label_minMktFund.Size = new Size(30, 15);
+            label_minMktFund.TabIndex = 19;
+            label_minMktFund.Text = "type";
+            // 
+            // label_statusMsg
+            // 
+            label_statusMsg.AutoSize = true;
+            label_statusMsg.Location = new Point(120, 229);
+            label_statusMsg.Name = "label_statusMsg";
+            label_statusMsg.Size = new Size(30, 15);
+            label_statusMsg.TabIndex = 18;
+            label_statusMsg.Text = "type";
+            // 
+            // label_status
+            // 
+            label_status.AutoSize = true;
+            label_status.Location = new Point(120, 202);
+            label_status.Name = "label_status";
+            label_status.Size = new Size(30, 15);
+            label_status.TabIndex = 17;
+            label_status.Text = "type";
+            // 
+            // label_displayName
+            // 
+            label_displayName.AutoSize = true;
+            label_displayName.Location = new Point(120, 176);
+            label_displayName.Name = "label_displayName";
+            label_displayName.Size = new Size(30, 15);
+            label_displayName.TabIndex = 16;
+            label_displayName.Text = "type";
+            // 
+            // label_quoteInc
+            // 
+            label_quoteInc.AutoSize = true;
+            label_quoteInc.Location = new Point(120, 149);
+            label_quoteInc.Name = "label_quoteInc";
+            label_quoteInc.Size = new Size(30, 15);
+            label_quoteInc.TabIndex = 15;
+            label_quoteInc.Text = "type";
+            // 
+            // label_baseInc
+            // 
+            label_baseInc.AutoSize = true;
+            label_baseInc.Location = new Point(120, 122);
+            label_baseInc.Name = "label_baseInc";
+            label_baseInc.Size = new Size(30, 15);
+            label_baseInc.TabIndex = 14;
+            label_baseInc.Text = "type";
+            // 
+            // label_quoteCurr
+            // 
+            label_quoteCurr.AutoSize = true;
+            label_quoteCurr.Location = new Point(120, 97);
+            label_quoteCurr.Name = "label_quoteCurr";
+            label_quoteCurr.Size = new Size(30, 15);
+            label_quoteCurr.TabIndex = 13;
+            label_quoteCurr.Text = "type";
+            // 
+            // label_baseCurr
+            // 
+            label_baseCurr.AutoSize = true;
+            label_baseCurr.Location = new Point(120, 73);
+            label_baseCurr.Name = "label_baseCurr";
+            label_baseCurr.Size = new Size(30, 15);
+            label_baseCurr.TabIndex = 12;
+            label_baseCurr.Text = "type";
+            // 
+            // label_id
+            // 
+            label_id.AutoSize = true;
+            label_id.Location = new Point(120, 48);
+            label_id.Name = "label_id";
+            label_id.Size = new Size(30, 15);
+            label_id.TabIndex = 11;
+            label_id.Text = "type";
+            // 
+            // label_productType
+            // 
+            label_productType.AutoSize = true;
+            label_productType.Location = new Point(120, 19);
+            label_productType.Name = "label_productType";
+            label_productType.Size = new Size(30, 15);
+            label_productType.TabIndex = 10;
+            label_productType.Text = "type";
+            // 
+            // label26
+            // 
+            label26.AutoSize = true;
+            label26.Location = new Point(12, 259);
+            label26.Name = "label26";
+            label26.Size = new Size(102, 15);
+            label26.TabIndex = 9;
+            label26.Text = "min market fund :";
+            // 
+            // label25
+            // 
+            label25.AutoSize = true;
+            label25.Location = new Point(21, 229);
+            label25.Name = "label25";
+            label25.Size = new Size(93, 15);
+            label25.TabIndex = 8;
+            label25.Text = "status message :";
+            // 
+            // label24
+            // 
+            label24.AutoSize = true;
+            label24.Location = new Point(70, 202);
+            label24.Name = "label24";
+            label24.Size = new Size(44, 15);
+            label24.TabIndex = 7;
+            label24.Text = "status :";
+            // 
+            // label23
+            // 
+            label23.AutoSize = true;
+            label23.Location = new Point(31, 176);
+            label23.Name = "label23";
+            label23.Size = new Size(83, 15);
+            label23.TabIndex = 6;
+            label23.Text = "display name :";
+            // 
+            // label22
+            // 
+            label22.AutoSize = true;
+            label22.Location = new Point(13, 149);
+            label22.Name = "label22";
+            label22.Size = new Size(101, 15);
+            label22.TabIndex = 5;
+            label22.Text = "quote increment :";
+            // 
+            // label21
+            // 
+            label21.AutoSize = true;
+            label21.Location = new Point(20, 122);
+            label21.Name = "label21";
+            label21.Size = new Size(94, 15);
+            label21.TabIndex = 4;
+            label21.Text = "base increment :";
+            // 
+            // label20
+            // 
+            label20.AutoSize = true;
+            label20.Location = new Point(21, 97);
+            label20.Name = "label20";
+            label20.Size = new Size(93, 15);
+            label20.TabIndex = 3;
+            label20.Text = "quote currency :";
+            // 
+            // label19
+            // 
+            label19.AutoSize = true;
+            label19.Location = new Point(28, 73);
+            label19.Name = "label19";
+            label19.Size = new Size(86, 15);
+            label19.TabIndex = 2;
+            label19.Text = "base currency :";
+            // 
+            // label18
+            // 
+            label18.AutoSize = true;
+            label18.Location = new Point(91, 48);
+            label18.Name = "label18";
+            label18.Size = new Size(23, 15);
+            label18.TabIndex = 1;
+            label18.Text = "id :";
+            // 
+            // label17
+            // 
+            label17.AutoSize = true;
+            label17.Location = new Point(33, 19);
+            label17.Name = "label17";
+            label17.Size = new Size(81, 15);
+            label17.TabIndex = 0;
+            label17.Text = "product type :";
+            // 
             // comboBox_symbols
             // 
             comboBox_symbols.FormattingEnabled = true;
@@ -655,6 +887,7 @@
             comboBox_symbols.Name = "comboBox_symbols";
             comboBox_symbols.Size = new Size(171, 23);
             comboBox_symbols.TabIndex = 2;
+            comboBox_symbols.SelectedIndexChanged += comboBox_symbols_SelectedIndexChanged;
             // 
             // tabConfig
             // 
@@ -741,6 +974,8 @@
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();
             tabProduct.ResumeLayout(false);
+            groupBox5.ResumeLayout(false);
+            groupBox5.PerformLayout();
             tabConfig.ResumeLayout(false);
             groupBox4.ResumeLayout(false);
             groupBox4.PerformLayout();
@@ -800,5 +1035,26 @@
         private Label label_apiInfo;
         private Label label_url;
         private Label label16;
+        private GroupBox groupBox5;
+        private Label label19;
+        private Label label18;
+        private Label label17;
+        private Label label20;
+        private Label label22;
+        private Label label21;
+        private Label label23;
+        private Label label24;
+        private Label label25;
+        private Label label26;
+        private Label label_minMktFund;
+        private Label label_statusMsg;
+        private Label label_status;
+        private Label label_displayName;
+        private Label label_quoteInc;
+        private Label label_baseInc;
+        private Label label_quoteCurr;
+        private Label label_baseCurr;
+        private Label label_id;
+        private Label label_productType;
     }
 }

@@ -13,7 +13,7 @@ string today = DateTime.Now.ToString("yyyyMMdd");
 
 string[] symbols = ["ETH-USD"];
 
-byte[] buffer = new byte[8192];
+byte[] buffer = new byte[1073741824];
 
 using (StreamReader sr = new StreamReader(configfile))
 {
@@ -96,7 +96,7 @@ using (StreamWriter sw = new StreamWriter(outputfile))
                 {
                     break;
                 }
-                if (count > buffer.Length)
+                if (count >= buffer.Length)
                 {
                     Console.WriteLine("Too Large Message   " + count.ToString());
                     return;
