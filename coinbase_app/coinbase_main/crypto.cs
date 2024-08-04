@@ -56,6 +56,20 @@ namespace coinbase_main
         {
             this.executedBaseAmount += trade.size;
             this.executedQuoteAmount += trade.size * trade.price;
+
+            this.last = (int)(trade.price / this.quote_increment);
+            if(this.open == 0)
+            {
+                this.open = this.last;
+            }
+            if (this.last > this.high)
+            {
+                this.high = this.last;
+            }
+            if(this.last < this.low || this.low == 0)
+            {
+                this.low = this.last;
+            }
         }
 
         public void findToB(int updated_pr)
@@ -176,6 +190,11 @@ namespace coinbase_main
         public int minPr;
         public int maxPr;
 
+        public int last;
+        public int open;
+        public int high;
+        public int low;
+
         public double executedBaseAmount;
         public double executedQuoteAmount;
 
@@ -189,6 +208,11 @@ namespace coinbase_main
             this.bestask = -1;
             this.minPr = -1;
             this.maxPr = -1;
+
+            this.last = 0;
+            this.open = 0;
+            this.high = 0;
+            this.low = 0;
         }
     }
 }

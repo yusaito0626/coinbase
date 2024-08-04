@@ -72,6 +72,31 @@
             label_sumBuyOrd = new Label();
             label_sumBuyExeAmt = new Label();
             tabProduct = new TabPage();
+            groupBox8 = new GroupBox();
+            tableLayoutPanel6 = new TableLayoutPanel();
+            label_CurrPos = new Label();
+            label35 = new Label();
+            tableLayoutPanel5 = new TableLayoutPanel();
+            label_P_buyAvgPr = new Label();
+            label32 = new Label();
+            label31 = new Label();
+            label33 = new Label();
+            label34 = new Label();
+            label_P_sellAvgPr = new Label();
+            label_P_sellVol = new Label();
+            label_P_buyVol = new Label();
+            label_symbol = new Label();
+            groupBox7 = new GroupBox();
+            tableLayoutPanel7 = new TableLayoutPanel();
+            label_open = new Label();
+            label_high = new Label();
+            label_low = new Label();
+            label29 = new Label();
+            label30 = new Label();
+            label28 = new Label();
+            label_volume = new Label();
+            label27 = new Label();
+            label_lastPr = new Label();
             groupBox6 = new GroupBox();
             tableLayoutPanel4 = new TableLayoutPanel();
             label_qtAsk6 = new Label();
@@ -127,6 +152,14 @@
             label16 = new Label();
             label15 = new Label();
             display_update = new System.Windows.Forms.Timer(components);
+            groupBox9 = new GroupBox();
+            tableLayoutPanel8 = new TableLayoutPanel();
+            label36 = new Label();
+            label_tradePnl = new Label();
+            label38 = new Label();
+            label_totalPnl = new Label();
+            label40 = new Label();
+            label_posPnl = new Label();
             tabControl.SuspendLayout();
             tabMain.SuspendLayout();
             groupBox3.SuspendLayout();
@@ -136,11 +169,18 @@
             groupBox1.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
             tabProduct.SuspendLayout();
+            groupBox8.SuspendLayout();
+            tableLayoutPanel6.SuspendLayout();
+            tableLayoutPanel5.SuspendLayout();
+            groupBox7.SuspendLayout();
+            tableLayoutPanel7.SuspendLayout();
             groupBox6.SuspendLayout();
             tableLayoutPanel4.SuspendLayout();
             groupBox5.SuspendLayout();
             tabConfig.SuspendLayout();
             groupBox4.SuspendLayout();
+            groupBox9.SuspendLayout();
+            tableLayoutPanel8.SuspendLayout();
             SuspendLayout();
             // 
             // tabControl
@@ -689,6 +729,10 @@
             // 
             // tabProduct
             // 
+            tabProduct.Controls.Add(groupBox9);
+            tabProduct.Controls.Add(groupBox8);
+            tabProduct.Controls.Add(label_symbol);
+            tabProduct.Controls.Add(groupBox7);
             tabProduct.Controls.Add(groupBox6);
             tabProduct.Controls.Add(groupBox5);
             tabProduct.Controls.Add(comboBox_symbols);
@@ -699,6 +743,309 @@
             tabProduct.TabIndex = 3;
             tabProduct.Text = "Product";
             tabProduct.UseVisualStyleBackColor = true;
+            // 
+            // groupBox8
+            // 
+            groupBox8.Controls.Add(tableLayoutPanel6);
+            groupBox8.Controls.Add(tableLayoutPanel5);
+            groupBox8.Location = new Point(15, 222);
+            groupBox8.Name = "groupBox8";
+            groupBox8.Size = new Size(475, 148);
+            groupBox8.TabIndex = 7;
+            groupBox8.TabStop = false;
+            groupBox8.Text = "Trade Summary";
+            // 
+            // tableLayoutPanel6
+            // 
+            tableLayoutPanel6.CellBorderStyle = TableLayoutPanelCellBorderStyle.OutsetDouble;
+            tableLayoutPanel6.ColumnCount = 1;
+            tableLayoutPanel6.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableLayoutPanel6.Controls.Add(label_CurrPos, 0, 1);
+            tableLayoutPanel6.Controls.Add(label35, 0, 0);
+            tableLayoutPanel6.Location = new Point(339, 76);
+            tableLayoutPanel6.Name = "tableLayoutPanel6";
+            tableLayoutPanel6.RowCount = 2;
+            tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayoutPanel6.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayoutPanel6.Size = new Size(122, 66);
+            tableLayoutPanel6.TabIndex = 1;
+            // 
+            // label_CurrPos
+            // 
+            label_CurrPos.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_CurrPos.AutoSize = true;
+            label_CurrPos.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_CurrPos.Location = new Point(6, 34);
+            label_CurrPos.Name = "label_CurrPos";
+            label_CurrPos.Size = new Size(110, 29);
+            label_CurrPos.TabIndex = 11;
+            label_CurrPos.Text = "0";
+            label_CurrPos.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label35
+            // 
+            label35.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label35.AutoSize = true;
+            label35.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label35.Location = new Point(6, 3);
+            label35.Name = "label35";
+            label35.Size = new Size(110, 28);
+            label35.TabIndex = 6;
+            label35.Text = "Current Position";
+            label35.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // tableLayoutPanel5
+            // 
+            tableLayoutPanel5.CellBorderStyle = TableLayoutPanelCellBorderStyle.OutsetDouble;
+            tableLayoutPanel5.ColumnCount = 3;
+            tableLayoutPanel5.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.34F));
+            tableLayoutPanel5.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33F));
+            tableLayoutPanel5.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33F));
+            tableLayoutPanel5.Controls.Add(label_P_buyAvgPr, 0, 2);
+            tableLayoutPanel5.Controls.Add(label32, 0, 2);
+            tableLayoutPanel5.Controls.Add(label31, 0, 1);
+            tableLayoutPanel5.Controls.Add(label33, 2, 0);
+            tableLayoutPanel5.Controls.Add(label34, 1, 0);
+            tableLayoutPanel5.Controls.Add(label_P_sellAvgPr, 1, 1);
+            tableLayoutPanel5.Controls.Add(label_P_sellVol, 2, 1);
+            tableLayoutPanel5.Controls.Add(label_P_buyVol, 1, 2);
+            tableLayoutPanel5.Location = new Point(3, 43);
+            tableLayoutPanel5.Name = "tableLayoutPanel5";
+            tableLayoutPanel5.RowCount = 3;
+            tableLayoutPanel5.RowStyles.Add(new RowStyle(SizeType.Percent, 33.34F));
+            tableLayoutPanel5.RowStyles.Add(new RowStyle(SizeType.Percent, 33.33F));
+            tableLayoutPanel5.RowStyles.Add(new RowStyle(SizeType.Percent, 33.33F));
+            tableLayoutPanel5.Size = new Size(322, 101);
+            tableLayoutPanel5.TabIndex = 0;
+            // 
+            // label_P_buyAvgPr
+            // 
+            label_P_buyAvgPr.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_P_buyAvgPr.AutoSize = true;
+            label_P_buyAvgPr.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_P_buyAvgPr.Location = new Point(112, 67);
+            label_P_buyAvgPr.Name = "label_P_buyAvgPr";
+            label_P_buyAvgPr.Size = new Size(97, 31);
+            label_P_buyAvgPr.TabIndex = 12;
+            label_P_buyAvgPr.Text = "0";
+            label_P_buyAvgPr.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label32
+            // 
+            label32.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label32.AutoSize = true;
+            label32.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label32.Location = new Point(6, 67);
+            label32.Name = "label32";
+            label32.Size = new Size(97, 31);
+            label32.TabIndex = 3;
+            label32.Text = "BUY";
+            label32.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // label31
+            // 
+            label31.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label31.AutoSize = true;
+            label31.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label31.Location = new Point(6, 35);
+            label31.Name = "label31";
+            label31.Size = new Size(97, 29);
+            label31.TabIndex = 2;
+            label31.Text = "SELL";
+            label31.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // label33
+            // 
+            label33.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label33.AutoSize = true;
+            label33.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label33.Location = new Point(218, 3);
+            label33.Name = "label33";
+            label33.Size = new Size(98, 29);
+            label33.TabIndex = 4;
+            label33.Text = "Volume";
+            label33.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // label34
+            // 
+            label34.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label34.AutoSize = true;
+            label34.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label34.Location = new Point(112, 3);
+            label34.Name = "label34";
+            label34.Size = new Size(97, 29);
+            label34.TabIndex = 5;
+            label34.Text = "Avg Price";
+            label34.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // label_P_sellAvgPr
+            // 
+            label_P_sellAvgPr.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_P_sellAvgPr.AutoSize = true;
+            label_P_sellAvgPr.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_P_sellAvgPr.Location = new Point(112, 35);
+            label_P_sellAvgPr.Name = "label_P_sellAvgPr";
+            label_P_sellAvgPr.Size = new Size(97, 29);
+            label_P_sellAvgPr.TabIndex = 9;
+            label_P_sellAvgPr.Text = "0";
+            label_P_sellAvgPr.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label_P_sellVol
+            // 
+            label_P_sellVol.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_P_sellVol.AutoSize = true;
+            label_P_sellVol.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_P_sellVol.Location = new Point(218, 35);
+            label_P_sellVol.Name = "label_P_sellVol";
+            label_P_sellVol.Size = new Size(98, 29);
+            label_P_sellVol.TabIndex = 10;
+            label_P_sellVol.Text = "0";
+            label_P_sellVol.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label_P_buyVol
+            // 
+            label_P_buyVol.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_P_buyVol.AutoSize = true;
+            label_P_buyVol.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_P_buyVol.Location = new Point(218, 67);
+            label_P_buyVol.Name = "label_P_buyVol";
+            label_P_buyVol.Size = new Size(98, 31);
+            label_P_buyVol.TabIndex = 11;
+            label_P_buyVol.Text = "0";
+            label_P_buyVol.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label_symbol
+            // 
+            label_symbol.AutoSize = true;
+            label_symbol.Font = new Font("Segoe UI", 14.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label_symbol.Location = new Point(11, 56);
+            label_symbol.Name = "label_symbol";
+            label_symbol.Size = new Size(79, 25);
+            label_symbol.TabIndex = 6;
+            label_symbol.Text = "Symbol";
+            // 
+            // groupBox7
+            // 
+            groupBox7.Controls.Add(tableLayoutPanel7);
+            groupBox7.Controls.Add(label_volume);
+            groupBox7.Controls.Add(label27);
+            groupBox7.Controls.Add(label_lastPr);
+            groupBox7.Location = new Point(164, 41);
+            groupBox7.Name = "groupBox7";
+            groupBox7.Size = new Size(326, 92);
+            groupBox7.TabIndex = 5;
+            groupBox7.TabStop = false;
+            // 
+            // tableLayoutPanel7
+            // 
+            tableLayoutPanel7.ColumnCount = 2;
+            tableLayoutPanel7.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40F));
+            tableLayoutPanel7.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 60F));
+            tableLayoutPanel7.Controls.Add(label_open, 1, 0);
+            tableLayoutPanel7.Controls.Add(label_high, 1, 1);
+            tableLayoutPanel7.Controls.Add(label_low, 1, 2);
+            tableLayoutPanel7.Controls.Add(label29, 0, 1);
+            tableLayoutPanel7.Controls.Add(label30, 0, 2);
+            tableLayoutPanel7.Controls.Add(label28, 0, 0);
+            tableLayoutPanel7.Location = new Point(180, 10);
+            tableLayoutPanel7.Name = "tableLayoutPanel7";
+            tableLayoutPanel7.RowCount = 3;
+            tableLayoutPanel7.RowStyles.Add(new RowStyle(SizeType.Percent, 33.3333321F));
+            tableLayoutPanel7.RowStyles.Add(new RowStyle(SizeType.Percent, 33.3333321F));
+            tableLayoutPanel7.RowStyles.Add(new RowStyle(SizeType.Percent, 33.3333321F));
+            tableLayoutPanel7.Size = new Size(136, 82);
+            tableLayoutPanel7.TabIndex = 8;
+            // 
+            // label_open
+            // 
+            label_open.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
+            label_open.Location = new Point(58, 0);
+            label_open.Name = "label_open";
+            label_open.Size = new Size(75, 27);
+            label_open.TabIndex = 6;
+            label_open.Text = "0";
+            label_open.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label_high
+            // 
+            label_high.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
+            label_high.Location = new Point(58, 27);
+            label_high.Name = "label_high";
+            label_high.Size = new Size(75, 27);
+            label_high.TabIndex = 7;
+            label_high.Text = "0";
+            label_high.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label_low
+            // 
+            label_low.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
+            label_low.Location = new Point(58, 54);
+            label_low.Name = "label_low";
+            label_low.Size = new Size(75, 28);
+            label_low.TabIndex = 8;
+            label_low.Text = "0";
+            label_low.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label29
+            // 
+            label29.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
+            label29.AutoSize = true;
+            label29.Location = new Point(11, 27);
+            label29.Name = "label29";
+            label29.Size = new Size(40, 27);
+            label29.TabIndex = 4;
+            label29.Text = "high : ";
+            label29.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // label30
+            // 
+            label30.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
+            label30.AutoSize = true;
+            label30.Location = new Point(16, 54);
+            label30.Name = "label30";
+            label30.Size = new Size(35, 28);
+            label30.TabIndex = 5;
+            label30.Text = "low : ";
+            label30.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // label28
+            // 
+            label28.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
+            label28.AutoSize = true;
+            label28.Location = new Point(8, 0);
+            label28.Name = "label28";
+            label28.Size = new Size(43, 27);
+            label28.TabIndex = 3;
+            label28.Text = "open : ";
+            label28.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // label_volume
+            // 
+            label_volume.Location = new Point(61, 61);
+            label_volume.Name = "label_volume";
+            label_volume.Size = new Size(94, 21);
+            label_volume.TabIndex = 2;
+            label_volume.Text = "0";
+            label_volume.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label27
+            // 
+            label27.AutoSize = true;
+            label27.Location = new Point(8, 64);
+            label27.Name = "label27";
+            label27.Size = new Size(56, 15);
+            label27.TabIndex = 1;
+            label27.Text = "Volume : ";
+            // 
+            // label_lastPr
+            // 
+            label_lastPr.AutoSize = true;
+            label_lastPr.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label_lastPr.Location = new Point(19, 21);
+            label_lastPr.Name = "label_lastPr";
+            label_lastPr.Size = new Size(48, 21);
+            label_lastPr.TabIndex = 0;
+            label_lastPr.Text = "price";
             // 
             // groupBox6
             // 
@@ -711,7 +1058,8 @@
             // 
             // tableLayoutPanel4
             // 
-            tableLayoutPanel4.CellBorderStyle = TableLayoutPanelCellBorderStyle.Inset;
+            tableLayoutPanel4.BackColor = Color.White;
+            tableLayoutPanel4.CellBorderStyle = TableLayoutPanelCellBorderStyle.InsetDouble;
             tableLayoutPanel4.ColumnCount = 3;
             tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33F));
             tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 34F));
@@ -755,17 +1103,18 @@
             tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 8.333332F));
             tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 8.333332F));
             tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 8.333332F));
-            tableLayoutPanel4.Size = new Size(279, 349);
+            tableLayoutPanel4.Size = new Size(279, 343);
             tableLayoutPanel4.TabIndex = 0;
             // 
             // label_qtAsk6
             // 
             label_qtAsk6.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             label_qtAsk6.AutoSize = true;
-            label_qtAsk6.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label_qtAsk6.Location = new Point(5, 2);
+            label_qtAsk6.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label_qtAsk6.ForeColor = Color.Red;
+            label_qtAsk6.Location = new Point(6, 3);
             label_qtAsk6.Name = "label_qtAsk6";
-            label_qtAsk6.Size = new Size(83, 26);
+            label_qtAsk6.Size = new Size(82, 25);
             label_qtAsk6.TabIndex = 27;
             label_qtAsk6.Text = "0";
             label_qtAsk6.TextAlign = ContentAlignment.MiddleRight;
@@ -774,10 +1123,11 @@
             // 
             label_prAsk1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             label_prAsk1.AutoSize = true;
-            label_prAsk1.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label_prAsk1.Location = new Point(96, 142);
+            label_prAsk1.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label_prAsk1.ForeColor = Color.Red;
+            label_prAsk1.Location = new Point(97, 143);
             label_prAsk1.Name = "label_prAsk1";
-            label_prAsk1.Size = new Size(86, 26);
+            label_prAsk1.Size = new Size(84, 25);
             label_prAsk1.TabIndex = 9;
             label_prAsk1.Text = "0";
             label_prAsk1.TextAlign = ContentAlignment.MiddleRight;
@@ -786,10 +1136,11 @@
             // 
             label_prAsk2.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             label_prAsk2.AutoSize = true;
-            label_prAsk2.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label_prAsk2.Location = new Point(96, 114);
+            label_prAsk2.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label_prAsk2.ForeColor = Color.Red;
+            label_prAsk2.Location = new Point(97, 115);
             label_prAsk2.Name = "label_prAsk2";
-            label_prAsk2.Size = new Size(86, 26);
+            label_prAsk2.Size = new Size(84, 25);
             label_prAsk2.TabIndex = 10;
             label_prAsk2.Text = "0";
             label_prAsk2.TextAlign = ContentAlignment.MiddleRight;
@@ -798,10 +1149,11 @@
             // 
             label_prAsk3.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             label_prAsk3.AutoSize = true;
-            label_prAsk3.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label_prAsk3.Location = new Point(96, 86);
+            label_prAsk3.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label_prAsk3.ForeColor = Color.Red;
+            label_prAsk3.Location = new Point(97, 87);
             label_prAsk3.Name = "label_prAsk3";
-            label_prAsk3.Size = new Size(86, 26);
+            label_prAsk3.Size = new Size(84, 25);
             label_prAsk3.TabIndex = 11;
             label_prAsk3.Text = "0";
             label_prAsk3.TextAlign = ContentAlignment.MiddleRight;
@@ -810,10 +1162,11 @@
             // 
             label_prAsk4.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             label_prAsk4.AutoSize = true;
-            label_prAsk4.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label_prAsk4.Location = new Point(96, 58);
+            label_prAsk4.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label_prAsk4.ForeColor = Color.Red;
+            label_prAsk4.Location = new Point(97, 59);
             label_prAsk4.Name = "label_prAsk4";
-            label_prAsk4.Size = new Size(86, 26);
+            label_prAsk4.Size = new Size(84, 25);
             label_prAsk4.TabIndex = 12;
             label_prAsk4.Text = "0";
             label_prAsk4.TextAlign = ContentAlignment.MiddleRight;
@@ -822,10 +1175,11 @@
             // 
             label_prAsk5.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             label_prAsk5.AutoSize = true;
-            label_prAsk5.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label_prAsk5.Location = new Point(96, 30);
+            label_prAsk5.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label_prAsk5.ForeColor = Color.Red;
+            label_prAsk5.Location = new Point(97, 31);
             label_prAsk5.Name = "label_prAsk5";
-            label_prAsk5.Size = new Size(86, 26);
+            label_prAsk5.Size = new Size(84, 25);
             label_prAsk5.TabIndex = 13;
             label_prAsk5.Text = "0";
             label_prAsk5.TextAlign = ContentAlignment.MiddleRight;
@@ -834,10 +1188,11 @@
             // 
             label_prAsk6.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             label_prAsk6.AutoSize = true;
-            label_prAsk6.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label_prAsk6.Location = new Point(96, 2);
+            label_prAsk6.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label_prAsk6.ForeColor = Color.Red;
+            label_prAsk6.Location = new Point(97, 3);
             label_prAsk6.Name = "label_prAsk6";
-            label_prAsk6.Size = new Size(86, 26);
+            label_prAsk6.Size = new Size(84, 25);
             label_prAsk6.TabIndex = 14;
             label_prAsk6.Text = "0";
             label_prAsk6.TextAlign = ContentAlignment.MiddleRight;
@@ -846,10 +1201,11 @@
             // 
             label_prBid1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             label_prBid1.AutoSize = true;
-            label_prBid1.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label_prBid1.Location = new Point(96, 170);
+            label_prBid1.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label_prBid1.ForeColor = Color.LimeGreen;
+            label_prBid1.Location = new Point(97, 171);
             label_prBid1.Name = "label_prBid1";
-            label_prBid1.Size = new Size(86, 26);
+            label_prBid1.Size = new Size(84, 25);
             label_prBid1.TabIndex = 15;
             label_prBid1.Text = "0";
             label_prBid1.TextAlign = ContentAlignment.MiddleRight;
@@ -858,10 +1214,11 @@
             // 
             label_prBid2.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             label_prBid2.AutoSize = true;
-            label_prBid2.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label_prBid2.Location = new Point(96, 198);
+            label_prBid2.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label_prBid2.ForeColor = Color.LimeGreen;
+            label_prBid2.Location = new Point(97, 199);
             label_prBid2.Name = "label_prBid2";
-            label_prBid2.Size = new Size(86, 26);
+            label_prBid2.Size = new Size(84, 25);
             label_prBid2.TabIndex = 16;
             label_prBid2.Text = "0";
             label_prBid2.TextAlign = ContentAlignment.MiddleRight;
@@ -870,10 +1227,11 @@
             // 
             label_prBid3.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             label_prBid3.AutoSize = true;
-            label_prBid3.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label_prBid3.Location = new Point(96, 226);
+            label_prBid3.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label_prBid3.ForeColor = Color.LimeGreen;
+            label_prBid3.Location = new Point(97, 227);
             label_prBid3.Name = "label_prBid3";
-            label_prBid3.Size = new Size(86, 26);
+            label_prBid3.Size = new Size(84, 25);
             label_prBid3.TabIndex = 17;
             label_prBid3.Text = "0";
             label_prBid3.TextAlign = ContentAlignment.MiddleRight;
@@ -882,10 +1240,11 @@
             // 
             label_prBid4.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             label_prBid4.AutoSize = true;
-            label_prBid4.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label_prBid4.Location = new Point(96, 254);
+            label_prBid4.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label_prBid4.ForeColor = Color.LimeGreen;
+            label_prBid4.Location = new Point(97, 255);
             label_prBid4.Name = "label_prBid4";
-            label_prBid4.Size = new Size(86, 26);
+            label_prBid4.Size = new Size(84, 25);
             label_prBid4.TabIndex = 18;
             label_prBid4.Text = "0";
             label_prBid4.TextAlign = ContentAlignment.MiddleRight;
@@ -894,10 +1253,11 @@
             // 
             label_prBid5.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             label_prBid5.AutoSize = true;
-            label_prBid5.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label_prBid5.Location = new Point(96, 282);
+            label_prBid5.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label_prBid5.ForeColor = Color.LimeGreen;
+            label_prBid5.Location = new Point(97, 283);
             label_prBid5.Name = "label_prBid5";
-            label_prBid5.Size = new Size(86, 26);
+            label_prBid5.Size = new Size(84, 25);
             label_prBid5.TabIndex = 19;
             label_prBid5.Text = "0";
             label_prBid5.TextAlign = ContentAlignment.MiddleRight;
@@ -906,10 +1266,11 @@
             // 
             label_prBid6.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             label_prBid6.AutoSize = true;
-            label_prBid6.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label_prBid6.Location = new Point(96, 310);
+            label_prBid6.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label_prBid6.ForeColor = Color.LimeGreen;
+            label_prBid6.Location = new Point(97, 311);
             label_prBid6.Name = "label_prBid6";
-            label_prBid6.Size = new Size(86, 37);
+            label_prBid6.Size = new Size(84, 29);
             label_prBid6.TabIndex = 20;
             label_prBid6.Text = "0";
             label_prBid6.TextAlign = ContentAlignment.MiddleRight;
@@ -918,10 +1279,11 @@
             // 
             label_qtBid1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             label_qtBid1.AutoSize = true;
-            label_qtBid1.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label_qtBid1.Location = new Point(190, 170);
+            label_qtBid1.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label_qtBid1.ForeColor = Color.LimeGreen;
+            label_qtBid1.Location = new Point(190, 171);
             label_qtBid1.Name = "label_qtBid1";
-            label_qtBid1.Size = new Size(84, 26);
+            label_qtBid1.Size = new Size(83, 25);
             label_qtBid1.TabIndex = 21;
             label_qtBid1.Text = "0";
             label_qtBid1.TextAlign = ContentAlignment.MiddleRight;
@@ -930,10 +1292,11 @@
             // 
             label_qtBid2.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             label_qtBid2.AutoSize = true;
-            label_qtBid2.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label_qtBid2.Location = new Point(190, 198);
+            label_qtBid2.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label_qtBid2.ForeColor = Color.LimeGreen;
+            label_qtBid2.Location = new Point(190, 199);
             label_qtBid2.Name = "label_qtBid2";
-            label_qtBid2.Size = new Size(84, 26);
+            label_qtBid2.Size = new Size(83, 25);
             label_qtBid2.TabIndex = 22;
             label_qtBid2.Text = "0";
             label_qtBid2.TextAlign = ContentAlignment.MiddleRight;
@@ -942,10 +1305,11 @@
             // 
             label_qtBid3.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             label_qtBid3.AutoSize = true;
-            label_qtBid3.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label_qtBid3.Location = new Point(190, 226);
+            label_qtBid3.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label_qtBid3.ForeColor = Color.LimeGreen;
+            label_qtBid3.Location = new Point(190, 227);
             label_qtBid3.Name = "label_qtBid3";
-            label_qtBid3.Size = new Size(84, 26);
+            label_qtBid3.Size = new Size(83, 25);
             label_qtBid3.TabIndex = 23;
             label_qtBid3.Text = "0";
             label_qtBid3.TextAlign = ContentAlignment.MiddleRight;
@@ -954,10 +1318,11 @@
             // 
             label_qtBid4.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             label_qtBid4.AutoSize = true;
-            label_qtBid4.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label_qtBid4.Location = new Point(190, 254);
+            label_qtBid4.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label_qtBid4.ForeColor = Color.LimeGreen;
+            label_qtBid4.Location = new Point(190, 255);
             label_qtBid4.Name = "label_qtBid4";
-            label_qtBid4.Size = new Size(84, 26);
+            label_qtBid4.Size = new Size(83, 25);
             label_qtBid4.TabIndex = 24;
             label_qtBid4.Text = "0";
             label_qtBid4.TextAlign = ContentAlignment.MiddleRight;
@@ -966,10 +1331,11 @@
             // 
             label_qtBid5.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             label_qtBid5.AutoSize = true;
-            label_qtBid5.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label_qtBid5.Location = new Point(190, 282);
+            label_qtBid5.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label_qtBid5.ForeColor = Color.LimeGreen;
+            label_qtBid5.Location = new Point(190, 283);
             label_qtBid5.Name = "label_qtBid5";
-            label_qtBid5.Size = new Size(84, 26);
+            label_qtBid5.Size = new Size(83, 25);
             label_qtBid5.TabIndex = 25;
             label_qtBid5.Text = "0";
             label_qtBid5.TextAlign = ContentAlignment.MiddleRight;
@@ -978,10 +1344,11 @@
             // 
             label_qtBid6.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             label_qtBid6.AutoSize = true;
-            label_qtBid6.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label_qtBid6.Location = new Point(190, 310);
+            label_qtBid6.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label_qtBid6.ForeColor = Color.LimeGreen;
+            label_qtBid6.Location = new Point(190, 311);
             label_qtBid6.Name = "label_qtBid6";
-            label_qtBid6.Size = new Size(84, 37);
+            label_qtBid6.Size = new Size(83, 29);
             label_qtBid6.TabIndex = 26;
             label_qtBid6.Text = "0";
             label_qtBid6.TextAlign = ContentAlignment.MiddleRight;
@@ -990,10 +1357,11 @@
             // 
             label_qtAsk5.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             label_qtAsk5.AutoSize = true;
-            label_qtAsk5.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label_qtAsk5.Location = new Point(5, 30);
+            label_qtAsk5.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label_qtAsk5.ForeColor = Color.Red;
+            label_qtAsk5.Location = new Point(6, 31);
             label_qtAsk5.Name = "label_qtAsk5";
-            label_qtAsk5.Size = new Size(83, 26);
+            label_qtAsk5.Size = new Size(82, 25);
             label_qtAsk5.TabIndex = 28;
             label_qtAsk5.Text = "0";
             label_qtAsk5.TextAlign = ContentAlignment.MiddleRight;
@@ -1002,10 +1370,11 @@
             // 
             label_qtAsk4.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             label_qtAsk4.AutoSize = true;
-            label_qtAsk4.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label_qtAsk4.Location = new Point(5, 58);
+            label_qtAsk4.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label_qtAsk4.ForeColor = Color.Red;
+            label_qtAsk4.Location = new Point(6, 59);
             label_qtAsk4.Name = "label_qtAsk4";
-            label_qtAsk4.Size = new Size(83, 26);
+            label_qtAsk4.Size = new Size(82, 25);
             label_qtAsk4.TabIndex = 29;
             label_qtAsk4.Text = "0";
             label_qtAsk4.TextAlign = ContentAlignment.MiddleRight;
@@ -1014,10 +1383,11 @@
             // 
             label_qtAsk3.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             label_qtAsk3.AutoSize = true;
-            label_qtAsk3.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label_qtAsk3.Location = new Point(5, 86);
+            label_qtAsk3.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label_qtAsk3.ForeColor = Color.Red;
+            label_qtAsk3.Location = new Point(6, 87);
             label_qtAsk3.Name = "label_qtAsk3";
-            label_qtAsk3.Size = new Size(83, 26);
+            label_qtAsk3.Size = new Size(82, 25);
             label_qtAsk3.TabIndex = 30;
             label_qtAsk3.Text = "0";
             label_qtAsk3.TextAlign = ContentAlignment.MiddleRight;
@@ -1026,10 +1396,11 @@
             // 
             label_qtAsk2.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             label_qtAsk2.AutoSize = true;
-            label_qtAsk2.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label_qtAsk2.Location = new Point(5, 114);
+            label_qtAsk2.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label_qtAsk2.ForeColor = Color.Red;
+            label_qtAsk2.Location = new Point(6, 115);
             label_qtAsk2.Name = "label_qtAsk2";
-            label_qtAsk2.Size = new Size(83, 26);
+            label_qtAsk2.Size = new Size(82, 25);
             label_qtAsk2.TabIndex = 31;
             label_qtAsk2.Text = "0";
             label_qtAsk2.TextAlign = ContentAlignment.MiddleRight;
@@ -1038,10 +1409,11 @@
             // 
             label_qtAsk1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             label_qtAsk1.AutoSize = true;
-            label_qtAsk1.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label_qtAsk1.Location = new Point(5, 142);
+            label_qtAsk1.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label_qtAsk1.ForeColor = Color.Red;
+            label_qtAsk1.Location = new Point(6, 143);
             label_qtAsk1.Name = "label_qtAsk1";
-            label_qtAsk1.Size = new Size(83, 26);
+            label_qtAsk1.Size = new Size(82, 25);
             label_qtAsk1.TabIndex = 32;
             label_qtAsk1.Text = "0";
             label_qtAsk1.TextAlign = ContentAlignment.MiddleRight;
@@ -1068,9 +1440,9 @@
             groupBox5.Controls.Add(label19);
             groupBox5.Controls.Add(label18);
             groupBox5.Controls.Add(label17);
-            groupBox5.Location = new Point(14, 46);
+            groupBox5.Location = new Point(562, 376);
             groupBox5.Name = "groupBox5";
-            groupBox5.Size = new Size(228, 309);
+            groupBox5.Size = new Size(215, 309);
             groupBox5.TabIndex = 3;
             groupBox5.TabStop = false;
             groupBox5.Text = "Status";
@@ -1080,90 +1452,80 @@
             label_minMktFund.AutoSize = true;
             label_minMktFund.Location = new Point(120, 259);
             label_minMktFund.Name = "label_minMktFund";
-            label_minMktFund.Size = new Size(30, 15);
+            label_minMktFund.Size = new Size(0, 15);
             label_minMktFund.TabIndex = 19;
-            label_minMktFund.Text = "type";
             // 
             // label_statusMsg
             // 
             label_statusMsg.AutoSize = true;
             label_statusMsg.Location = new Point(120, 229);
             label_statusMsg.Name = "label_statusMsg";
-            label_statusMsg.Size = new Size(30, 15);
+            label_statusMsg.Size = new Size(0, 15);
             label_statusMsg.TabIndex = 18;
-            label_statusMsg.Text = "type";
             // 
             // label_status
             // 
             label_status.AutoSize = true;
             label_status.Location = new Point(120, 202);
             label_status.Name = "label_status";
-            label_status.Size = new Size(30, 15);
+            label_status.Size = new Size(0, 15);
             label_status.TabIndex = 17;
-            label_status.Text = "type";
             // 
             // label_displayName
             // 
             label_displayName.AutoSize = true;
             label_displayName.Location = new Point(120, 176);
             label_displayName.Name = "label_displayName";
-            label_displayName.Size = new Size(30, 15);
+            label_displayName.Size = new Size(0, 15);
             label_displayName.TabIndex = 16;
-            label_displayName.Text = "type";
             // 
             // label_quoteInc
             // 
             label_quoteInc.AutoSize = true;
             label_quoteInc.Location = new Point(120, 149);
             label_quoteInc.Name = "label_quoteInc";
-            label_quoteInc.Size = new Size(30, 15);
+            label_quoteInc.Size = new Size(0, 15);
             label_quoteInc.TabIndex = 15;
-            label_quoteInc.Text = "type";
             // 
             // label_baseInc
             // 
             label_baseInc.AutoSize = true;
             label_baseInc.Location = new Point(120, 122);
             label_baseInc.Name = "label_baseInc";
-            label_baseInc.Size = new Size(30, 15);
+            label_baseInc.Size = new Size(0, 15);
             label_baseInc.TabIndex = 14;
-            label_baseInc.Text = "type";
             // 
             // label_quoteCurr
             // 
             label_quoteCurr.AutoSize = true;
             label_quoteCurr.Location = new Point(120, 97);
             label_quoteCurr.Name = "label_quoteCurr";
-            label_quoteCurr.Size = new Size(30, 15);
+            label_quoteCurr.Size = new Size(0, 15);
             label_quoteCurr.TabIndex = 13;
-            label_quoteCurr.Text = "type";
             // 
             // label_baseCurr
             // 
             label_baseCurr.AutoSize = true;
             label_baseCurr.Location = new Point(120, 73);
             label_baseCurr.Name = "label_baseCurr";
-            label_baseCurr.Size = new Size(30, 15);
+            label_baseCurr.Size = new Size(0, 15);
             label_baseCurr.TabIndex = 12;
-            label_baseCurr.Text = "type";
             // 
             // label_id
             // 
             label_id.AutoSize = true;
             label_id.Location = new Point(120, 48);
             label_id.Name = "label_id";
-            label_id.Size = new Size(30, 15);
+            label_id.Size = new Size(0, 15);
             label_id.TabIndex = 11;
-            label_id.Text = "type";
             // 
             // label_productType
             // 
             label_productType.AutoSize = true;
             label_productType.Location = new Point(120, 19);
             label_productType.Name = "label_productType";
-            label_productType.Size = new Size(30, 15);
+            label_productType.Size = new Size(0, 15);
             label_productType.TabIndex = 10;
-            label_productType.Text = "type";
             // 
             // label26
             // 
@@ -1330,6 +1692,109 @@
             display_update.Interval = 1000;
             display_update.Tick += display_update_Tick;
             // 
+            // groupBox9
+            // 
+            groupBox9.Controls.Add(tableLayoutPanel8);
+            groupBox9.Location = new Point(15, 136);
+            groupBox9.Name = "groupBox9";
+            groupBox9.Size = new Size(475, 88);
+            groupBox9.TabIndex = 8;
+            groupBox9.TabStop = false;
+            groupBox9.Text = "PnL";
+            // 
+            // tableLayoutPanel8
+            // 
+            tableLayoutPanel8.CellBorderStyle = TableLayoutPanelCellBorderStyle.OutsetDouble;
+            tableLayoutPanel8.ColumnCount = 3;
+            tableLayoutPanel8.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33F));
+            tableLayoutPanel8.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33F));
+            tableLayoutPanel8.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.34F));
+            tableLayoutPanel8.Controls.Add(label_posPnl, 0, 1);
+            tableLayoutPanel8.Controls.Add(label40, 0, 1);
+            tableLayoutPanel8.Controls.Add(label_totalPnl, 0, 1);
+            tableLayoutPanel8.Controls.Add(label36, 0, 0);
+            tableLayoutPanel8.Controls.Add(label_tradePnl, 1, 0);
+            tableLayoutPanel8.Controls.Add(label38, 2, 0);
+            tableLayoutPanel8.Location = new Point(3, 19);
+            tableLayoutPanel8.Name = "tableLayoutPanel8";
+            tableLayoutPanel8.RowCount = 2;
+            tableLayoutPanel8.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayoutPanel8.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayoutPanel8.Size = new Size(466, 63);
+            tableLayoutPanel8.TabIndex = 0;
+            // 
+            // label36
+            // 
+            label36.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label36.AutoSize = true;
+            label36.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label36.Location = new Point(6, 3);
+            label36.Name = "label36";
+            label36.Size = new Size(145, 27);
+            label36.TabIndex = 6;
+            label36.Text = "Position PnL";
+            label36.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // label_tradePnl
+            // 
+            label_tradePnl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_tradePnl.AutoSize = true;
+            label_tradePnl.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label_tradePnl.Location = new Point(160, 3);
+            label_tradePnl.Name = "label_tradePnl";
+            label_tradePnl.Size = new Size(145, 27);
+            label_tradePnl.TabIndex = 7;
+            label_tradePnl.Text = "Trade PnL";
+            label_tradePnl.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // label38
+            // 
+            label38.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label38.AutoSize = true;
+            label38.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label38.Location = new Point(314, 3);
+            label38.Name = "label38";
+            label38.Size = new Size(146, 27);
+            label38.TabIndex = 8;
+            label38.Text = "Total PnL";
+            label38.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // label_totalPnl
+            // 
+            label_totalPnl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_totalPnl.AutoSize = true;
+            label_totalPnl.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_totalPnl.Location = new Point(314, 33);
+            label_totalPnl.Name = "label_totalPnl";
+            label_totalPnl.Size = new Size(146, 27);
+            label_totalPnl.TabIndex = 10;
+            label_totalPnl.Text = "0";
+            label_totalPnl.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label40
+            // 
+            label40.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label40.AutoSize = true;
+            label40.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label40.Location = new Point(160, 33);
+            label40.Name = "label40";
+            label40.Size = new Size(145, 27);
+            label40.TabIndex = 11;
+            label40.Text = "0";
+            label40.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label_posPnl
+            // 
+            label_posPnl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_posPnl.AutoSize = true;
+            label_posPnl.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_posPnl.Location = new Point(6, 33);
+            label_posPnl.Name = "label_posPnl";
+            label_posPnl.Size = new Size(145, 27);
+            label_posPnl.TabIndex = 12;
+            label_posPnl.Text = "0";
+            label_posPnl.TextAlign = ContentAlignment.MiddleRight;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -1350,6 +1815,16 @@
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();
             tabProduct.ResumeLayout(false);
+            tabProduct.PerformLayout();
+            groupBox8.ResumeLayout(false);
+            tableLayoutPanel6.ResumeLayout(false);
+            tableLayoutPanel6.PerformLayout();
+            tableLayoutPanel5.ResumeLayout(false);
+            tableLayoutPanel5.PerformLayout();
+            groupBox7.ResumeLayout(false);
+            groupBox7.PerformLayout();
+            tableLayoutPanel7.ResumeLayout(false);
+            tableLayoutPanel7.PerformLayout();
             groupBox6.ResumeLayout(false);
             tableLayoutPanel4.ResumeLayout(false);
             tableLayoutPanel4.PerformLayout();
@@ -1358,6 +1833,9 @@
             tabConfig.ResumeLayout(false);
             groupBox4.ResumeLayout(false);
             groupBox4.PerformLayout();
+            groupBox9.ResumeLayout(false);
+            tableLayoutPanel8.ResumeLayout(false);
+            tableLayoutPanel8.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -1461,5 +1939,38 @@
         private Label label_prAsk6;
         private Label label_prBid6;
         private Label label_qtBid6;
+        private Label label_symbol;
+        private GroupBox groupBox7;
+        private Label label_lastPr;
+        private Label label_volume;
+        private Label label27;
+        private Label label_low;
+        private Label label_high;
+        private Label label_open;
+        private Label label30;
+        private Label label29;
+        private Label label28;
+        private GroupBox groupBox8;
+        private TableLayoutPanel tableLayoutPanel5;
+        private Label label_P_buyAvgPr;
+        private Label label32;
+        private Label label31;
+        private Label label33;
+        private Label label34;
+        private Label label_P_sellAvgPr;
+        private Label label_P_sellVol;
+        private Label label_P_buyVol;
+        private TableLayoutPanel tableLayoutPanel6;
+        private Label label_CurrPos;
+        private Label label35;
+        private TableLayoutPanel tableLayoutPanel7;
+        private GroupBox groupBox9;
+        private TableLayoutPanel tableLayoutPanel8;
+        private Label label_posPnl;
+        private Label label40;
+        private Label label_totalPnl;
+        private Label label36;
+        private Label label_tradePnl;
+        private Label label38;
     }
 }

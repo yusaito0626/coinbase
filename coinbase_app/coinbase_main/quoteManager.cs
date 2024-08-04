@@ -35,6 +35,7 @@ namespace coinbase_main
                                 cp.updateTrade(td);
                                 break;
                         }
+                        this.feedStack.Push(td);
                     }
                 }
             }
@@ -53,6 +54,7 @@ namespace coinbase_main
                                 cp.updateTrade(td);
                                 break;
                         }
+                        this.feedStack.Push(td);
                     }
                 }
             }

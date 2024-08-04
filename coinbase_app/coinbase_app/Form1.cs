@@ -254,6 +254,10 @@ namespace coinbase_app
         }
         private void display_update_main()
         {
+            this.label_feedAll.Text = this.connection.msgCount.ToString("N0");
+            this.label_feedInc.Text = this.connection.msgIncrement.ToString("N0");
+            this.connection.msgIncrement = 0;
+            this.label_feedQueue.Text = this.connection.msgQueue.Count().ToString("N0");
             this.writeLog();
         }
 
@@ -261,58 +265,73 @@ namespace coinbase_app
         {
             if (this.displayedCrypto != null)
             {
+                crypto cp = this.displayedCrypto;
                 int count = 0;
                 while (true)
                 {
                     if (Interlocked.Exchange(ref this.updating, 1) == 0)
                     {
-                        this.label_productType.Text = this.displayedCrypto.product_type;
-                        this.label_id.Text = this.displayedCrypto.id;
-                        this.label_baseCurr.Text = this.displayedCrypto.base_currency;
-                        this.label_quoteCurr.Text = this.displayedCrypto.quote_currency;
-                        this.label_baseInc.Text = this.displayedCrypto.base_increment.ToString();
-                        this.label_quoteInc.Text = this.displayedCrypto.quote_increment.ToString();
-                        this.label_displayName.Text = this.displayedCrypto.display_name;
-                        this.label_status.Text = this.displayedCrypto.status;
-                        this.label_statusMsg.Text = this.displayedCrypto.status_message;
-                        this.label_minMktFund.Text = this.displayedCrypto.min_market_funds;
+                        this.label_symbol.Text = cp.id;
+                        this.label_productType.Text = cp.product_type;
+                        this.label_id.Text = cp.id;
+                        this.label_baseCurr.Text = cp.base_currency;
+                        this.label_quoteCurr.Text = cp.quote_currency;
+                        this.label_baseInc.Text = cp.base_increment.ToString();
+                        this.label_quoteInc.Text = cp.quote_increment.ToString();
+                        this.label_displayName.Text = cp.display_name;
+                        this.label_status.Text = cp.status;
+                        this.label_statusMsg.Text = cp.status_message;
+                        this.label_minMktFund.Text = cp.min_market_funds;
 
-                        if(this.displayedCrypto.quotesInitialized)
+                        if(cp.quotesInitialized)
                         {
-                            int askidx = this.displayedCrypto.bestask;
-                            int bididx = this.displayedCrypto.bestbid;
+                            this.label_lastPr.Text = (cp.last * cp.quote_increment).ToString("N2");
+                            this.label_open.Text = (cp.open * cp.quote_increment).ToString("N2");
+                            this.label_high.Text = (cp.high * cp.quote_increment).ToString("N2");
+                            this.label_low.Text = (cp.low * cp.quote_increment).ToString("N2");
+                            this.label_volume.Text = (cp.executedBaseAmount).ToString("N2");
+                            int askidx = cp.bestask;
+                            int bididx = cp.bestbid;
                             int aski = 0;
                             int bidi = 0;
-                            quote askquote = this.displayedCrypto.quotes[askidx];
-                            quote bidquote = this.displayedCrypto.quotes[bididx];
+                            quote askquote = cp.quotes[askidx];
+                            quote bidquote = cp.quotes[bididx];
 
                             while (true)
                             {
                                 if (askquote.side == "offer" && aski < DEPTH)
                                 {
-                                    this.askLabels[aski].Key.Text = (askquote.price * this.displayedCrypto.quote_increment).ToString("N2");
+                                    this.askLabels[aski].Key.Text = (askquote.price * cp.quote_increment).ToString("N2");
                                     this.askLabels[aski].Value.Text = askquote.quantity.ToString();
                                     ++aski;
                                 }
                                 if (bidquote.side == "bid" && bidi < DEPTH)
                                 {
-                                    this.bidLabels[bidi].Key.Text = (bidquote.price * this.displayedCrypto.quote_increment).ToString("N2");
+                                    this.bidLabels[bidi].Key.Text = (bidquote.price * cp.quote_increment).ToString("N2");
                                     this.bidLabels[bidi].Value.Text = bidquote.quantity.ToString();
                                     ++bidi;
                                 }
-                                ++askidx;
-                                --bididx;
-                                if ((aski >= DEPTH && bidi >= DEPTH) || (askidx == this.displayedCrypto.quotes.Count() && bididx < 0))
+                                if ((aski >= DEPTH && bidi >= DEPTH) || (askidx == cp.maxPr && bididx == cp.minPr))
                                 {
                                     break;
                                 }
-                                if (askidx <= this.displayedCrypto.maxPr)
+                                ++askidx;
+                                --bididx;
+                                if (askidx <= cp.maxPr)
                                 {
-                                    askquote = this.displayedCrypto.quotes[askidx];
+                                    askquote = cp.quotes[askidx];
                                 }
-                                if (bididx >= this.displayedCrypto.minPr)
+                                else
                                 {
-                                    bidquote = this.displayedCrypto.quotes[bididx];
+                                    --askidx;
+                                }
+                                if (bididx >= cp.minPr)
+                                {
+                                    bidquote = cp.quotes[bididx];
+                                }
+                                else
+                                {
+                                    ++bididx;
                                 }
                             }
                         }

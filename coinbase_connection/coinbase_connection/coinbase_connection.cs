@@ -21,6 +21,9 @@ namespace coinbase_connection
         private string name;
         private string privateKey;
 
+        public long msgCount;
+        public long msgIncrement;
+
         static Random random = new Random();
 
         public ConcurrentQueue<string> msgQueue;
@@ -176,6 +179,8 @@ namespace coinbase_connection
 
                     var message = Encoding.UTF8.GetString(buffer, 0, count);
                     this.msgQueue.Enqueue(message);
+                    ++this.msgCount;
+                    ++this.msgIncrement;
                 }
 
             }
