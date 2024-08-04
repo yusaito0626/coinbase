@@ -277,7 +277,6 @@ namespace coinbase_connection
             {
                 if (_instance == null)
                 {
-                    //インスタンス生成
                     _instance = new coinbase_connection();
                 }
                 return _instance;
@@ -285,6 +284,143 @@ namespace coinbase_connection
         }
     }
 
+    public class coinbase_restAPI
+    {
+        private coinbase_restAPI()
+        {
+            this.url_listAccount = this.url + "accounts";
+            this.url_getAccount = this.url + "accounts/";//Need uuid
+            this.url_createOrder = this.url + "orders";
+            this.url_cancelOrder = this.url + "orders/batch_cancel";
+            this.url_editOrder = this.url + "orders/edit";
+            this.url_editOrderReview = this.url + "orders/edit_preview";
+            this.url_listOrders = this.url + "orders/historical/batch";
+            this.url_listFills = this.url + "orders/historical/fills";
+            this.url_getOrders = this.url + "orders/historical/";//Need order_id
+            this.url_previewOrder = this.url + "orders/preview";
+            this.url_closePosition = this.url + "orders/close_position";
+            this.order_no = 0;
+            this.client = new HttpClient();
+        }
+
+        //Risk checks should be made in OMS
+        public async Task<HttpResponseMessage> createOrder(string product_id, string side, string order_config,string leverage = "1.0", string margin_type = "CROSS", string retail_portfolio = "", string preview_id = "")
+        {
+            string str = "{\"client_order_id\":\"" + this.getOrderId(product_id) + "\","
+                        + "\"product_id\":\"" + product_id + "\","
+                        + "\"side\":\"" + side + "\","
+                        + "\"order_configuration\":\"" + order_config + "\","
+                        + "\"leverage\":\"" + leverage + "\","
+                        + "\"margin_type\":\"" + margin_type + "\"";
+            if(retail_portfolio != "")
+            {
+                str += ",\"retail_portfolio\":\"" + retail_portfolio + "\"";
+            }
+            if(preview_id != "")
+            {
+                str += ",\"preview_id\":\"" + preview_id + "\"";
+            }
+            str += "}";
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, this.url_createOrder);
+            StringContent content = new StringContent(str,null, "application/json");
+            request.Content = content;
+            return await client.SendAsync(request);
+        }
+
+        //order Configs
+        public string market_market_ioc(string size, string size_type)
+        {
+            string str = "";
+            if (size_type == "base")
+            {
+                str = "\"order_configuration\":{\"market_market_ioc\":{\"base_size\":\"" + size + "\"}}";
+            }
+            else if (size_type == "quote")
+            {
+                str = "\"order_configuration\":{\"market_market_ioc\":{\"quote_size\":\"" + size + "\"}}";
+            }
+            return str;
+        }
+
+        public string sor_limit_ioc(string base_size, string limit_price)
+        {
+            return "\"order_configuration\": {\"sor_limit_ioc\":{\"base_size\": \"" + base_size + "\",\"limit_price\": \"" + limit_price + "\"}}";
+        }
+
+        public string limit_limit_gtc(string base_size, string limit_price,string post_only)
+        {
+            return "\"order_configuration\": {\"limit_limit_gtc\":{\"base_size\": \"" + base_size + "\",\"limit_price\": \"" + limit_price + "\",\"post_only\":" + post_only + "}}";
+        }
+
+        public string limit_limit_gtd(string base_size, string limit_price, string post_only,string end_time)
+        {
+            return "\"order_configuration\": {\"limit_limit_gtd\":{\"base_size\": \"" + base_size + "\",\"limit_price\": \"" + limit_price + "\",\"end_time\": \"" + end_time + "\",\"post_only\":" + post_only + "}}";
+        }
+
+        public string limit_limit_fok(string base_size,string limit_price)
+        {
+            return "\"order_configuration\": {\"limit_limit_fok\":{\"base_size\": \"" + base_size + "\",\"limit_price\": \"" + limit_price + "\"}}";
+        }
+
+        public string stop_limit_stop_limit_gtc(string base_size, string limit_price,string stop_price,string stop_direction)
+        {
+            return "\"order_configuration\": {\"stop_limit_stop_limit_gtc\":{\"base_size\": \"" + base_size + "\",\"limit_price\": \"" + limit_price + "\",\"stop_price\": \"" + stop_price + "\",\"stop_direction\": \"" + stop_direction + "\"}}";
+        }
+
+        public string stop_limit_stop_limit_gtd(string base_size, string limit_price, string stop_price, string end_time, string stop_direction)
+        {
+            return "\"order_configuration\": {\"stop_limit_stop_limit_gtd\":{\"base_size\": \"" + base_size + "\",\"limit_price\": \"" + limit_price + "\",\"stop_price\": \"" + stop_price + ",\"end_time\": \"" + end_time + "\",\"stop_direction\": \"" + stop_direction + "\"}}";
+        }
+
+        public string trigger_bracket_gtc(string base_size, string limit_price, string stop_trigger_price)
+        {
+            return "\"order_configuration\": {\"trigger_bracket_gtc\":{\"base_size\": \"" + base_size + "\",\"limit_price\": \"" + limit_price + "\",\"stop_trigger_price\": \"" + stop_trigger_price + "\"}}";
+        }
+
+        public string trigger_bracket_gtd(string base_size, string limit_price, string stop_trigger_price,string end_time)
+        {
+            return "\"order_configuration\": {\"trigger_bracket_gtd\":{\"base_size\": \"" + base_size + "\",\"limit_price\": \"" + limit_price + "\",\"stop_trigger_price\": \"" + stop_trigger_price + ",\"end_time\": \"" + end_time + "\"}}";
+        }
+
+        public string getOrderId(string symbol)
+        {
+            int current_no = Interlocked.Increment(ref this.order_no);
+            return symbol + DateTime.Now.ToString("yyyyMMdd") + current_no.ToString("D8");
+        }
+
+        private string url = "https://api.coinbase.com/api/v3/brokerage/";
+        private HttpClient client;
+        //Account
+        private string url_listAccount;
+        private string url_getAccount;
+        //Order
+        private string url_createOrder;
+        private string url_cancelOrder;
+        private string url_editOrder;
+        private string url_editOrderReview;
+        private string url_listOrders;
+        private string url_listFills;
+        private string url_getOrders;
+        private string url_previewOrder;
+        private string url_closePosition;
+
+        private int order_no;
+
+        private static coinbase_restAPI _instance;
+        private static readonly object _lockObject = new object();
+
+        public static coinbase_restAPI GetInstance()
+        {
+            lock (_lockObject)
+            {
+                if (_instance == null)
+                {
+                    _instance = new coinbase_restAPI();
+                }
+                return _instance;
+            }
+        }
+    }
     public enum cbChannels
     {
         NONE = 0,
