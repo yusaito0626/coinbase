@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using System.Text;
 using coinbase_connection;
@@ -12,10 +13,32 @@ namespace coinbase_app
             this.updating = 0;
             string configFile = "coinbase_app.ini";
             InitializeComponent();
+            this.bidLabels = new List<KeyValuePair<Label, Label>>();
+            this.bidLabels.Add(new KeyValuePair<Label, Label>(this.label_prBid1, this.label_qtBid1));
+            this.bidLabels.Add(new KeyValuePair<Label, Label>(this.label_prBid2, this.label_qtBid2));
+            this.bidLabels.Add(new KeyValuePair<Label, Label>(this.label_prBid3, this.label_qtBid3));
+            this.bidLabels.Add(new KeyValuePair<Label, Label>(this.label_prBid4, this.label_qtBid4));
+            this.bidLabels.Add(new KeyValuePair<Label, Label>(this.label_prBid5, this.label_qtBid5));
+            this.bidLabels.Add(new KeyValuePair<Label, Label>(this.label_prBid6, this.label_qtBid6));
+            this.askLabels = new List<KeyValuePair<Label, Label>>();
+            this.askLabels.Add(new KeyValuePair<Label, Label>(this.label_prAsk1, this.label_qtAsk1));
+            this.askLabels.Add(new KeyValuePair<Label, Label>(this.label_prAsk2, this.label_qtAsk2));
+            this.askLabels.Add(new KeyValuePair<Label, Label>(this.label_prAsk3, this.label_qtAsk3));
+            this.askLabels.Add(new KeyValuePair<Label, Label>(this.label_prAsk4, this.label_qtAsk4));
+            this.askLabels.Add(new KeyValuePair<Label, Label>(this.label_prAsk5, this.label_qtAsk5));
+            this.askLabels.Add(new KeyValuePair<Label, Label>(this.label_prAsk6, this.label_qtAsk6));
+            this.logQueue = new ConcurrentQueue<string>();
             readConfig(configFile);
-            this.thManager = new threadManager(this.decodingThCount, this.quotesThCount, this.optThCount);
-            this.connection = new coinbase_connection.coinbase_connection();
+            Action<string> addLogFunc = this.addLog;
+            this.connection = coinbase_connection.coinbase_connection.GetInstance();
+            this.connection.addLog = addLogFunc;
             this.connection.readApiKey(this.apiFilename);
+            this.connection.msgQueue = new System.Collections.Concurrent.ConcurrentQueue<string>();
+            this.thManager = coinbase_app.threadManager.GetInstance();
+            this.thManager.addLog = addLogFunc;
+            this.thManager.initialzeThreadManager(this.decodingThCount, this.quotesThCount, this.optThCount);
+            this.thManager.setQueues(this.connection.msgQueue);
+            this.thManager.startThreads();
             this.cryptos = new Dictionary<string, crypto>();
             this.displayedCrypto = null;
             for (int i = 0; i < this.symbols.Length; ++i)
@@ -66,6 +89,7 @@ namespace coinbase_app
                                 }
                                 if (count >= buffer.Length)
                                 {
+                                    this.addLog("[ERROR] The message is too large.");
                                     return;
                                 }
                                 segment = new ArraySegment<byte>(buffer, count, buffer.Length - count);
@@ -105,13 +129,13 @@ namespace coinbase_app
                                             crypto cp = new crypto();
                                             cp.setStatus(status);
                                             this.cryptos[cp.id] = cp;
-                                            if (this.cryptos.Count == this.symbols.Length)
-                                            {
-                                                this.connection.disconnect();
-                                                break;
-                                            }
                                         }
                                         start = msg.events.IndexOf("{", end);
+                                    }
+                                    if (this.cryptos.Count == this.symbols.Length)
+                                    {
+                                        this.connection.disconnect();
+                                        break;
                                     }
                                 }
                             }
@@ -119,12 +143,40 @@ namespace coinbase_app
 
                     }
                 }
+                this.thManager.setCryptoList(this.cryptos);
             }
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-
+            if (this.connection != null)
+            {
+                WebSocketState st;
+                this.connection.connect(this.url);
+                st = this.connection.getState();
+                int i = 0;
+                while(st.ToString() != "Open")
+                {
+                    System.Threading.Thread.Sleep(100);
+                    st = this.connection.getState();
+                    ++i;
+                    if(i > 50)
+                    {
+                        this.addLog("[ERROR] Failed to connect.");
+                        return;
+                    }
+                }
+                if (st.ToString() == "Open")
+                {
+                    this.addLog("[INFO] Connected Successfully");
+                    this.connection.startListen(cbChannels.heartbeats);
+                    this.connection.startListen(cbChannels.level2, this.symbols);
+                    this.connection.startListen(cbChannels.market_trades, this.symbols);
+                    this.listeningThread = new Thread(new ThreadStart(this.connection.listen));
+                    this.listeningThread.Start();
+                    this.thManager.activateAllThreads();
+                }
+            }
         }
 
         private void readConfig(string filename)
@@ -175,9 +227,15 @@ namespace coinbase_app
         Dictionary<string, crypto> cryptos;
         int updating;
         crypto displayedCrypto;
+        const int DEPTH = 6;
+        List<KeyValuePair<Label, Label>> bidLabels;
+        List<KeyValuePair<Label, Label>> askLabels;
 
         coinbase_connection.coinbase_connection connection;
         threadManager thManager;
+        System.Threading.Thread listeningThread;
+
+        ConcurrentQueue<string> logQueue;
 
         private void display_update_Tick(object sender, EventArgs e)
         {
@@ -196,7 +254,7 @@ namespace coinbase_app
         }
         private void display_update_main()
         {
-
+            this.writeLog();
         }
 
         private void display_update_product()
@@ -218,6 +276,46 @@ namespace coinbase_app
                         this.label_status.Text = this.displayedCrypto.status;
                         this.label_statusMsg.Text = this.displayedCrypto.status_message;
                         this.label_minMktFund.Text = this.displayedCrypto.min_market_funds;
+
+                        if(this.displayedCrypto.quotesInitialized)
+                        {
+                            int askidx = this.displayedCrypto.bestask;
+                            int bididx = this.displayedCrypto.bestbid;
+                            int aski = 0;
+                            int bidi = 0;
+                            quote askquote = this.displayedCrypto.quotes[askidx];
+                            quote bidquote = this.displayedCrypto.quotes[bididx];
+
+                            while (true)
+                            {
+                                if (askquote.side == "offer" && aski < DEPTH)
+                                {
+                                    this.askLabels[aski].Key.Text = (askquote.price * this.displayedCrypto.quote_increment).ToString("N2");
+                                    this.askLabels[aski].Value.Text = askquote.quantity.ToString();
+                                    ++aski;
+                                }
+                                if (bidquote.side == "bid" && bidi < DEPTH)
+                                {
+                                    this.bidLabels[bidi].Key.Text = (bidquote.price * this.displayedCrypto.quote_increment).ToString("N2");
+                                    this.bidLabels[bidi].Value.Text = bidquote.quantity.ToString();
+                                    ++bidi;
+                                }
+                                ++askidx;
+                                --bididx;
+                                if ((aski >= DEPTH && bidi >= DEPTH) || (askidx == this.displayedCrypto.quotes.Count() && bididx < 0))
+                                {
+                                    break;
+                                }
+                                if (askidx <= this.displayedCrypto.maxPr)
+                                {
+                                    askquote = this.displayedCrypto.quotes[askidx];
+                                }
+                                if (bididx >= this.displayedCrypto.minPr)
+                                {
+                                    bidquote = this.displayedCrypto.quotes[bididx];
+                                }
+                            }
+                        }
                         this.updating = 0;
                         break;
                     }
@@ -282,6 +380,19 @@ namespace coinbase_app
                 }
             }
             this.display_update_product();
+        }
+
+        public void addLog(string str)
+        {
+            this.logQueue.Enqueue(str);
+        }
+        public void writeLog()
+        {
+            string line;
+            while(this.logQueue.TryDequeue(out line))
+            {
+                this.mainLog.Text += line + "\n";
+            }
         }
     }
 }

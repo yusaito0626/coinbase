@@ -17,7 +17,11 @@ namespace coinbase_app
 {
     public class threadManager
     {
-        public threadManager(int decoding,int quotes,int opt)
+        private threadManager()
+        {
+
+        }
+        public void initialzeThreadManager(int decoding,int quotes,int opt)
         {
             this.NofDecodingTh = decoding;
             if(this.NofDecodingTh > 1)
@@ -27,6 +31,15 @@ namespace coinbase_app
             this.NofQuotesTh = quotes;
             this.NofOptTh = opt;
 
+            this.feedStack = new ConcurrentStack<trades>();
+            int i;
+            for (i = 0; i < this.STACK_SIZE; i++)
+            {
+                this.feedStack.Push(new trades());
+            }
+
+            this.qtManager.feedStack = this.feedStack;
+
             this.decodingThreads = new List<decodingThread>();
             this.updateQuotesThreads = new List<updateQuotesThread>();
             this.optimizingThreads = new List<optimizingThread>();
@@ -34,10 +47,9 @@ namespace coinbase_app
             this.quotesQueue = new ConcurrentQueue<string>();
             this.optimizingQueues = new List<ConcurrentQueue<string>>();
 
-            int i;
             for(i = 0;i < this.NofDecodingTh;++i)
             {
-                this.decodingThreads.Add(new decodingThread());
+                this.decodingThreads.Add(new decodingThread(this.feedStack));
             }
             for (i = 0; i < this.NofQuotesTh; ++i)
             {
@@ -70,15 +82,61 @@ namespace coinbase_app
         {
             foreach (var th in this.decodingThreads)
             {
-                th.threadStart();
+                th.addLog = this.addLog;
+                this.addLog("Starting decoding thread");
+                th.th = new Thread(new ThreadStart(th.threadStart));
+                th.th.Start();
             }
             foreach (var th in this.updateQuotesThreads)
             {
-                th.threadStart();
+                th.addLog = this.addLog;
+                this.addLog("Starting updating thread");
+                th.th = new Thread(new ThreadStart(th.threadStart));
+                th.th.Start();
             }
             foreach (var th in this.optimizingThreads)
             {
-                th.threadStart();
+                th.addLog = this.addLog;
+                this.addLog("Starting optimizing thread");
+                th.th = new Thread(new ThreadStart(th.threadStart));
+                th.th.Start();
+            }
+        }
+
+        public void activateAllThreads()
+        {
+            foreach (var th in this.decodingThreads)
+            {
+                if(th.started)
+                {
+                    th.activate(this.feedQueue, this.quotesQueue);
+                }
+            }
+            int i = 0;
+            foreach (var th in this.updateQuotesThreads)
+            {
+                if(th.started)
+                {
+                    th.activate(quotesQueue, this.optimizingQueues[i]);
+                    ++i;
+                    if(i >= this.optimizingQueues.Count)
+                    {
+                        i = 0;
+                    }
+                }
+            }
+            i = 0;
+            foreach (var th in this.optimizingThreads)
+            {
+                if(th.started)
+                {
+                    th.activate(this.optimizingQueues[i]);
+                    ++i;
+                    if (i >= this.optimizingQueues.Count)
+                    {
+                        i = 0;
+                    }
+                }
             }
         }
 
@@ -95,11 +153,34 @@ namespace coinbase_app
         List<updateQuotesThread> updateQuotesThreads;
         List<optimizingThread> optimizingThreads;
 
+        private int STACK_SIZE = 1000000;
         ConcurrentQueue<string> feedQueue;
         ConcurrentQueue<string> quotesQueue;
+        ConcurrentStack<cbMsg.trades> feedStack;
+
         List<ConcurrentQueue<string>> optimizingQueues;
 
         public Dictionary<string, crypto> cryptos;
+
+        public quoteManager qtManager = coinbase_main.quoteManager.GetInstance();
+
+        public Action<string> addLog = (str) => { Console.WriteLine(str); };
+
+        private static threadManager _instance;
+        private static readonly object _lockObject = new object();
+
+        public static threadManager GetInstance()
+        {
+            lock (_lockObject)
+            {
+                if (_instance == null)
+                {
+                    //インスタンス生成
+                    _instance = new threadManager();
+                }
+                return _instance;
+            }
+        }
     }
     public abstract class absThread
     {
@@ -110,9 +191,11 @@ namespace coinbase_app
 
         public int active;
         public int aborting;
+        public bool started;
 
         public Thread th;
         public delegate void func();
+        public Action<string> addLog = (str) => { Console.WriteLine(str); };
 
         public virtual void threadStart() { }
         public virtual void threadStop() 
@@ -136,7 +219,6 @@ namespace coinbase_app
     public class decodingThread : absThread
     {
         //Decoding thread should be single thread
-        private int STACK_SIZE = 1000000;
 
         public ConcurrentQueue<string> strQueue;
         public ConcurrentStack<cbMsg.trades> feedStack;
@@ -144,25 +226,23 @@ namespace coinbase_app
 
         public Dictionary<string, crypto> cryptos;
 
-        public decodingThread()
+        public decodingThread(ConcurrentStack<cbMsg.trades> _feedstack)
         {
             this.aborting = 0;
             this.active = 0;
             this.mutex = new Mutex(true);
-            this.feedStack = new ConcurrentStack<trades>();
-            int i;
-            for(i = 0;i<this.STACK_SIZE;i++)
-            {
-                this.feedStack.Push(new trades());
-            }
+            this.feedStack = _feedstack;
         }
         public override void threadStart()
         {
-            while(true)
+            this.started = true;
+            this.addLog("Decoding thread started");
+            while (true)
             {
                 this.mutex.WaitOne();
                 if(this.active > 0)
                 {
+                    this.addLog("Decoding thread activated");
                     this.decoding();
                     this.mutex.ReleaseMutex();
                 }
@@ -200,6 +280,7 @@ namespace coinbase_app
         public void decodeMain(string str)
         {
             string symbol;
+            string event_type;
             string msg_Type;
             cbMsg.trades tr;
             cbMsg.jsTrades jstr = new jsTrades();
@@ -215,6 +296,7 @@ namespace coinbase_app
             coinbase_connection.parser.parseMsg(str, ref msg);
             msg_Type = msg.channel;
             symbol = coinbase_connection.parser.findSymbol(msg.events);
+            event_type = coinbase_connection.parser.findEventType(msg.events);
             if(this.cryptos.ContainsKey(symbol))
             {
                 cp = this.cryptos[symbol];
@@ -231,6 +313,7 @@ namespace coinbase_app
                             if (this.feedStack.TryPop(out tr))
                             {
                                 coinbase_connection.parser.jsUpdateToTrades(symbol, jsup, ref tr);
+                                tr.event_type = event_type;
                                 cp.qtQueue.Enqueue(tr);
                                 this.symbolQueue.Enqueue(symbol);
                             }
@@ -251,6 +334,7 @@ namespace coinbase_app
                             if (this.feedStack.TryPop(out tr))
                             {
                                 coinbase_connection.parser.jsTradesToTrades(jstr, ref tr);
+                                tr.event_type = event_type;
                                 cp.qtQueue.Enqueue(tr);
                                 this.symbolQueue.Enqueue(symbol);
                             }
@@ -295,13 +379,25 @@ namespace coinbase_app
         public ConcurrentQueue<string> optimizingQueue;
 
         public Dictionary<string, crypto> cryptos;
+
+        public quoteManager qtManager = coinbase_main.quoteManager.GetInstance();
+
+        public updateQuotesThread()
+        {
+            this.aborting = 0;
+            this.active = 0;
+            this.mutex = new Mutex(true);
+        }
         public override void threadStart()
         {
+            this.addLog("Updating thread started");
+            this.started = true;
             while (true)
             {
                 this.mutex.WaitOne();
                 if (this.active > 0)
                 {
+                    this.addLog("Updating thread activated");
                     this.updatingQuotes();
                     this.mutex.ReleaseMutex();
                 }
@@ -328,7 +424,7 @@ namespace coinbase_app
                         cp = this.cryptos[symbol];
                         if(Interlocked.Exchange(ref cp.updating,1) == 0)
                         {
-                            optimization = cp.updateQuote_Main();
+                            optimization = this.qtManager.update_quotes(ref cp);
                             if(cp.qtQueue.Count > 0)
                             {
                                 this.feedQueue.Enqueue(symbol);
@@ -374,9 +470,39 @@ namespace coinbase_app
         public List<ConcurrentQueue<string>> symbolQueues;
         public Dictionary<string, crypto> cryptos;
 
+        public optimizingThread()
+        {
+            this.aborting = 0;
+            this.active = 0;
+            this.mutex = new Mutex(true);
+        }
         public override void threadStart()
         {
-            base.threadStart();
+            this.addLog("Optimizing thread started");
+            this.started = true;
+            while (true)
+            {
+                this.mutex.WaitOne();
+                if (this.active > 0)
+                {
+                    this.addLog("Optimizing thread activated");
+                    this.optimizing();
+                    this.mutex.ReleaseMutex();
+                }
+                if (this.aborting > 0)
+                {
+                    break;
+                }
+                this.mutex.WaitOne(0);
+            }
+        }
+
+        public void optimizing()
+        {
+            while(true)
+            {
+                System.Threading.Thread.Sleep(1000);
+            }
         }
         public override void threadStop() { }
 

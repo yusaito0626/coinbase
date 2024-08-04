@@ -1,13 +1,14 @@
 ﻿using cbMsg;
 using coinbase_connection;
 using System.Collections.Concurrent;
+using System.Collections.Specialized;
 namespace coinbase_main
 {
     public class quote
     {
         public void update(cbMsg.trades qt,double increment)
         {
-            this.price = (int)(qt.price * increment);
+            this.price = (int)(qt.price / increment);
             this.quantity = qt.size;
             this.updated_time = qt.time;
             if(this.quantity == 0)
@@ -28,7 +29,7 @@ namespace coinbase_main
     {
         public void updateOneQuote(cbMsg.trades qt)
         {
-            int pr = (int)(qt.price * this.quote_increment);
+            int pr = (int)(qt.price / this.quote_increment);
             if (this.quotesInitialized)
             {
                 if (this.quotes.ContainsKey(pr))
@@ -51,16 +52,10 @@ namespace coinbase_main
             }
         }
 
-        public bool updateQuote_Main()
+        public void updateTrade(cbMsg.trades trade)
         {
-            trades td;
-            while(this.qtQueue.Count > 0)
-            {
-                td = this.qtQueue.Dequeue();
-                this.updateOneQuote(td);
-            }
-            this.updating = 0;
-            return true;
+            this.executedBaseAmount += trade.size;
+            this.executedQuoteAmount += trade.size * trade.price;
         }
 
         public void findToB(int updated_pr)
@@ -70,7 +65,7 @@ namespace coinbase_main
             {
                 this.bestbid = updated_pr;
             }
-            else if (updated_pr < this.bestask && current.side == "ask")
+            else if (updated_pr < this.bestask && current.side == "offer")
             {
                 this.bestask = updated_pr;
             }
@@ -95,7 +90,7 @@ namespace coinbase_main
                 quote qt = this.quotes[pr];
                 while (pr < this.maxPr)
                 {
-                    if (qt.side == "ask")
+                    if (qt.side == "offer")
                     {
                         this.bestask = pr;
                         break;
@@ -105,43 +100,46 @@ namespace coinbase_main
                 this.bestask = pr;
             }
         }
-        public void initializeQuotes()
+        public void initializeQuotes(cbMsg.trades trade)
         {
             bool best = false;
-            Dictionary<int, quote>.Enumerator minQuote = this.quotes.GetEnumerator();
-            Dictionary<int, quote>.Enumerator maxQuote = minQuote;
-            Dictionary<int, quote>.Enumerator prevBid = minQuote;
-            Dictionary<int, quote>.Enumerator it;
-            for (it = minQuote; it.MoveNext();)
+            this.minPr = (int)(trade.price / this.quote_increment * 0.9);
+            this.maxPr = (int)(trade.price / this.quote_increment * 1.1);
+
+            SortedDictionary<int, quote> temp_quotes = new SortedDictionary<int, quote>();
+
+            SortedDictionary<int, quote>.Enumerator it;
+            for (it = this.quotes.GetEnumerator(); it.MoveNext();) 
             {
-                if(it.Current.Value.side == "bid")
+                temp_quotes.Add(it.Current.Key, it.Current.Value);
+            }
+            this.quotes.Clear();
+
+            int prevBid = 0;
+
+            for(int i = this.minPr; i <= this.maxPr; ++i)
+            {
+                if(temp_quotes.ContainsKey(i))
                 {
-                    prevBid = it;
+                    this.quotes.Add(i, temp_quotes[i]);
+                    if (temp_quotes[i].side == "bid")
+                    {
+                        prevBid = i;
+                    }
+                    else if(temp_quotes[i].side == "offer" && !best)
+                    {
+                        best = true;
+                        this.bestbid = prevBid;
+                        this.bestask = i;
+                    }
                 }
-                else if(it.Current.Value.side == "ask" && !best)
+                else
                 {
-                    best = true;
-                    this.bestbid = prevBid.Current.Key;
-                    this.bestask = it.Current.Key;
+                    this.quotes.Add(i, new quote());
                 }
-                maxQuote = it;
             }
 
-            int pr = minQuote.Current.Key - (this.bestbid - minQuote.Current.Key);
-            if(pr <= 0)
-            {
-                pr = 1;
-            }
-            this.minPr = pr;
-            this.maxPr = maxQuote.Current.Key + (maxQuote.Current.Key - this.bestask);
-            while (pr <= this.maxPr)
-            {
-                if (!this.quotes.ContainsKey(pr))
-                {
-                    this.quotes.Add(pr, new quote());
-                }
-                ++pr;
-            }
+            this.quotesInitialized = true;
         }
 
         public void setStatus(cbMsg.product_status status)
@@ -168,19 +166,29 @@ namespace coinbase_main
         public string status_message { get; set; }
         public string min_market_funds { get; set; }
 
-        public Queue<cbMsg.trades> qtQueue;
+        public ConcurrentQueue<cbMsg.trades> qtQueue;
         public int updating;
 
         public bool quotesInitialized;
-        public Dictionary<int, quote> quotes;
+        public SortedDictionary<int, quote> quotes;
         public int bestbid;
         public int bestask;
         public int minPr;
         public int maxPr;
 
+        public double executedBaseAmount;
+        public double executedQuoteAmount;
+
         public crypto()
         {
-            
+            this.qtQueue = new ConcurrentQueue<cbMsg.trades>();
+            this.updating = 0;
+            this.quotesInitialized = false;
+            this.quotes = new SortedDictionary<int, quote>();
+            this.bestbid = -1;
+            this.bestask = -1;
+            this.minPr = -1;
+            this.maxPr = -1;
         }
     }
 }

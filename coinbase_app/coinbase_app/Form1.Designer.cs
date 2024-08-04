@@ -31,7 +31,7 @@
             components = new System.ComponentModel.Container();
             tabControl = new TabControl();
             tabMain = new TabPage();
-            button1 = new Button();
+            button_startListen = new Button();
             mainLog = new Label();
             groupBox3 = new GroupBox();
             tableLayoutPanel3 = new TableLayoutPanel();
@@ -72,6 +72,32 @@
             label_sumBuyOrd = new Label();
             label_sumBuyExeAmt = new Label();
             tabProduct = new TabPage();
+            groupBox6 = new GroupBox();
+            tableLayoutPanel4 = new TableLayoutPanel();
+            label_qtAsk6 = new Label();
+            label_prAsk1 = new Label();
+            label_prAsk2 = new Label();
+            label_prAsk3 = new Label();
+            label_prAsk4 = new Label();
+            label_prAsk5 = new Label();
+            label_prAsk6 = new Label();
+            label_prBid1 = new Label();
+            label_prBid2 = new Label();
+            label_prBid3 = new Label();
+            label_prBid4 = new Label();
+            label_prBid5 = new Label();
+            label_prBid6 = new Label();
+            label_qtBid1 = new Label();
+            label_qtBid2 = new Label();
+            label_qtBid3 = new Label();
+            label_qtBid4 = new Label();
+            label_qtBid5 = new Label();
+            label_qtBid6 = new Label();
+            label_qtAsk5 = new Label();
+            label_qtAsk4 = new Label();
+            label_qtAsk3 = new Label();
+            label_qtAsk2 = new Label();
+            label_qtAsk1 = new Label();
             groupBox5 = new GroupBox();
             label_minMktFund = new Label();
             label_statusMsg = new Label();
@@ -110,6 +136,8 @@
             groupBox1.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
             tabProduct.SuspendLayout();
+            groupBox6.SuspendLayout();
+            tableLayoutPanel4.SuspendLayout();
             groupBox5.SuspendLayout();
             tabConfig.SuspendLayout();
             groupBox4.SuspendLayout();
@@ -129,7 +157,7 @@
             // 
             // tabMain
             // 
-            tabMain.Controls.Add(button1);
+            tabMain.Controls.Add(button_startListen);
             tabMain.Controls.Add(mainLog);
             tabMain.Controls.Add(groupBox3);
             tabMain.Controls.Add(groupBox2);
@@ -143,17 +171,17 @@
             tabMain.Text = "Main";
             tabMain.UseVisualStyleBackColor = true;
             // 
-            // button1
+            // button_startListen
             // 
-            button1.FlatStyle = FlatStyle.Popup;
-            button1.Font = new Font("Segoe UI", 11.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            button1.Location = new Point(604, 349);
-            button1.Name = "button1";
-            button1.Size = new Size(181, 40);
-            button1.TabIndex = 4;
-            button1.Text = "Start";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
+            button_startListen.FlatStyle = FlatStyle.Popup;
+            button_startListen.Font = new Font("Segoe UI", 11.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            button_startListen.Location = new Point(604, 349);
+            button_startListen.Name = "button_startListen";
+            button_startListen.Size = new Size(181, 40);
+            button_startListen.TabIndex = 4;
+            button_startListen.Text = "Start Listening";
+            button_startListen.UseVisualStyleBackColor = true;
+            button_startListen.Click += button1_Click;
             // 
             // mainLog
             // 
@@ -661,6 +689,7 @@
             // 
             // tabProduct
             // 
+            tabProduct.Controls.Add(groupBox6);
             tabProduct.Controls.Add(groupBox5);
             tabProduct.Controls.Add(comboBox_symbols);
             tabProduct.Location = new Point(4, 24);
@@ -670,6 +699,352 @@
             tabProduct.TabIndex = 3;
             tabProduct.Text = "Product";
             tabProduct.UseVisualStyleBackColor = true;
+            // 
+            // groupBox6
+            // 
+            groupBox6.Controls.Add(tableLayoutPanel4);
+            groupBox6.Location = new Point(503, 9);
+            groupBox6.Name = "groupBox6";
+            groupBox6.Size = new Size(280, 361);
+            groupBox6.TabIndex = 4;
+            groupBox6.TabStop = false;
+            // 
+            // tableLayoutPanel4
+            // 
+            tableLayoutPanel4.CellBorderStyle = TableLayoutPanelCellBorderStyle.Inset;
+            tableLayoutPanel4.ColumnCount = 3;
+            tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33F));
+            tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 34F));
+            tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33F));
+            tableLayoutPanel4.Controls.Add(label_qtAsk6, 0, 0);
+            tableLayoutPanel4.Controls.Add(label_prAsk1, 1, 5);
+            tableLayoutPanel4.Controls.Add(label_prAsk2, 1, 4);
+            tableLayoutPanel4.Controls.Add(label_prAsk3, 1, 3);
+            tableLayoutPanel4.Controls.Add(label_prAsk4, 1, 2);
+            tableLayoutPanel4.Controls.Add(label_prAsk5, 1, 1);
+            tableLayoutPanel4.Controls.Add(label_prAsk6, 1, 0);
+            tableLayoutPanel4.Controls.Add(label_prBid1, 1, 6);
+            tableLayoutPanel4.Controls.Add(label_prBid2, 1, 7);
+            tableLayoutPanel4.Controls.Add(label_prBid3, 1, 8);
+            tableLayoutPanel4.Controls.Add(label_prBid4, 1, 9);
+            tableLayoutPanel4.Controls.Add(label_prBid5, 1, 10);
+            tableLayoutPanel4.Controls.Add(label_prBid6, 1, 11);
+            tableLayoutPanel4.Controls.Add(label_qtBid1, 2, 6);
+            tableLayoutPanel4.Controls.Add(label_qtBid2, 2, 7);
+            tableLayoutPanel4.Controls.Add(label_qtBid3, 2, 8);
+            tableLayoutPanel4.Controls.Add(label_qtBid4, 2, 9);
+            tableLayoutPanel4.Controls.Add(label_qtBid5, 2, 10);
+            tableLayoutPanel4.Controls.Add(label_qtBid6, 2, 11);
+            tableLayoutPanel4.Controls.Add(label_qtAsk5, 0, 1);
+            tableLayoutPanel4.Controls.Add(label_qtAsk4, 0, 2);
+            tableLayoutPanel4.Controls.Add(label_qtAsk3, 0, 3);
+            tableLayoutPanel4.Controls.Add(label_qtAsk2, 0, 4);
+            tableLayoutPanel4.Controls.Add(label_qtAsk1, 0, 5);
+            tableLayoutPanel4.Location = new Point(1, 12);
+            tableLayoutPanel4.Name = "tableLayoutPanel4";
+            tableLayoutPanel4.RowCount = 12;
+            tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 8.333332F));
+            tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 8.333332F));
+            tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 8.333332F));
+            tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 8.333332F));
+            tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 8.333332F));
+            tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 8.333332F));
+            tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 8.333332F));
+            tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 8.333332F));
+            tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 8.333332F));
+            tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 8.333332F));
+            tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 8.333332F));
+            tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 8.333332F));
+            tableLayoutPanel4.Size = new Size(279, 349);
+            tableLayoutPanel4.TabIndex = 0;
+            // 
+            // label_qtAsk6
+            // 
+            label_qtAsk6.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_qtAsk6.AutoSize = true;
+            label_qtAsk6.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_qtAsk6.Location = new Point(5, 2);
+            label_qtAsk6.Name = "label_qtAsk6";
+            label_qtAsk6.Size = new Size(83, 26);
+            label_qtAsk6.TabIndex = 27;
+            label_qtAsk6.Text = "0";
+            label_qtAsk6.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label_prAsk1
+            // 
+            label_prAsk1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_prAsk1.AutoSize = true;
+            label_prAsk1.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_prAsk1.Location = new Point(96, 142);
+            label_prAsk1.Name = "label_prAsk1";
+            label_prAsk1.Size = new Size(86, 26);
+            label_prAsk1.TabIndex = 9;
+            label_prAsk1.Text = "0";
+            label_prAsk1.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label_prAsk2
+            // 
+            label_prAsk2.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_prAsk2.AutoSize = true;
+            label_prAsk2.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_prAsk2.Location = new Point(96, 114);
+            label_prAsk2.Name = "label_prAsk2";
+            label_prAsk2.Size = new Size(86, 26);
+            label_prAsk2.TabIndex = 10;
+            label_prAsk2.Text = "0";
+            label_prAsk2.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label_prAsk3
+            // 
+            label_prAsk3.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_prAsk3.AutoSize = true;
+            label_prAsk3.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_prAsk3.Location = new Point(96, 86);
+            label_prAsk3.Name = "label_prAsk3";
+            label_prAsk3.Size = new Size(86, 26);
+            label_prAsk3.TabIndex = 11;
+            label_prAsk3.Text = "0";
+            label_prAsk3.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label_prAsk4
+            // 
+            label_prAsk4.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_prAsk4.AutoSize = true;
+            label_prAsk4.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_prAsk4.Location = new Point(96, 58);
+            label_prAsk4.Name = "label_prAsk4";
+            label_prAsk4.Size = new Size(86, 26);
+            label_prAsk4.TabIndex = 12;
+            label_prAsk4.Text = "0";
+            label_prAsk4.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label_prAsk5
+            // 
+            label_prAsk5.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_prAsk5.AutoSize = true;
+            label_prAsk5.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_prAsk5.Location = new Point(96, 30);
+            label_prAsk5.Name = "label_prAsk5";
+            label_prAsk5.Size = new Size(86, 26);
+            label_prAsk5.TabIndex = 13;
+            label_prAsk5.Text = "0";
+            label_prAsk5.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label_prAsk6
+            // 
+            label_prAsk6.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_prAsk6.AutoSize = true;
+            label_prAsk6.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_prAsk6.Location = new Point(96, 2);
+            label_prAsk6.Name = "label_prAsk6";
+            label_prAsk6.Size = new Size(86, 26);
+            label_prAsk6.TabIndex = 14;
+            label_prAsk6.Text = "0";
+            label_prAsk6.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label_prBid1
+            // 
+            label_prBid1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_prBid1.AutoSize = true;
+            label_prBid1.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_prBid1.Location = new Point(96, 170);
+            label_prBid1.Name = "label_prBid1";
+            label_prBid1.Size = new Size(86, 26);
+            label_prBid1.TabIndex = 15;
+            label_prBid1.Text = "0";
+            label_prBid1.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label_prBid2
+            // 
+            label_prBid2.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_prBid2.AutoSize = true;
+            label_prBid2.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_prBid2.Location = new Point(96, 198);
+            label_prBid2.Name = "label_prBid2";
+            label_prBid2.Size = new Size(86, 26);
+            label_prBid2.TabIndex = 16;
+            label_prBid2.Text = "0";
+            label_prBid2.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label_prBid3
+            // 
+            label_prBid3.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_prBid3.AutoSize = true;
+            label_prBid3.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_prBid3.Location = new Point(96, 226);
+            label_prBid3.Name = "label_prBid3";
+            label_prBid3.Size = new Size(86, 26);
+            label_prBid3.TabIndex = 17;
+            label_prBid3.Text = "0";
+            label_prBid3.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label_prBid4
+            // 
+            label_prBid4.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_prBid4.AutoSize = true;
+            label_prBid4.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_prBid4.Location = new Point(96, 254);
+            label_prBid4.Name = "label_prBid4";
+            label_prBid4.Size = new Size(86, 26);
+            label_prBid4.TabIndex = 18;
+            label_prBid4.Text = "0";
+            label_prBid4.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label_prBid5
+            // 
+            label_prBid5.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_prBid5.AutoSize = true;
+            label_prBid5.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_prBid5.Location = new Point(96, 282);
+            label_prBid5.Name = "label_prBid5";
+            label_prBid5.Size = new Size(86, 26);
+            label_prBid5.TabIndex = 19;
+            label_prBid5.Text = "0";
+            label_prBid5.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label_prBid6
+            // 
+            label_prBid6.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_prBid6.AutoSize = true;
+            label_prBid6.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_prBid6.Location = new Point(96, 310);
+            label_prBid6.Name = "label_prBid6";
+            label_prBid6.Size = new Size(86, 37);
+            label_prBid6.TabIndex = 20;
+            label_prBid6.Text = "0";
+            label_prBid6.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label_qtBid1
+            // 
+            label_qtBid1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_qtBid1.AutoSize = true;
+            label_qtBid1.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_qtBid1.Location = new Point(190, 170);
+            label_qtBid1.Name = "label_qtBid1";
+            label_qtBid1.Size = new Size(84, 26);
+            label_qtBid1.TabIndex = 21;
+            label_qtBid1.Text = "0";
+            label_qtBid1.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label_qtBid2
+            // 
+            label_qtBid2.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_qtBid2.AutoSize = true;
+            label_qtBid2.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_qtBid2.Location = new Point(190, 198);
+            label_qtBid2.Name = "label_qtBid2";
+            label_qtBid2.Size = new Size(84, 26);
+            label_qtBid2.TabIndex = 22;
+            label_qtBid2.Text = "0";
+            label_qtBid2.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label_qtBid3
+            // 
+            label_qtBid3.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_qtBid3.AutoSize = true;
+            label_qtBid3.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_qtBid3.Location = new Point(190, 226);
+            label_qtBid3.Name = "label_qtBid3";
+            label_qtBid3.Size = new Size(84, 26);
+            label_qtBid3.TabIndex = 23;
+            label_qtBid3.Text = "0";
+            label_qtBid3.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label_qtBid4
+            // 
+            label_qtBid4.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_qtBid4.AutoSize = true;
+            label_qtBid4.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_qtBid4.Location = new Point(190, 254);
+            label_qtBid4.Name = "label_qtBid4";
+            label_qtBid4.Size = new Size(84, 26);
+            label_qtBid4.TabIndex = 24;
+            label_qtBid4.Text = "0";
+            label_qtBid4.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label_qtBid5
+            // 
+            label_qtBid5.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_qtBid5.AutoSize = true;
+            label_qtBid5.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_qtBid5.Location = new Point(190, 282);
+            label_qtBid5.Name = "label_qtBid5";
+            label_qtBid5.Size = new Size(84, 26);
+            label_qtBid5.TabIndex = 25;
+            label_qtBid5.Text = "0";
+            label_qtBid5.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label_qtBid6
+            // 
+            label_qtBid6.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_qtBid6.AutoSize = true;
+            label_qtBid6.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_qtBid6.Location = new Point(190, 310);
+            label_qtBid6.Name = "label_qtBid6";
+            label_qtBid6.Size = new Size(84, 37);
+            label_qtBid6.TabIndex = 26;
+            label_qtBid6.Text = "0";
+            label_qtBid6.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label_qtAsk5
+            // 
+            label_qtAsk5.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_qtAsk5.AutoSize = true;
+            label_qtAsk5.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_qtAsk5.Location = new Point(5, 30);
+            label_qtAsk5.Name = "label_qtAsk5";
+            label_qtAsk5.Size = new Size(83, 26);
+            label_qtAsk5.TabIndex = 28;
+            label_qtAsk5.Text = "0";
+            label_qtAsk5.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label_qtAsk4
+            // 
+            label_qtAsk4.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_qtAsk4.AutoSize = true;
+            label_qtAsk4.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_qtAsk4.Location = new Point(5, 58);
+            label_qtAsk4.Name = "label_qtAsk4";
+            label_qtAsk4.Size = new Size(83, 26);
+            label_qtAsk4.TabIndex = 29;
+            label_qtAsk4.Text = "0";
+            label_qtAsk4.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label_qtAsk3
+            // 
+            label_qtAsk3.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_qtAsk3.AutoSize = true;
+            label_qtAsk3.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_qtAsk3.Location = new Point(5, 86);
+            label_qtAsk3.Name = "label_qtAsk3";
+            label_qtAsk3.Size = new Size(83, 26);
+            label_qtAsk3.TabIndex = 30;
+            label_qtAsk3.Text = "0";
+            label_qtAsk3.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label_qtAsk2
+            // 
+            label_qtAsk2.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_qtAsk2.AutoSize = true;
+            label_qtAsk2.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_qtAsk2.Location = new Point(5, 114);
+            label_qtAsk2.Name = "label_qtAsk2";
+            label_qtAsk2.Size = new Size(83, 26);
+            label_qtAsk2.TabIndex = 31;
+            label_qtAsk2.Text = "0";
+            label_qtAsk2.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label_qtAsk1
+            // 
+            label_qtAsk1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_qtAsk1.AutoSize = true;
+            label_qtAsk1.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_qtAsk1.Location = new Point(5, 142);
+            label_qtAsk1.Name = "label_qtAsk1";
+            label_qtAsk1.Size = new Size(83, 26);
+            label_qtAsk1.TabIndex = 32;
+            label_qtAsk1.Text = "0";
+            label_qtAsk1.TextAlign = ContentAlignment.MiddleRight;
             // 
             // groupBox5
             // 
@@ -951,6 +1326,7 @@
             // 
             // display_update
             // 
+            display_update.Enabled = true;
             display_update.Interval = 1000;
             display_update.Tick += display_update_Tick;
             // 
@@ -974,6 +1350,9 @@
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();
             tabProduct.ResumeLayout(false);
+            groupBox6.ResumeLayout(false);
+            tableLayoutPanel4.ResumeLayout(false);
+            tableLayoutPanel4.PerformLayout();
             groupBox5.ResumeLayout(false);
             groupBox5.PerformLayout();
             tabConfig.ResumeLayout(false);
@@ -1008,7 +1387,7 @@
         private Label label12;
         private Label label13;
         private Label label14;
-        private Button button1;
+        private Button button_startListen;
         private Label label_feedAll;
         private Label label_feedInc;
         private Label label_feedQueue;
@@ -1056,5 +1435,31 @@
         private Label label_baseCurr;
         private Label label_id;
         private Label label_productType;
+        private GroupBox groupBox6;
+        private TableLayoutPanel tableLayoutPanel4;
+        private Label label_prAsk1;
+        private Label label_prAsk2;
+        private Label label_prAsk3;
+        private Label label_prAsk4;
+        private Label label_prAsk5;
+        private Label label_prBid1;
+        private Label label_prBid2;
+        private Label label_prBid3;
+        private Label label_prBid4;
+        private Label label_prBid5;
+        private Label label_qtBid1;
+        private Label label_qtBid2;
+        private Label label_qtBid3;
+        private Label label_qtBid4;
+        private Label label_qtBid5;
+        private Label label_qtAsk5;
+        private Label label_qtAsk4;
+        private Label label_qtAsk3;
+        private Label label_qtAsk2;
+        private Label label_qtAsk1;
+        private Label label_qtAsk6;
+        private Label label_prAsk6;
+        private Label label_prBid6;
+        private Label label_qtBid6;
     }
 }

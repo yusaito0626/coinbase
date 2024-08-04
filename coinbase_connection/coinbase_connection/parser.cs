@@ -108,6 +108,20 @@ namespace coinbase_connection
                 return "";
             }
         }
+        static public string findEventType(string str)
+        {
+            string target = "\"type\":";
+            int start = str.IndexOf(target) + target.Length + 1;
+            if (start > 0)
+            {
+                int end = str.IndexOf("\"", start);
+                return str.Substring(start, end - start);
+            }
+            else
+            {
+                return "";
+            }
+        }
 
         static public void parseUpdate(string str,ref cbMsg.jsUpdate obj)
         {
@@ -124,7 +138,7 @@ namespace coinbase_connection
 
         static public void jsUpdateToTrades(string symbol,cbMsg.jsUpdate jsup, ref cbMsg.trades obj)
         {
-            obj.msg_type = "update";
+            obj.msg_type = "l2_data";
             obj.product_id = symbol;
             obj.time = jsup.event_time;
             obj.price = double.Parse(jsup.price_level);
@@ -303,6 +317,7 @@ namespace cbMsg
         public trades(jsTrades jst)
         {
             this.msg_type = "";
+            this.event_type = "";
             this.trade_id = jst.trade_id;
             this.product_id = jst.product_id;
             this.price = Double.Parse(jst.price);
@@ -311,6 +326,7 @@ namespace cbMsg
             this.time = jst.time;
         }
         public string msg_type;
+        public string event_type;
         public string trade_id;
         public string product_id;
         public double price;

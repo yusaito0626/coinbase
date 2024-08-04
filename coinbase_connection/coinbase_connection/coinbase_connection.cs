@@ -10,6 +10,7 @@ using System.Security.Cryptography;
 using Jose;
 using System.Diagnostics.SymbolStore;
 using cbMsg;
+using System;
 
 namespace coinbase_connection
 {
@@ -22,16 +23,17 @@ namespace coinbase_connection
 
         static Random random = new Random();
 
-        private ConcurrentQueue<string> q;
+        public ConcurrentQueue<string> msgQueue;
 
-        public coinbase_connection()
+        public Action<string> addLog = (str) => { Console.WriteLine(str); };
+
+        private coinbase_connection()
         {
             this.ws = new ClientWebSocket();
             this.url = "";
             this.name = "";
             this.privateKey = "";
 
-            this.q = new ConcurrentQueue<string>();
         }
         ~coinbase_connection()
         {
@@ -65,31 +67,40 @@ namespace coinbase_connection
             switch (channel)
             {
                 case cbChannels.heartbeats:
+                    this.addLog("Start listening heartbeats...");
                     strChannel += "\"heartbeats\",";
                     break;
                 case cbChannels.candles:
+                    this.addLog("Start listening candles...");
                     strChannel += "\"candle\",";
                     break;
                 case cbChannels.status:
+                    this.addLog("Start listening status...");
                     strChannel += "\"status\",";
                     break;
                 case cbChannels.ticker:
+                    this.addLog("Start listening ticker...");
                     strChannel += "\"ticker\",";
                     break;
                 case cbChannels.ticker_batch:
+                    this.addLog("Start listening ticker_batch...");
                     strChannel += "\"ticker_batch\",";
                     break;
                 case cbChannels.level2:
+                    this.addLog("Start listening level 2...");
                     strChannel += "\"level2\",";
                     break;
                 case cbChannels.user:
+                    this.addLog("Start listening user...");
                     strChannel += "\"user\",";
                     break;
                 case cbChannels.market_trades:
+                    this.addLog("Start listening market_trades...");
                     strChannel += "\"market_trades\",";
                     break;
                 case cbChannels.NONE:
                 default:
+                    this.addLog("[ERROR] Channel not specified");
                     strChannel = "";
                     return false;
                     break;
@@ -121,7 +132,52 @@ namespace coinbase_connection
             }
             else
             {
+                this.addLog("[ERROR] The name or the key is unknown.");
                 return false;
+            }
+        }
+
+        public void listen()
+        {
+            this.addLog("Listening thread started.");
+            byte[] buffer = new byte[1073741824];
+            while (true)
+            {
+                var segment = new ArraySegment<byte>(buffer);
+                var result = this.recv(ref segment);
+
+                if (result.IsFaulted == false)
+                {
+                    if (result.Result.MessageType == WebSocketMessageType.Close)
+                    {
+                        return;
+                    }
+                    if (result.Result.MessageType == WebSocketMessageType.Binary)
+                    {
+                        return;
+                    }
+
+                    int count = result.Result.Count;
+                    while (!result.Result.EndOfMessage)
+                    {
+                        if (result.Result.Count == 0)
+                        {
+                            break;
+                        }
+                        if (count >= buffer.Length)
+                        {
+                            return;
+                        }
+                        segment = new ArraySegment<byte>(buffer, count, buffer.Length - count);
+                        result = this.recv(ref segment);
+
+                        count += result.Result.Count;
+                    }
+
+                    var message = Encoding.UTF8.GetString(buffer, 0, count);
+                    this.msgQueue.Enqueue(message);
+                }
+
             }
         }
 
@@ -205,6 +261,22 @@ namespace coinbase_connection
         public WebSocketState getState()
         {
             return this.ws.State;
+        }
+
+        private static coinbase_connection _instance;
+        private static readonly object _lockObject = new object();
+
+        public static coinbase_connection GetInstance()
+        {
+            lock (_lockObject)
+            {
+                if (_instance == null)
+                {
+                    //インスタンス生成
+                    _instance = new coinbase_connection();
+                }
+                return _instance;
+            }
         }
     }
 
