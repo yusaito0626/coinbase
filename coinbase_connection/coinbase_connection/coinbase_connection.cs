@@ -11,6 +11,8 @@ using Jose;
 using System.Diagnostics.SymbolStore;
 using cbMsg;
 using System;
+using System.Net.Http.Headers;
+using System.Globalization;
 
 namespace coinbase_connection
 {
@@ -296,7 +298,7 @@ namespace coinbase_connection
             this.url_editOrderReview = this.url + "orders/edit_preview";
             this.url_listOrders = this.url + "orders/historical/batch";
             this.url_listFills = this.url + "orders/historical/fills";
-            this.url_getOrders = this.url + "orders/historical/";//Need order_id
+            this.url_getOrder = this.url + "orders/historical/";//Need order_id
             this.url_previewOrder = this.url + "orders/preview";
             this.url_closePosition = this.url + "orders/close_position";
             this.order_no = 0;
@@ -326,7 +328,474 @@ namespace coinbase_connection
             request.Content = content;
             return await client.SendAsync(request);
         }
-
+        public async Task<HttpResponseMessage> cancelOrders(string[] order_ids)
+        {
+            string str = "{\"order_ids\":[";
+            int i;
+            for(i = 0;i < order_ids.Length;++i)
+            {
+                if(i == 0)
+                {
+                    str += "\"" + order_ids[i] + "\"";
+                }
+                else
+                {
+                    str += ",\"" + order_ids[i] + "\"";
+                }
+            }
+            str += "]}";
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, this.url_cancelOrder);
+            StringContent content = new StringContent(str, null, "application/json");
+            request.Content = content;
+            return await client.SendAsync(request);
+        }
+        public async Task<HttpResponseMessage> editOrder(string order_id,string price = "", string size = "")
+        {
+            string str = "{\"order_id\":\"" + order_id + "\"";
+            if(price != "")
+            {
+                str += ",\"price\":\"" + price + "\"";
+            }
+            if (size != "")
+            {
+                str += ",\"size\":\"" + size + "\"";
+            }
+            str += "}";
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, this.url_editOrder);
+            StringContent content = new StringContent(str, null, "application/json");
+            request.Content = content;
+            return await client.SendAsync(request);
+        }
+        public async Task<HttpResponseMessage> editPreview(string order_id, string price = "", string size = "")
+        {
+            string str = "{\"order_id\":\"" + order_id + "\"";
+            if (price != "")
+            {
+                str += ",\"price\":\"" + price + "\"";
+            }
+            if (size != "")
+            {
+                str += ",\"size\":\"" + size + "\"";
+            }
+            str += "}";
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, this.url_editOrderReview);
+            StringContent content = new StringContent(str, null, "application/json");
+            request.Content = content;
+            return await client.SendAsync(request);
+        }
+        public async Task<HttpResponseMessage> listOrders(string[] order_ids, string[] product_ids, string product_type, string[] order_status, string[] time_in_forces, string[] order_types,string order_side,string start_date,string end_date,string order_placement_source,string contract_expiry_type, string[] asset_filters,string retail_portfolio_id,string limit,string cursor,string user_native_currency)
+        {
+            string str = "";
+            int i;
+            if(order_ids.Length > 0)
+            {
+                for(i = 0;i <order_ids.Length;++i)
+                {
+                    if(str == "")
+                    {
+                        str += "order_ids=" + order_ids[i];
+                    }
+                    else
+                    {
+                        str += "&order_ids=" + order_ids[i];
+                    }
+                }
+            }
+            if (product_ids.Length > 0)
+            {
+                for (i = 0; i < product_ids.Length; ++i)
+                {
+                    if (str == "")
+                    {
+                        str += "product_ids=" + product_ids[i];
+                    }
+                    else
+                    {
+                        str += "&product_ids=" + product_ids[i];
+                    }
+                }
+            }
+            if(product_type != "")
+            {
+                if (str == "")
+                {
+                    str += "product_type=" + product_type;
+                }
+                else
+                {
+                    str += "&product_type=" + product_type;
+                }
+            }
+            if (order_status.Length > 0)
+            {
+                for (i = 0; i < order_status.Length; ++i)
+                {
+                    if (str == "")
+                    {
+                        str += "order_status=" + order_status[i];
+                    }
+                    else
+                    {
+                        str += "&order_status=" + order_status[i];
+                    }
+                }
+            }
+            if (time_in_forces.Length > 0)
+            {
+                for (i = 0; i < time_in_forces.Length; ++i)
+                {
+                    if (str == "")
+                    {
+                        str += "time_in_forces=" + time_in_forces[i];
+                    }
+                    else
+                    {
+                        str += "&time_in_forces=" + time_in_forces[i];
+                    }
+                }
+            }
+            if (order_types.Length > 0)
+            {
+                for (i = 0; i < order_types.Length; ++i)
+                {
+                    if (str == "")
+                    {
+                        str += "order_types=" + order_types[i];
+                    }
+                    else
+                    {
+                        str += "&order_types=" + order_types[i];
+                    }
+                }
+            }
+            if (order_side != "")
+            {
+                if (str == "")
+                {
+                    str += "order_side=" + order_side;
+                }
+                else
+                {
+                    str += "&order_side=" + order_side;
+                }
+            }
+            if (start_date != "")
+            {
+                if (str == "")
+                {
+                    str += "start_date=" + start_date;
+                }
+                else
+                {
+                    str += "&start_date=" + start_date;
+                }
+            }
+            if (end_date != "")
+            {
+                if (str == "")
+                {
+                    str += "end_date=" + end_date;
+                }
+                else
+                {
+                    str += "&end_date=" + end_date;
+                }
+            }
+            if (order_placement_source != "")
+            {
+                if (str == "")
+                {
+                    str += "order_placement_source=" + order_placement_source;
+                }
+                else
+                {
+                    str += "&order_placement_source=" + order_placement_source;
+                }
+            }
+            if (contract_expiry_type != "")
+            {
+                if (str == "")
+                {
+                    str += "contract_expiry_type=" + contract_expiry_type;
+                }
+                else
+                {
+                    str += "&contract_expiry_type=" + contract_expiry_type;
+                }
+            }
+            if (asset_filters.Length > 0)
+            {
+                for (i = 0; i < asset_filters.Length; ++i)
+                {
+                    if (str == "")
+                    {
+                        str += "asset_filters=" + asset_filters[i];
+                    }
+                    else
+                    {
+                        str += "&asset_filters=" + asset_filters[i];
+                    }
+                }
+            }
+            if (retail_portfolio_id != "")
+            {
+                if (str == "")
+                {
+                    str += "retail_portfolio_id=" + retail_portfolio_id;
+                }
+                else
+                {
+                    str += "&retail_portfolio_id=" + retail_portfolio_id;
+                }
+            }
+            if (limit != "")
+            {
+                if (str == "")
+                {
+                    str += "limit=" + limit;
+                }
+                else
+                {
+                    str += "&limit=" + limit;
+                }
+            }
+            if (cursor != "")
+            {
+                if (str == "")
+                {
+                    str += "cursor=" + cursor;
+                }
+                else
+                {
+                    str += "&cursor=" + cursor;
+                }
+            }
+            if (user_native_currency != "")
+            {
+                if (str == "")
+                {
+                    str += "user_native_currency=" + user_native_currency;
+                }
+                else
+                {
+                    str += "&user_native_currency=" + user_native_currency;
+                }
+            }
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, this.url_listOrders + "?" + str);
+            StringContent content = new StringContent(string.Empty);
+            content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            request.Content = content;
+            return await client.SendAsync(request);
+        }
+        public async Task<HttpResponseMessage> listFills(string[] order_ids, string[] trade_ids, string[] product_ids, string start_sequence_timestamp, string end_sequence_timestamp, string retail_portfolio_id, string limit, string cursor, string sort_by)
+        {
+            string str = "";
+            int i;
+            if (order_ids.Length > 0)
+            {
+                for (i = 0; i < order_ids.Length; ++i)
+                {
+                    if (str == "")
+                    {
+                        str += "order_ids=" + order_ids[i];
+                    }
+                    else
+                    {
+                        str += "&order_ids=" + order_ids[i];
+                    }
+                }
+            }
+            if (trade_ids.Length > 0)
+            {
+                for (i = 0; i < trade_ids.Length; ++i)
+                {
+                    if (str == "")
+                    {
+                        str += "trade_ids=" + trade_ids[i];
+                    }
+                    else
+                    {
+                        str += "&trade_ids=" + trade_ids[i];
+                    }
+                }
+            }
+            if (product_ids.Length > 0)
+            {
+                for (i = 0; i < product_ids.Length; ++i)
+                {
+                    if (str == "")
+                    {
+                        str += "product_ids=" + product_ids[i];
+                    }
+                    else
+                    {
+                        str += "&product_ids=" + product_ids[i];
+                    }
+                }
+            }
+            if (start_sequence_timestamp != "")
+            {
+                if (str == "")
+                {
+                    str += "start_sequence_timestamp=" + start_sequence_timestamp;
+                }
+                else
+                {
+                    str += "&start_sequence_timestamp=" + start_sequence_timestamp;
+                }
+            }
+            if (end_sequence_timestamp != "")
+            {
+                if (str == "")
+                {
+                    str += "end_sequence_timestamp=" + end_sequence_timestamp;
+                }
+                else
+                {
+                    str += "&end_sequence_timestamp=" + end_sequence_timestamp;
+                }
+            }
+            if (retail_portfolio_id != "")
+            {
+                if (str == "")
+                {
+                    str += "retail_portfolio_id=" + retail_portfolio_id;
+                }
+                else
+                {
+                    str += "&retail_portfolio_id=" + retail_portfolio_id;
+                }
+            }
+            if (limit != "")
+            {
+                if (str == "")
+                {
+                    str += "limit=" + limit;
+                }
+                else
+                {
+                    str += "&limit=" + limit;
+                }
+            }
+            if (cursor != "")
+            {
+                if (str == "")
+                {
+                    str += "cursor=" + cursor;
+                }
+                else
+                {
+                    str += "&cursor=" + cursor;
+                }
+            }
+            if (sort_by != "")
+            {
+                if (str == "")
+                {
+                    str += "sort_by=" + sort_by;
+                }
+                else
+                {
+                    str += "&sort_by=" + sort_by;
+                }
+            }
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, this.url_listFills + "?" + str);
+            StringContent content = new StringContent(string.Empty);
+            content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            request.Content = content;
+            return await client.SendAsync(request);
+        }
+        public async Task<HttpResponseMessage> getOrder(string order_id,string client_order_id,string user_native_currency)
+        {
+            string str = "";
+            if (client_order_id != "")
+            {
+                if(str == "")
+                {
+                    str += "?client_order_id=" + client_order_id;
+                }
+                else
+                {
+                    str += "&client_order_id=" + client_order_id;
+                }
+                
+            }
+            if (user_native_currency != "")
+            {
+                if (str == "")
+                {
+                    str += "?user_native_currency=" + user_native_currency;
+                }
+                else
+                {
+                    str += "&user_native_currency=" + user_native_currency;
+                }
+            }
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, this.url_getOrder + "/" + order_id + str);
+            StringContent content = new StringContent(string.Empty);
+            content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            request.Content = content;
+            return await client.SendAsync(request);
+        }
+        public async Task<HttpResponseMessage> previewOrder(string product_id, string side, string order_config, string leverage = "1.0", string margin_type = "CROSS", string retail_portfolio = "")
+        {
+            string str = "{\"product_id\":\"" + product_id + "\","
+                        + "\"side\":\"" + side + "\","
+                        + "\"order_configuration\":\"" + order_config + "\","
+                        + "\"leverage\":\"" + leverage + "\","
+                        + "\"margin_type\":\"" + margin_type + "\"";
+            if (retail_portfolio != "")
+            {
+                str += ",\"retail_portfolio\":\"" + retail_portfolio + "\"";
+            }
+            str += "}";
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, this..url_previewOrder);
+            StringContent content = new StringContent(str, null, "application/json");
+            request.Content = content;
+            return await client.SendAsync(request);
+        }
+        public async Task<HttpResponseMessage> closePosition(string client_order_id, string product_id, string size = "")
+        {
+            string str = "{\"order_id\":\"" + client_order_id + "\",\"product_id\":\"" + product_id + "\"";
+            if (size != "")
+            {
+                str += ",\"size\":\"" + size + "\"";
+            }
+            str += "}";
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, this.url_closePosition);
+            StringContent content = new StringContent(str, null, "application/json");
+            request.Content = content;
+            return await client.SendAsync(request);
+        }
+        public async Task<HttpResponseMessage> listAccount(string limit, string cursor, string retail_portfolio_id)
+        {
+            string str = "";
+            if (limit != "")
+            {
+                str += "&limit=" + limit;
+            }
+            if (cursor != "")
+            {
+                str += "&cursor=" + cursor;
+            }
+            if (retail_portfolio_id != "")
+            {
+                str += "&retail_portfolio_id=" + retail_portfolio_id;
+            }
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, this.url_listAccount + "?" + str);
+            StringContent content = new StringContent(string.Empty);
+            content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            request.Content = content;
+            return await client.SendAsync(request);
+        }
+        public async Task<HttpResponseMessage> getAccount(string account_uuid)
+        {
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, this.url_getAccount + "/" + account_uuid);
+            StringContent content = new StringContent(string.Empty);
+            content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            request.Content = content;
+            return await client.SendAsync(request);
+        }
 
         //order Configs
         public string market_market_ioc(string size, string size_type)
@@ -342,42 +811,34 @@ namespace coinbase_connection
             }
             return str;
         }
-
         public string sor_limit_ioc(string base_size, string limit_price)
         {
             return "\"order_configuration\": {\"sor_limit_ioc\":{\"base_size\": \"" + base_size + "\",\"limit_price\": \"" + limit_price + "\"}}";
         }
-
         public string limit_limit_gtc(string base_size, string limit_price,string post_only)
         {
             return "\"order_configuration\": {\"limit_limit_gtc\":{\"base_size\": \"" + base_size + "\",\"limit_price\": \"" + limit_price + "\",\"post_only\":" + post_only + "}}";
         }
-
         public string limit_limit_gtd(string base_size, string limit_price, string post_only,string end_time)
         {
             return "\"order_configuration\": {\"limit_limit_gtd\":{\"base_size\": \"" + base_size + "\",\"limit_price\": \"" + limit_price + "\",\"end_time\": \"" + end_time + "\",\"post_only\":" + post_only + "}}";
         }
-
         public string limit_limit_fok(string base_size,string limit_price)
         {
             return "\"order_configuration\": {\"limit_limit_fok\":{\"base_size\": \"" + base_size + "\",\"limit_price\": \"" + limit_price + "\"}}";
         }
-
         public string stop_limit_stop_limit_gtc(string base_size, string limit_price,string stop_price,string stop_direction)
         {
             return "\"order_configuration\": {\"stop_limit_stop_limit_gtc\":{\"base_size\": \"" + base_size + "\",\"limit_price\": \"" + limit_price + "\",\"stop_price\": \"" + stop_price + "\",\"stop_direction\": \"" + stop_direction + "\"}}";
         }
-
         public string stop_limit_stop_limit_gtd(string base_size, string limit_price, string stop_price, string end_time, string stop_direction)
         {
             return "\"order_configuration\": {\"stop_limit_stop_limit_gtd\":{\"base_size\": \"" + base_size + "\",\"limit_price\": \"" + limit_price + "\",\"stop_price\": \"" + stop_price + ",\"end_time\": \"" + end_time + "\",\"stop_direction\": \"" + stop_direction + "\"}}";
         }
-
         public string trigger_bracket_gtc(string base_size, string limit_price, string stop_trigger_price)
         {
             return "\"order_configuration\": {\"trigger_bracket_gtc\":{\"base_size\": \"" + base_size + "\",\"limit_price\": \"" + limit_price + "\",\"stop_trigger_price\": \"" + stop_trigger_price + "\"}}";
         }
-
         public string trigger_bracket_gtd(string base_size, string limit_price, string stop_trigger_price,string end_time)
         {
             return "\"order_configuration\": {\"trigger_bracket_gtd\":{\"base_size\": \"" + base_size + "\",\"limit_price\": \"" + limit_price + "\",\"stop_trigger_price\": \"" + stop_trigger_price + ",\"end_time\": \"" + end_time + "\"}}";
@@ -401,7 +862,7 @@ namespace coinbase_connection
         private string url_editOrderReview;
         private string url_listOrders;
         private string url_listFills;
-        private string url_getOrders;
+        private string url_getOrder;
         private string url_previewOrder;
         private string url_closePosition;
 
