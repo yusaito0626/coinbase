@@ -749,7 +749,7 @@ namespace coinbase_connection
                 str += ",\"retail_portfolio\":\"" + retail_portfolio + "\"";
             }
             str += "}";
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, this..url_previewOrder);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, this.url_previewOrder);
             StringContent content = new StringContent(str, null, "application/json");
             request.Content = content;
             return await client.SendAsync(request);
