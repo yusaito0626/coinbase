@@ -190,6 +190,14 @@ namespace coinbase_main
         public int minPr;
         public int maxPr;
 
+        public Dictionary<string, order> liveOrders;
+        public Dictionary<string, order> orders;
+
+        public int minOrdPr;
+        public int maxOrdPr;
+        public double maxQuoteSize;
+        public double maxBaseSize;
+
         public int last;
         public int open;
         public int high;
