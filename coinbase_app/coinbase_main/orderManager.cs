@@ -12,16 +12,31 @@ using System.Threading.Tasks;
 
 namespace coinbase_main
 {
-    internal class orderManager
+    public class orderManager
     {
+        private orderManager()
+        {
+            this.orderStack = new ConcurrentStack<order>();
+            for(int i = 0;i < this.STACK_SIZE; ++i)
+            {
+                this.orderStack.Push(new order());
+            }
+            this.tempjson = new Dictionary<string, string>();
+        }
 
         public Action<string> addLog = (str) => { Console.WriteLine(str); };
 
+        private int STACK_SIZE = 100000;
         public ConcurrentStack<order> orderStack;
 
         public Dictionary<string, crypto> cryptos;
 
         private coinbase_connection.coinbase_restAPI api = coinbase_connection.coinbase_restAPI.GetInstance();
+
+        public void readApiKey(string filename)
+        {
+            this.api.readApiKey(filename);
+        }
         
         public async Task<HttpResponseMessage> sendMarketOrder(string product_id, string side, double base_size, string leverage = "1.0", string margin_type = "CROSS", string retail_portfolio = "", string preview_id = "") 
         {
@@ -36,7 +51,7 @@ namespace coinbase_main
                 this.addLog("[ERROR] Invalid side");
                 return null;
             }
-            if(!this.checkSize(cp,base_size))
+            if(!this.checkSize(cp,base_size,0,side))
             {
                 this.addLog("[ERROR] Invalid size");
                 return null;
@@ -98,7 +113,7 @@ namespace coinbase_main
                 this.addLog("[ERROR] Invalid limit price");
                 return null;
             }
-            if (!this.checkSize(cp, base_size))
+            if (!this.checkSize(cp, base_size,limit_price,side))
             {
                 this.addLog("[ERROR] Invalid size");
                 return null;
@@ -160,7 +175,7 @@ namespace coinbase_main
                 this.addLog("[ERROR] Invalid limit price");
                 return null;
             }
-            if (!this.checkSize(cp, base_size))
+            if (!this.checkSize(cp, base_size, limit_price, side))
             {
                 this.addLog("[ERROR] Invalid size");
                 return null;
@@ -222,7 +237,7 @@ namespace coinbase_main
                 this.addLog("[ERROR] Invalid limit price");
                 return null;
             }
-            if (!this.checkSize(cp, base_size))
+            if (!this.checkSize(cp, base_size, limit_price, side))
             {
                 this.addLog("[ERROR] Invalid size");
                 return null;
@@ -289,7 +304,7 @@ namespace coinbase_main
                 this.addLog("[ERROR] Invalid limit price");
                 return null;
             }
-            if (!this.checkSize(cp, base_size))
+            if (!this.checkSize(cp, base_size, limit_price, side))
             {
                 this.addLog("[ERROR] Invalid size");
                 return null;
@@ -351,7 +366,7 @@ namespace coinbase_main
                 this.addLog("[ERROR] Invalid limit price");
                 return null;
             }
-            if (!this.checkSize(cp, base_size))
+            if (!this.checkSize(cp, base_size, limit_price, side))
             {
                 this.addLog("[ERROR] Invalid size");
                 return null;
@@ -413,7 +428,7 @@ namespace coinbase_main
                 this.addLog("[ERROR] Invalid limit price");
                 return null;
             }
-            if (!this.checkSize(cp, base_size))
+            if (!this.checkSize(cp, base_size, limit_price, side))
             {
                 this.addLog("[ERROR] Invalid size");
                 return null;
@@ -480,7 +495,7 @@ namespace coinbase_main
                 this.addLog("[ERROR] Invalid limit price");
                 return null;
             }
-            if (!this.checkSize(cp, base_size))
+            if (!this.checkSize(cp, base_size, limit_price, side))
             {
                 this.addLog("[ERROR] Invalid size");
                 return null;
@@ -542,7 +557,7 @@ namespace coinbase_main
                 this.addLog("[ERROR] Invalid limit price");
                 return null;
             }
-            if (!this.checkSize(cp, base_size))
+            if (!this.checkSize(cp, base_size,limit_price,side))
             {
                 this.addLog("[ERROR] Invalid size");
                 return null;
@@ -612,7 +627,7 @@ namespace coinbase_main
             }
             if (newSize >= 0 && newSize != orgOrd.size)
             {
-                if (!this.checkSize(cp, newSize))
+                if (!this.checkSize(cp, newSize,newPr,orgOrd.side))
                 {
                     this.addLog("[ERROR] Invalid size");
                     return null;
@@ -706,7 +721,7 @@ namespace coinbase_main
             {
                 return false;
             }
-            else if(limit_price < cp.minPr || limit_price > cp.maxPr)
+            else if((int)(limit_price / cp.quote_increment) < cp.minPr || (int)(limit_price / cp.quote_increment) > cp.maxPr)
             {
                 return false;
             }
@@ -715,16 +730,16 @@ namespace coinbase_main
                 return true;
             }
         }
-        private bool checkSize(crypto cp, double base_size,double limi_price = 0,string side = "")
+        private bool checkSize(crypto cp, double base_size,double limit_price = 0,string side = "")
         {
             if(base_size > cp.maxBaseSize || base_size > this.maxBaseSize)
             {
                 return false;
             }
             double price;
-            if(limi_price > 0)
+            if(limit_price > 0)
             {
-                price = limi_price;
+                price = limit_price;
             }
             else if(side == "BUY" && cp.bestask > 0)
             {
@@ -736,10 +751,11 @@ namespace coinbase_main
             }
             else
             {
+                addLog(cp.bestask.ToString() + " " + cp.bestbid.ToString());
                 return false;
             }
             if(base_size * price > cp.maxQuoteSize || base_size * price > this.maxQuoteSize)
-            {  
+            {
                 return false;
             }
             return true;

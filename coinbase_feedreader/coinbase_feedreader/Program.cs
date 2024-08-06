@@ -68,27 +68,18 @@ using (StreamWriter sw = new StreamWriter(outputfile))
 
         if (result.IsFaulted == false)
         {
-            //if(result.Status.ToString() == "WaitingForActivation")
-            //{
-            //    Console.WriteLine("Coinbase currently offline");
-            //    cc.disconnect();
-            //    break;
-            //}
-            //エンドポイントCloseの場合、処理を中断
             if (result.Result.MessageType == WebSocketMessageType.Close)
             {
                 Console.WriteLine("Endpoint Closed");
                 return;
             }
 
-            //バイナリの場合は、当処理では扱えないため、処理を中断
             if (result.Result.MessageType == WebSocketMessageType.Binary)
             {
                 Console.WriteLine("Result Binary");
                 return;
             }
 
-            //メッセージの最後まで取得
             int count = result.Result.Count;
             while (!result.Result.EndOfMessage)
             {

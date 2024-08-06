@@ -75,7 +75,6 @@ namespace coinbase_main
             {
                 if (_instance == null)
                 {
-                    //インスタンス生成
                     _instance = new quoteManager();
                 }
                 return _instance;

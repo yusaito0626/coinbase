@@ -323,7 +323,8 @@ namespace coinbase_connection
                 str += ",\"preview_id\":\"" + preview_id + "\"";
             }
             str += "}";
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, this.url_createOrder);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://" + this.url_createOrder);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", this.generateToken(this.name,this.privateKey,"POST " + this.url_createOrder));
             StringContent content = new StringContent(str,null, "application/json");
             request.Content = content;
             return await client.SendAsync(request);
@@ -344,7 +345,8 @@ namespace coinbase_connection
                 }
             }
             str += "]}";
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, this.url_cancelOrder);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://" + this.url_cancelOrder);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", this.generateToken(this.name, this.privateKey, "POST " + this.url_cancelOrder));
             StringContent content = new StringContent(str, null, "application/json");
             request.Content = content;
             return await client.SendAsync(request);
@@ -361,7 +363,8 @@ namespace coinbase_connection
                 str += ",\"size\":\"" + size + "\"";
             }
             str += "}";
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, this.url_editOrder);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://" + this.url_editOrder);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", this.generateToken(this.name, this.privateKey, "POST " + this.url_editOrder));
             StringContent content = new StringContent(str, null, "application/json");
             request.Content = content;
             return await client.SendAsync(request);
@@ -378,7 +381,8 @@ namespace coinbase_connection
                 str += ",\"size\":\"" + size + "\"";
             }
             str += "}";
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, this.url_editOrderReview);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://" + this.url_editOrderReview);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", this.generateToken(this.name, this.privateKey, "POST " + this.url_editOrderReview));
             StringContent content = new StringContent(str, null, "application/json");
             request.Content = content;
             return await client.SendAsync(request);
@@ -581,7 +585,12 @@ namespace coinbase_connection
                     str += "&user_native_currency=" + user_native_currency;
                 }
             }
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, this.url_listOrders + "?" + str);
+            if (str != "")
+            {
+                str = "?" + str;
+            }
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "https://" + this.url_listOrders + str);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", this.generateToken(this.name, this.privateKey, "GET " + this.url_listOrders));
             StringContent content = new StringContent(string.Empty);
             content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
             request.Content = content;
@@ -699,7 +708,12 @@ namespace coinbase_connection
                     str += "&sort_by=" + sort_by;
                 }
             }
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, this.url_listFills + "?" + str);
+            if(str != "")
+            {
+                str = "?" + str;
+            }
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "https://" + this.url_listFills + str);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", this.generateToken(this.name, this.privateKey, "GET " + this.url_listFills));
             StringContent content = new StringContent(string.Empty);
             content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
             request.Content = content;
@@ -731,7 +745,8 @@ namespace coinbase_connection
                     str += "&user_native_currency=" + user_native_currency;
                 }
             }
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, this.url_getOrder + "/" + order_id + str);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "https://" + this.url_getOrder + "/" + order_id + str);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", this.generateToken(this.name, this.privateKey, "GET " + this.url_getOrder));
             StringContent content = new StringContent(string.Empty);
             content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
             request.Content = content;
@@ -749,7 +764,8 @@ namespace coinbase_connection
                 str += ",\"retail_portfolio\":\"" + retail_portfolio + "\"";
             }
             str += "}";
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, this.url_previewOrder);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://" + this.url_previewOrder);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", this.generateToken(this.name, this.privateKey, "POST " + this.url_previewOrder));
             StringContent content = new StringContent(str, null, "application/json");
             request.Content = content;
             return await client.SendAsync(request);
@@ -762,7 +778,8 @@ namespace coinbase_connection
                 str += ",\"size\":\"" + size + "\"";
             }
             str += "}";
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, this.url_closePosition);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://" + this.url_closePosition);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", this.generateToken(this.name, this.privateKey, "POST " + this.url_closePosition));
             StringContent content = new StringContent(str, null, "application/json");
             request.Content = content;
             return await client.SendAsync(request);
@@ -782,7 +799,12 @@ namespace coinbase_connection
             {
                 str += "&retail_portfolio_id=" + retail_portfolio_id;
             }
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, this.url_listAccount + "?" + str);
+            if(str != "")
+            {
+                str = "?" + str;
+            }
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "https://" + this.url_listAccount + str);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", this.generateToken(this.name, this.privateKey, "GET " + this.url_listAccount + str));
             StringContent content = new StringContent(string.Empty);
             content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
             request.Content = content;
@@ -790,7 +812,8 @@ namespace coinbase_connection
         }
         public async Task<HttpResponseMessage> getAccount(string account_uuid)
         {
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, this.url_getAccount + "/" + account_uuid);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "https://" + this.url_getAccount + "/" + account_uuid);
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", this.generateToken(this.name, this.privateKey, "POST " + this.url_createOrder));
             StringContent content = new StringContent(string.Empty);
             content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
             request.Content = content;
@@ -850,7 +873,84 @@ namespace coinbase_connection
             return symbol + DateTime.Now.ToString("yyyyMMdd") + current_no.ToString("D8");
         }
 
-        private string url = "https://api.coinbase.com/api/v3/brokerage/";
+        public void readApiKey(string filename)
+        {
+            using (var fileStream = File.OpenRead(filename))
+            {
+                using (var streamReader = new StreamReader(fileStream))
+                {
+                    String line;
+                    while ((line = streamReader.ReadLine()) != null)
+                    {
+                        if (line.Substring(0, 7) == "API key")
+                        {
+                            this.name = line.Substring(9);
+                        }
+                        else if (line.Substring(0, 11) == "Private key")
+                        {
+                            string temp = line.Substring(13);
+                            this.privateKey = parseKey(temp);
+                        }
+                    }
+                }
+            }
+        }
+
+
+        string parseKey(string key)
+        {
+            List<string> keyLines = new List<string>();
+            keyLines.AddRange(key.Split("\\n", StringSplitOptions.RemoveEmptyEntries));
+
+            keyLines.RemoveAt(0);
+            keyLines.RemoveAt(keyLines.Count - 1);
+
+            return string.Join("", keyLines);
+        }
+
+        string generateToken(string name, string secret, string uri)
+        {
+            var privateKeyBytes = Convert.FromBase64String(secret); // Assuming PEM is base64 encoded
+            using var key = ECDsa.Create();
+            key.ImportECPrivateKey(privateKeyBytes, out _);
+
+            var payload = new Dictionary<string, object>
+             {
+                 { "sub", name },
+                 { "iss", "cdp" },
+                 { "nbf", Convert.ToInt64((DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds) },
+                 { "exp", Convert.ToInt64((DateTime.UtcNow.AddMinutes(2) - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds) },
+                 { "uri", uri }
+             };
+
+            var extraHeaders = new Dictionary<string, object>
+             {
+                 { "kid", name },
+                 // add nonce to prevent replay attacks with a random 10 digit number
+                 { "nonce", randomHex(10) },
+                 { "typ", "JWT"}
+             };
+
+            var encodedToken = Jose.JWT.Encode(payload, key, JwsAlgorithm.ES256, extraHeaders);
+
+            return encodedToken;
+        }
+
+        string randomHex(int digits)
+        {
+            byte[] buffer = new byte[digits / 2];
+            random.NextBytes(buffer);
+            string result = String.Concat(buffer.Select(x => x.ToString("X2")).ToArray());
+            if (digits % 2 == 0)
+                return result;
+            return result + random.Next(16).ToString("X");
+        }
+
+        private string name;
+        private string privateKey;
+
+        static Random random = new Random();
+        private string url = "api.coinbase.com/api/v3/brokerage/";
         private HttpClient client;
         //Account
         private string url_listAccount;

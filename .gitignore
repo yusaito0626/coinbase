@@ -21,3 +21,6 @@
 /coinbase_feedreader/coinbase_feedreader/obj/coinbase_feedreader.csproj.nuget.g.targets
 /coinbase_feedreader/coinbase_feedreader/obj/project.assets.json
 /coinbase_feedreader/coinbase_feedreader/obj/project.nuget.cache
+/coinbase_order_tester/.vs
+/coinbase_order_tester/coinbase_order_tester/obj/Debug/net8.0
+/coinbase_order_tester/coinbase_order_tester/obj
