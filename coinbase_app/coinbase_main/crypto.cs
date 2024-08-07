@@ -217,10 +217,21 @@ namespace coinbase_main
             this.minPr = -1;
             this.maxPr = -1;
 
+            this.liveOrders = new Dictionary<string, order>();
+            this.orders = new Dictionary<string, order>();
+
+            this.minOrdPr = -1;
+            this.maxOrdPr = -1;
+            this.maxQuoteSize = -1;
+            this.maxBaseSize = -1;
+
             this.last = 0;
             this.open = 0;
             this.high = 0;
             this.low = 0;
+
+            this.executedBaseAmount = 0;
+            this.executedQuoteAmount = 0;
         }
     }
 }

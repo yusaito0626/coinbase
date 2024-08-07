@@ -12,8 +12,6 @@ namespace coinbase_connection
     {
         static public void parseMsg(string strjs, ref message msg)
         {
-            //msg = JsonSerializer.Deserialize<message>(strjs);
-
             string target;
             int pos = -1;
             int last = -1;
@@ -135,6 +133,10 @@ namespace coinbase_connection
         {
             obj = JsonSerializer.Deserialize<cbMsg.product_status>(str);
         }
+        static public void parseOrder(string str,ref cbMsg.jsOrder obj)
+        {
+            obj = JsonSerializer.Deserialize<cbMsg.jsOrder>(str);
+        }
 
         static public void jsUpdateToTrades(string symbol,cbMsg.jsUpdate jsup, ref cbMsg.trades obj)
         {
@@ -155,6 +157,10 @@ namespace coinbase_connection
             obj.side = jstr.side;
             obj.size = double.Parse(jstr.size);
             obj.trade_id = jstr.trade_id;
+        }
+        static public void jsOrderToOrder(cbMsg.jsOrder jso,ref cbMsg.order obj)
+        {
+            obj.addMsg(jso);
         }
 
         static public void strToList(string org,ref List<string> lis)
@@ -471,7 +477,47 @@ namespace cbMsg
             this.order_side = jso.order_side;
             this.order_type = jso.order_type;
             this.outstanding_hold_amount = Double.Parse(jso.outstanding_hold_amount);
-            this.post_only = jso.post_only;
+            this.post_only = bool.Parse(jso.post_only);
+            this.product_id = jso.product_id;
+            this.product_type = jso.product_type;
+            this.reject_reason = jso.reject_reason;
+            this.retail_portfolio_id = jso.retail_portfolio_id;
+            this.risk_managed_by = jso.risk_managed_by;
+            this.status = jso.status;
+            if (jso.stop_price != "")
+            {
+                this.stop_price = Double.Parse(jso.stop_price);
+            }
+            else
+            {
+                this.stop_price = -1;
+            }
+            this.time_in_force = jso.time_in_force;
+            this.total_fees = Double.Parse(jso.total_fees);
+            this.total_value_after_fees = Double.Parse(jso.total_value_after_fees);
+            this.trigger_status = jso.trigger_status;
+            this.creation_time = jso.creation_time;
+            this.end_time = jso.end_time;
+            this.start_time = jso.start_time;
+        }
+
+        public void addMsg(jsOrder jso)
+        {
+            this.avg_price = Double.Parse(jso.avg_price);
+            this.cancel_reason = jso.cancel_reason;
+            this.client_order_id = jso.client_order_id;
+            this.completion_percentage = Double.Parse(jso.completion_percentage);
+            this.contract_expiry_type = jso.contract_expiry_type;
+            this.cumulative_quantity = Double.Parse(jso.cumulative_quantity);
+            this.filled_value = Double.Parse(jso.filled_value);
+            this.leaves_quantity = Double.Parse(jso.leaves_quantity);
+            this.limit_price = Double.Parse(jso.limit_price);
+            this.number_of_fills = Int32.Parse(jso.number_of_fills);
+            this.order_id = jso.order_id;
+            this.order_side = jso.order_side;
+            this.order_type = jso.order_type;
+            this.outstanding_hold_amount = Double.Parse(jso.outstanding_hold_amount);
+            this.post_only = bool.Parse(jso.post_only);
             this.product_id = jso.product_id;
             this.product_type = jso.product_type;
             this.reject_reason = jso.reject_reason;
@@ -509,7 +555,7 @@ namespace cbMsg
         public string order_side;
         public string order_type;
         public double outstanding_hold_amount;
-        public string post_only;
+        public bool post_only;
         public string product_id;
         public string product_type;
         public string reject_reason;

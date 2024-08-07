@@ -98,7 +98,6 @@ using (StreamWriter sw = new StreamWriter(outputfile))
                 count += result.Result.Count;
             }
 
-            //メッセージを取得
             var message = Encoding.UTF8.GetString(buffer, 0, count);
             if (message.Contains("heartbeats"))
             {

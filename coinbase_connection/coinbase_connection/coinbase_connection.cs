@@ -301,17 +301,16 @@ namespace coinbase_connection
             this.url_getOrder = this.url + "orders/historical/";//Need order_id
             this.url_previewOrder = this.url + "orders/preview";
             this.url_closePosition = this.url + "orders/close_position";
-            this.order_no = 0;
             this.client = new HttpClient();
         }
 
         //Risk checks should be made in OMS
-        public async Task<HttpResponseMessage> createOrder(string product_id, string side, string order_config,string leverage = "1.0", string margin_type = "CROSS", string retail_portfolio = "", string preview_id = "")
+        public async Task<HttpResponseMessage> createOrder(string order_id,string product_id, string side, string order_config,string leverage = "1.0", string margin_type = "CROSS", string retail_portfolio = "", string preview_id = "")
         {
-            string str = "{\"client_order_id\":\"" + this.getOrderId(product_id) + "\","
+            string str = "{\"client_order_id\":\"" + order_id + "\","
                         + "\"product_id\":\"" + product_id + "\","
                         + "\"side\":\"" + side + "\","
-                        + "\"order_configuration\":\"" + order_config + "\","
+                        + "\"order_configuration\":" + order_config + ","
                         + "\"leverage\":\"" + leverage + "\","
                         + "\"margin_type\":\"" + margin_type + "\"";
             if(retail_portfolio != "")
@@ -345,6 +344,7 @@ namespace coinbase_connection
                 }
             }
             str += "]}";
+            this.addLog(str);
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://" + this.url_cancelOrder);
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", this.generateToken(this.name, this.privateKey, "POST " + this.url_cancelOrder));
             StringContent content = new StringContent(str, null, "application/json");
@@ -363,6 +363,7 @@ namespace coinbase_connection
                 str += ",\"size\":\"" + size + "\"";
             }
             str += "}";
+            this.addLog(str);
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://" + this.url_editOrder);
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", this.generateToken(this.name, this.privateKey, "POST " + this.url_editOrder));
             StringContent content = new StringContent(str, null, "application/json");
@@ -826,51 +827,45 @@ namespace coinbase_connection
             string str = "";
             if (size_type == "base")
             {
-                str = "\"order_configuration\":{\"market_market_ioc\":{\"base_size\":\"" + size + "\"}}";
+                str = "{\"market_market_ioc\":{\"base_size\":\"" + size + "\"}}";
             }
             else if (size_type == "quote")
             {
-                str = "\"order_configuration\":{\"market_market_ioc\":{\"quote_size\":\"" + size + "\"}}";
+                str = "{\"market_market_ioc\":{\"quote_size\":\"" + size + "\"}}";
             }
             return str;
         }
         public string sor_limit_ioc(string base_size, string limit_price)
         {
-            return "\"order_configuration\": {\"sor_limit_ioc\":{\"base_size\": \"" + base_size + "\",\"limit_price\": \"" + limit_price + "\"}}";
+            return "{\"sor_limit_ioc\":{\"base_size\": \"" + base_size + "\",\"limit_price\": \"" + limit_price + "\"}}";
         }
         public string limit_limit_gtc(string base_size, string limit_price,string post_only)
         {
-            return "\"order_configuration\": {\"limit_limit_gtc\":{\"base_size\": \"" + base_size + "\",\"limit_price\": \"" + limit_price + "\",\"post_only\":" + post_only + "}}";
+            return "{\"limit_limit_gtc\":{\"base_size\": \"" + base_size + "\",\"limit_price\": \"" + limit_price + "\",\"post_only\":" + post_only + "}}";
         }
         public string limit_limit_gtd(string base_size, string limit_price, string post_only,string end_time)
         {
-            return "\"order_configuration\": {\"limit_limit_gtd\":{\"base_size\": \"" + base_size + "\",\"limit_price\": \"" + limit_price + "\",\"end_time\": \"" + end_time + "\",\"post_only\":" + post_only + "}}";
+            return "{\"limit_limit_gtd\":{\"base_size\": \"" + base_size + "\",\"limit_price\": \"" + limit_price + "\",\"end_time\": \"" + end_time + "\",\"post_only\":" + post_only + "}}";
         }
         public string limit_limit_fok(string base_size,string limit_price)
         {
-            return "\"order_configuration\": {\"limit_limit_fok\":{\"base_size\": \"" + base_size + "\",\"limit_price\": \"" + limit_price + "\"}}";
+            return "{\"limit_limit_fok\":{\"base_size\": \"" + base_size + "\",\"limit_price\": \"" + limit_price + "\"}}";
         }
         public string stop_limit_stop_limit_gtc(string base_size, string limit_price,string stop_price,string stop_direction)
         {
-            return "\"order_configuration\": {\"stop_limit_stop_limit_gtc\":{\"base_size\": \"" + base_size + "\",\"limit_price\": \"" + limit_price + "\",\"stop_price\": \"" + stop_price + "\",\"stop_direction\": \"" + stop_direction + "\"}}";
+            return "{\"stop_limit_stop_limit_gtc\":{\"base_size\": \"" + base_size + "\",\"limit_price\": \"" + limit_price + "\",\"stop_price\": \"" + stop_price + "\",\"stop_direction\": \"" + stop_direction + "\"}}";
         }
         public string stop_limit_stop_limit_gtd(string base_size, string limit_price, string stop_price, string end_time, string stop_direction)
         {
-            return "\"order_configuration\": {\"stop_limit_stop_limit_gtd\":{\"base_size\": \"" + base_size + "\",\"limit_price\": \"" + limit_price + "\",\"stop_price\": \"" + stop_price + ",\"end_time\": \"" + end_time + "\",\"stop_direction\": \"" + stop_direction + "\"}}";
+            return "{\"stop_limit_stop_limit_gtd\":{\"base_size\": \"" + base_size + "\",\"limit_price\": \"" + limit_price + "\",\"stop_price\": \"" + stop_price + ",\"end_time\": \"" + end_time + "\",\"stop_direction\": \"" + stop_direction + "\"}}";
         }
         public string trigger_bracket_gtc(string base_size, string limit_price, string stop_trigger_price)
         {
-            return "\"order_configuration\": {\"trigger_bracket_gtc\":{\"base_size\": \"" + base_size + "\",\"limit_price\": \"" + limit_price + "\",\"stop_trigger_price\": \"" + stop_trigger_price + "\"}}";
+            return "{\"trigger_bracket_gtc\":{\"base_size\": \"" + base_size + "\",\"limit_price\": \"" + limit_price + "\",\"stop_trigger_price\": \"" + stop_trigger_price + "\"}}";
         }
         public string trigger_bracket_gtd(string base_size, string limit_price, string stop_trigger_price,string end_time)
         {
-            return "\"order_configuration\": {\"trigger_bracket_gtd\":{\"base_size\": \"" + base_size + "\",\"limit_price\": \"" + limit_price + "\",\"stop_trigger_price\": \"" + stop_trigger_price + ",\"end_time\": \"" + end_time + "\"}}";
-        }
-
-        public string getOrderId(string symbol)
-        {
-            int current_no = Interlocked.Increment(ref this.order_no);
-            return symbol + DateTime.Now.ToString("yyyyMMdd") + current_no.ToString("D8");
+            return "{\"trigger_bracket_gtd\":{\"base_size\": \"" + base_size + "\",\"limit_price\": \"" + limit_price + "\",\"stop_trigger_price\": \"" + stop_trigger_price + ",\"end_time\": \"" + end_time + "\"}}";
         }
 
         public void readApiKey(string filename)
@@ -966,7 +961,7 @@ namespace coinbase_connection
         private string url_previewOrder;
         private string url_closePosition;
 
-        private int order_no;
+        public Action<string> addLog = (str) => { Console.WriteLine(str); };
 
         private static coinbase_restAPI _instance;
         private static readonly object _lockObject = new object();

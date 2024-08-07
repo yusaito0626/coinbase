@@ -12,6 +12,7 @@ namespace coinbase_main
     {
         quoteManager()
         {
+
         }
         public bool update_quotes(ref crypto cp)
         {
