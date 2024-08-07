@@ -30,10 +30,9 @@ namespace coinbase_app
             this.logQueue = new ConcurrentQueue<string>();
             readConfig(configFile);
             Action<string> addLogFunc = this.addLog;
-            this.connection = coinbase_connection.coinbase_connection.GetInstance();
+            this.connection = new coinbase_connection.coinbase_connection();
             this.connection.addLog = addLogFunc;
-            this.connection.readApiKey(this.apiFilename);
-            this.connection.msgQueue = new System.Collections.Concurrent.ConcurrentQueue<string>();
+            this.connection.readApiJson(this.apiFilename);
             this.thManager = coinbase_app.threadManager.GetInstance();
             this.thManager.addLog = addLogFunc;
             this.thManager.initialzeThreadManager(this.decodingThCount, this.quotesThCount, this.optThCount);
@@ -46,6 +45,7 @@ namespace coinbase_app
                 this.comboBox_symbols.Items.Add(this.symbols[i]);
             }
             this.getCryptoStatus();
+            this.OMS = orderManager.GetInstance();
         }
 
         async Task getCryptoStatus()
@@ -155,12 +155,12 @@ namespace coinbase_app
                 this.connection.connect(this.url);
                 st = this.connection.getState();
                 int i = 0;
-                while(st.ToString() != "Open")
+                while (st.ToString() != "Open")
                 {
                     System.Threading.Thread.Sleep(100);
                     st = this.connection.getState();
                     ++i;
-                    if(i > 50)
+                    if (i > 50)
                     {
                         this.addLog("[ERROR] Failed to connect.");
                         return;
@@ -233,6 +233,7 @@ namespace coinbase_app
 
         coinbase_connection.coinbase_connection connection;
         threadManager thManager;
+        orderManager OMS;
         System.Threading.Thread listeningThread;
 
         ConcurrentQueue<string> logQueue;
@@ -283,7 +284,7 @@ namespace coinbase_app
                         this.label_statusMsg.Text = cp.status_message;
                         this.label_minMktFund.Text = cp.min_market_funds;
 
-                        if(cp.quotesInitialized)
+                        if (cp.quotesInitialized)
                         {
                             this.label_lastPr.Text = (cp.last * cp.quote_increment).ToString("N2");
                             this.label_open.Text = (cp.open * cp.quote_increment).ToString("N2");
@@ -386,7 +387,7 @@ namespace coinbase_app
                         this.displayedCrypto = this.cryptos[symbol];
                     }
                     this.updating = 0;
-                    break;  
+                    break;
                 }
                 else
                 {
@@ -408,10 +409,15 @@ namespace coinbase_app
         public void writeLog()
         {
             string line;
-            while(this.logQueue.TryDequeue(out line))
+            while (this.logQueue.TryDequeue(out line))
             {
                 this.mainLog.Text += line + "\n";
             }
+        }
+
+        private void buttonOMS_Click(object sender, EventArgs e)
+        {
+            this.OMS.initialize(this.apiFilename,this.url, this.cryptos, this.addLog);
         }
     }
 }

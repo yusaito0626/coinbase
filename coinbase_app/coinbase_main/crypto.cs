@@ -190,6 +190,7 @@ namespace coinbase_main
         public int minPr;
         public int maxPr;
 
+        public int orderUpdating;
         public Dictionary<string, order> liveOrders;
         public Dictionary<string, order> orders;
 
@@ -217,6 +218,7 @@ namespace coinbase_main
             this.minPr = -1;
             this.maxPr = -1;
 
+            this.orderUpdating = 0;
             this.liveOrders = new Dictionary<string, order>();
             this.orders = new Dictionary<string, order>();
 

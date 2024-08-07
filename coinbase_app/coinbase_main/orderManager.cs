@@ -1,8 +1,10 @@
-﻿using System;
+﻿using coinbase_connection;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Net.WebSockets;
 using System.Security.AccessControl;
 using System.Security.Cryptography;
 using System.Text;
@@ -22,23 +24,71 @@ namespace coinbase_main
             {
                 this.orderStack.Push(new order());
             }
-            this.tempjson = new Dictionary<string, string>();
+            this.stopListening = false;
         }
 
         public Action<string> addLog = (str) => { Console.WriteLine(str); };
 
         private int STACK_SIZE = 100000;
         public ConcurrentStack<order> orderStack;
+        public ConcurrentStack<cbMsg.order> msgStack;
 
         public Dictionary<string, crypto> cryptos;
 
-        private coinbase_connection.coinbase_restAPI api = coinbase_connection.coinbase_restAPI.GetInstance();
+        private coinbase_connection.coinbase_connection ws_order;
+        private coinbase_connection.coinbase_restAPI api;
+        private string ws_url;
 
+        private Thread orderListeningTh;
+        private bool stopListening;
+
+        public void initialize(string apiFile,string url, Dictionary<string, crypto> cryptos, Action<string> logFunc = null)
+        {
+            this.cryptos = cryptos;
+            this.ws_order = new coinbase_connection.coinbase_connection();
+            this.api = new coinbase_connection.coinbase_restAPI();
+            this.ws_order.readApiJson(apiFile);
+            this.api.readApiJson(apiFile);
+            if(logFunc != null)
+            {
+                this.addLog = logFunc;
+                this.ws_order.addLog = logFunc;
+                this.api.addLog = logFunc;
+            }
+            this.ws_url = url;
+            this.ws_order.connect(url);
+            WebSocketState st;
+            st = this.ws_order.getState();
+            int i = 0;
+            while (st.ToString() != "Open")
+            {
+                System.Threading.Thread.Sleep(100);
+                st = this.ws_order.getState();
+                ++i;
+                if (i > 50)
+                {
+                    this.addLog("[ERROR] Failed to connect.");
+                    return;
+                }
+            }
+            if (st.ToString() == "Open")
+            {
+                this.addLog("[INFO] Connected Successfully");
+                this.ws_order.startListen(cbChannels.heartbeats);
+                this.ws_order.startListen(cbChannels.user);
+                this.orderListeningTh = new Thread(new ThreadStart(this.listening));
+                this.orderListeningTh.Start();
+            }
+            else
+            {
+                this.addLog("[ERROR] The websocket is not open.");
+                return;
+            }
+        }
         public void readApiKey(string filename)
         {
-            this.api.readApiKey(filename);
-        }
-        
+            this.api.readApiJson(filename);
+        }     
         public async Task<HttpResponseMessage> sendMarketOrder(string product_id, string side, double base_size, string leverage = "1.0", string margin_type = "CROSS", string retail_portfolio = "", string preview_id = "") 
         {
             crypto cp = this.checkProductId(product_id);
@@ -799,13 +849,127 @@ namespace coinbase_main
             return symbol + DateTime.Now.ToString("yyyyMMddHHmmss") + current_no.ToString("D8");
         }
 
+        private void listening()
+        {
+            this.addLog("Start listening order messages...");
+            cbMsg.message msg = new cbMsg.message();
+            cbMsg.jsOrder jso = new cbMsg.jsOrder();
+            cbMsg.order ordMsg = new cbMsg.order();
+            byte[] buffer = new byte[1073741824];
+            while (true)
+            {
+                var segment = new ArraySegment<byte>(buffer);
+                var result = this.ws_order.recv(ref segment);
+                if (result.IsFaulted == false)
+                {
+                    if (result.Result.MessageType == WebSocketMessageType.Close)
+                    {
+                        this.addLog("Endpoint Closed");
+                        break;
+                    }
+
+                    if (result.Result.MessageType == WebSocketMessageType.Binary)
+                    {
+                        this.addLog("Result Binary");
+                        break;
+                    }
+
+                    int count = result.Result.Count;
+                    while (!result.Result.EndOfMessage)
+                    {
+                        if (result.Result.Count == 0)
+                        {
+                            break;
+                        }
+                        if (count >= buffer.Length)
+                        {
+                            this.addLog("Too Large Message   " + count.ToString());
+                            break;
+                        }
+                        segment = new ArraySegment<byte>(buffer, count, buffer.Length - count);
+                        result = this.ws_order.recv(ref segment);
+
+                        count += result.Result.Count;
+                    }
+                    if (count >= buffer.Length)
+                    {
+                        break;
+                    }
+
+                    var message = Encoding.UTF8.GetString(buffer, 0, count);
+
+                    parser.parseMsg(message, ref msg);
+                    if (msg.channel == "user")
+                    {
+                        string temp;
+                        string target = "\"type\":";
+                        int start = msg.events.IndexOf(target) + target.Length + 1;
+                        int end = msg.events.IndexOf(",", start) - 1;
+
+                        if (msg.events.Substring(start, end - start) == "update")
+                        {
+                            target = "\"orders\":[";
+                            start = msg.events.IndexOf(target) + target.Length;
+                            int endBracket = msg.events.IndexOf("]", start);
+                            while (start > 0 && start < endBracket)
+                            {
+                                end = msg.events.IndexOf("}", start) + 1;
+                                temp = msg.events.Substring(start, end - start);
+                                coinbase_connection.parser.parseOrder(temp, ref jso);
+                                ordMsg.addMsg(jso);
+                                if (cryptos.ContainsKey(ordMsg.product_id))
+                                {
+                                    crypto cp = cryptos[ordMsg.product_id];
+                                    while(true)
+                                    {
+                                        if(Interlocked.Exchange(ref cp.orderUpdating,1) == 0)
+                                        {
+                                            if (cp.liveOrders.ContainsKey(ordMsg.client_order_id))
+                                            {
+                                                order obj = cp.liveOrders[ordMsg.client_order_id];
+                                                obj.setMsg(ordMsg);
+                                            }
+                                            else
+                                            {
+                                                order ord;
+                                                while(true)
+                                                {
+                                                    if(this.orderStack.TryPop(out ord))
+                                                    {
+                                                        break;
+                                                    }
+                                                }
+                                                ord.setMsg(ordMsg);
+                                                cp.liveOrders.Add(ordMsg.client_order_id, ord);
+                                            }
+                                            cp.orderUpdating = 0;
+                                            break;
+                                        }
+                                    }
+
+
+                                }
+                                else
+                                {
+                                    this.addLog("[ERROR] product not found id:" + ordMsg.product_id);
+                                }
+                                start = msg.events.IndexOf("{", end);
+                            }
+                        }
+                    }
+                }
+                if(this.stopListening)
+                {
+                    break;
+                }
+            }
+        }
+
         private int order_no;
         private string random_str;
 
         private double maxBaseSize = 1;
         private double maxQuoteSize = 10000;
-
-        private Dictionary<string, string> tempjson;
 
         private static orderManager _instance;
         private static readonly object _lockObject = new object();

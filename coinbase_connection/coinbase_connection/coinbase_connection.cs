@@ -31,14 +31,17 @@ namespace coinbase_connection
         public ConcurrentQueue<string> msgQueue;
 
         public Action<string> addLog = (str) => { Console.WriteLine(str); };
-
-        private coinbase_connection()
+        public coinbase_connection()
         {
             this.ws = new ClientWebSocket();
             this.url = "";
             this.name = "";
             this.privateKey = "";
 
+            this.msgCount = 0;
+            this.msgIncrement = 0;
+
+            this.msgQueue = new ConcurrentQueue<string>();
         }
         ~coinbase_connection()
         {
@@ -48,7 +51,6 @@ namespace coinbase_connection
             this.name = "";
             this.privateKey = "";
         }
-
         public async Task connect(string _url)
         {
             this.ws = new ClientWebSocket();
@@ -56,7 +58,6 @@ namespace coinbase_connection
             var uri = new Uri(this.url);
             await this.ws.ConnectAsync(uri, CancellationToken.None);
         }
-
         public void disconnect() 
         {
             if(this.ws != null)
@@ -65,7 +66,6 @@ namespace coinbase_connection
                 this.ws.Dispose();
             }
         }
-
         public bool startListen(cbChannels channel, string[] symbols = null)
         {
             string strChannel = "\"channel\":";
@@ -141,7 +141,6 @@ namespace coinbase_connection
                 return false;
             }
         }
-
         public void listen()
         {
             this.addLog("Listening thread started.");
@@ -187,42 +186,27 @@ namespace coinbase_connection
 
             }
         }
-
-        public void readApiKey(string filename)
+        public void readApiJson(string jsonfile)
         {
-            using (var fileStream = File.OpenRead(filename))
+            Dictionary<string, string> dict = new Dictionary<string, string>();
+            using (StreamReader r = new StreamReader(jsonfile))
             {
-                using (var streamReader = new StreamReader(fileStream))
-                {
-                    String line;
-                    while ((line = streamReader.ReadLine()) != null)
-                    {
-                        if (line.Substring(0, 7) == "API key")
-                        {
-                            this.name = line.Substring(9);
-                        }
-                        else if (line.Substring(0, 11) == "Private key")
-                        {
-                            string temp = line.Substring(13);
-                            this.privateKey = parseKey(temp);
-                        }
-                    }
-                }
+                string json = r.ReadToEnd();
+                dict = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+                this.name = dict["name"];
+                this.privateKey = parseKey(dict["privateKey"]);
             }
         }
-
-
         string parseKey(string key)
         {
             List<string> keyLines = new List<string>();
-            keyLines.AddRange(key.Split("\\n", StringSplitOptions.RemoveEmptyEntries));
+            keyLines.AddRange(key.Split("\n", StringSplitOptions.RemoveEmptyEntries));
 
             keyLines.RemoveAt(0);
             keyLines.RemoveAt(keyLines.Count - 1);
 
             return string.Join("", keyLines);
         }
-
         string generateToken(string name, string secret)
         {
             var privateKeyBytes = Convert.FromBase64String(secret); // Assuming PEM is base64 encoded
@@ -249,7 +233,6 @@ namespace coinbase_connection
 
             return encodedToken;
         }
-
         string randomHex(int digits)
         {
             byte[] buffer = new byte[digits / 2];
@@ -259,36 +242,19 @@ namespace coinbase_connection
                 return result;
             return result + random.Next(16).ToString("X");
         }
-
         public Task<WebSocketReceiveResult> recv(ref ArraySegment<Byte> seg)
         {
             return this.ws.ReceiveAsync(seg, CancellationToken.None);
         }
-
         public WebSocketState getState()
         {
             return this.ws.State;
-        }
-
-        private static coinbase_connection _instance;
-        private static readonly object _lockObject = new object();
-
-        public static coinbase_connection GetInstance()
-        {
-            lock (_lockObject)
-            {
-                if (_instance == null)
-                {
-                    _instance = new coinbase_connection();
-                }
-                return _instance;
-            }
         }
     }
 
     public class coinbase_restAPI
     {
-        private coinbase_restAPI()
+        public coinbase_restAPI()
         {
             this.url_listAccount = this.url + "accounts";
             this.url_getAccount = this.url + "accounts/";//Need uuid
@@ -867,35 +833,22 @@ namespace coinbase_connection
         {
             return "{\"trigger_bracket_gtd\":{\"base_size\": \"" + base_size + "\",\"limit_price\": \"" + limit_price + "\",\"stop_trigger_price\": \"" + stop_trigger_price + ",\"end_time\": \"" + end_time + "\"}}";
         }
-
-        public void readApiKey(string filename)
+        public void readApiJson(string jsonfile)
         {
-            using (var fileStream = File.OpenRead(filename))
+            Dictionary<string,string> dict = new Dictionary<string,string>();
+            using (StreamReader r = new StreamReader(jsonfile))
             {
-                using (var streamReader = new StreamReader(fileStream))
-                {
-                    String line;
-                    while ((line = streamReader.ReadLine()) != null)
-                    {
-                        if (line.Substring(0, 7) == "API key")
-                        {
-                            this.name = line.Substring(9);
-                        }
-                        else if (line.Substring(0, 11) == "Private key")
-                        {
-                            string temp = line.Substring(13);
-                            this.privateKey = parseKey(temp);
-                        }
-                    }
-                }
+                string json = r.ReadToEnd();
+                dict = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+                this.name = dict["name"];
+                this.privateKey = parseKey(dict["privateKey"]);
             }
         }
-
 
         string parseKey(string key)
         {
             List<string> keyLines = new List<string>();
-            keyLines.AddRange(key.Split("\\n", StringSplitOptions.RemoveEmptyEntries));
+            keyLines.AddRange(key.Split("\n", StringSplitOptions.RemoveEmptyEntries));
 
             keyLines.RemoveAt(0);
             keyLines.RemoveAt(keyLines.Count - 1);
@@ -962,21 +915,6 @@ namespace coinbase_connection
         private string url_closePosition;
 
         public Action<string> addLog = (str) => { Console.WriteLine(str); };
-
-        private static coinbase_restAPI _instance;
-        private static readonly object _lockObject = new object();
-
-        public static coinbase_restAPI GetInstance()
-        {
-            lock (_lockObject)
-            {
-                if (_instance == null)
-                {
-                    _instance = new coinbase_restAPI();
-                }
-                return _instance;
-            }
-        }
     }
     public enum cbChannels
     {

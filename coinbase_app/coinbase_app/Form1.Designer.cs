@@ -72,6 +72,14 @@
             label_sumBuyOrd = new Label();
             label_sumBuyExeAmt = new Label();
             tabProduct = new TabPage();
+            groupBox9 = new GroupBox();
+            tableLayoutPanel8 = new TableLayoutPanel();
+            label_posPnl = new Label();
+            label40 = new Label();
+            label_totalPnl = new Label();
+            label36 = new Label();
+            label_tradePnl = new Label();
+            label38 = new Label();
             groupBox8 = new GroupBox();
             tableLayoutPanel6 = new TableLayoutPanel();
             label_CurrPos = new Label();
@@ -152,14 +160,7 @@
             label16 = new Label();
             label15 = new Label();
             display_update = new System.Windows.Forms.Timer(components);
-            groupBox9 = new GroupBox();
-            tableLayoutPanel8 = new TableLayoutPanel();
-            label36 = new Label();
-            label_tradePnl = new Label();
-            label38 = new Label();
-            label_totalPnl = new Label();
-            label40 = new Label();
-            label_posPnl = new Label();
+            buttonOMS = new Button();
             tabControl.SuspendLayout();
             tabMain.SuspendLayout();
             groupBox3.SuspendLayout();
@@ -169,6 +170,8 @@
             groupBox1.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
             tabProduct.SuspendLayout();
+            groupBox9.SuspendLayout();
+            tableLayoutPanel8.SuspendLayout();
             groupBox8.SuspendLayout();
             tableLayoutPanel6.SuspendLayout();
             tableLayoutPanel5.SuspendLayout();
@@ -179,8 +182,6 @@
             groupBox5.SuspendLayout();
             tabConfig.SuspendLayout();
             groupBox4.SuspendLayout();
-            groupBox9.SuspendLayout();
-            tableLayoutPanel8.SuspendLayout();
             SuspendLayout();
             // 
             // tabControl
@@ -197,6 +198,7 @@
             // 
             // tabMain
             // 
+            tabMain.Controls.Add(buttonOMS);
             tabMain.Controls.Add(button_startListen);
             tabMain.Controls.Add(mainLog);
             tabMain.Controls.Add(groupBox3);
@@ -743,6 +745,109 @@
             tabProduct.TabIndex = 3;
             tabProduct.Text = "Product";
             tabProduct.UseVisualStyleBackColor = true;
+            // 
+            // groupBox9
+            // 
+            groupBox9.Controls.Add(tableLayoutPanel8);
+            groupBox9.Location = new Point(15, 136);
+            groupBox9.Name = "groupBox9";
+            groupBox9.Size = new Size(475, 88);
+            groupBox9.TabIndex = 8;
+            groupBox9.TabStop = false;
+            groupBox9.Text = "PnL";
+            // 
+            // tableLayoutPanel8
+            // 
+            tableLayoutPanel8.CellBorderStyle = TableLayoutPanelCellBorderStyle.OutsetDouble;
+            tableLayoutPanel8.ColumnCount = 3;
+            tableLayoutPanel8.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33F));
+            tableLayoutPanel8.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33F));
+            tableLayoutPanel8.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.34F));
+            tableLayoutPanel8.Controls.Add(label_posPnl, 0, 1);
+            tableLayoutPanel8.Controls.Add(label40, 0, 1);
+            tableLayoutPanel8.Controls.Add(label_totalPnl, 0, 1);
+            tableLayoutPanel8.Controls.Add(label36, 0, 0);
+            tableLayoutPanel8.Controls.Add(label_tradePnl, 1, 0);
+            tableLayoutPanel8.Controls.Add(label38, 2, 0);
+            tableLayoutPanel8.Location = new Point(3, 19);
+            tableLayoutPanel8.Name = "tableLayoutPanel8";
+            tableLayoutPanel8.RowCount = 2;
+            tableLayoutPanel8.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayoutPanel8.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayoutPanel8.Size = new Size(466, 63);
+            tableLayoutPanel8.TabIndex = 0;
+            // 
+            // label_posPnl
+            // 
+            label_posPnl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_posPnl.AutoSize = true;
+            label_posPnl.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_posPnl.Location = new Point(6, 33);
+            label_posPnl.Name = "label_posPnl";
+            label_posPnl.Size = new Size(145, 27);
+            label_posPnl.TabIndex = 12;
+            label_posPnl.Text = "0";
+            label_posPnl.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label40
+            // 
+            label40.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label40.AutoSize = true;
+            label40.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label40.Location = new Point(160, 33);
+            label40.Name = "label40";
+            label40.Size = new Size(145, 27);
+            label40.TabIndex = 11;
+            label40.Text = "0";
+            label40.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label_totalPnl
+            // 
+            label_totalPnl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_totalPnl.AutoSize = true;
+            label_totalPnl.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_totalPnl.Location = new Point(314, 33);
+            label_totalPnl.Name = "label_totalPnl";
+            label_totalPnl.Size = new Size(146, 27);
+            label_totalPnl.TabIndex = 10;
+            label_totalPnl.Text = "0";
+            label_totalPnl.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // label36
+            // 
+            label36.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label36.AutoSize = true;
+            label36.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label36.Location = new Point(6, 3);
+            label36.Name = "label36";
+            label36.Size = new Size(145, 27);
+            label36.TabIndex = 6;
+            label36.Text = "Position PnL";
+            label36.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // label_tradePnl
+            // 
+            label_tradePnl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_tradePnl.AutoSize = true;
+            label_tradePnl.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label_tradePnl.Location = new Point(160, 3);
+            label_tradePnl.Name = "label_tradePnl";
+            label_tradePnl.Size = new Size(145, 27);
+            label_tradePnl.TabIndex = 7;
+            label_tradePnl.Text = "Trade PnL";
+            label_tradePnl.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // label38
+            // 
+            label38.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label38.AutoSize = true;
+            label38.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label38.Location = new Point(314, 3);
+            label38.Name = "label38";
+            label38.Size = new Size(146, 27);
+            label38.TabIndex = 8;
+            label38.Text = "Total PnL";
+            label38.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // groupBox8
             // 
@@ -1692,108 +1797,17 @@
             display_update.Interval = 1000;
             display_update.Tick += display_update_Tick;
             // 
-            // groupBox9
+            // buttonOMS
             // 
-            groupBox9.Controls.Add(tableLayoutPanel8);
-            groupBox9.Location = new Point(15, 136);
-            groupBox9.Name = "groupBox9";
-            groupBox9.Size = new Size(475, 88);
-            groupBox9.TabIndex = 8;
-            groupBox9.TabStop = false;
-            groupBox9.Text = "PnL";
-            // 
-            // tableLayoutPanel8
-            // 
-            tableLayoutPanel8.CellBorderStyle = TableLayoutPanelCellBorderStyle.OutsetDouble;
-            tableLayoutPanel8.ColumnCount = 3;
-            tableLayoutPanel8.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33F));
-            tableLayoutPanel8.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33F));
-            tableLayoutPanel8.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.34F));
-            tableLayoutPanel8.Controls.Add(label_posPnl, 0, 1);
-            tableLayoutPanel8.Controls.Add(label40, 0, 1);
-            tableLayoutPanel8.Controls.Add(label_totalPnl, 0, 1);
-            tableLayoutPanel8.Controls.Add(label36, 0, 0);
-            tableLayoutPanel8.Controls.Add(label_tradePnl, 1, 0);
-            tableLayoutPanel8.Controls.Add(label38, 2, 0);
-            tableLayoutPanel8.Location = new Point(3, 19);
-            tableLayoutPanel8.Name = "tableLayoutPanel8";
-            tableLayoutPanel8.RowCount = 2;
-            tableLayoutPanel8.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableLayoutPanel8.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableLayoutPanel8.Size = new Size(466, 63);
-            tableLayoutPanel8.TabIndex = 0;
-            // 
-            // label36
-            // 
-            label36.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            label36.AutoSize = true;
-            label36.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label36.Location = new Point(6, 3);
-            label36.Name = "label36";
-            label36.Size = new Size(145, 27);
-            label36.TabIndex = 6;
-            label36.Text = "Position PnL";
-            label36.TextAlign = ContentAlignment.MiddleCenter;
-            // 
-            // label_tradePnl
-            // 
-            label_tradePnl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            label_tradePnl.AutoSize = true;
-            label_tradePnl.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label_tradePnl.Location = new Point(160, 3);
-            label_tradePnl.Name = "label_tradePnl";
-            label_tradePnl.Size = new Size(145, 27);
-            label_tradePnl.TabIndex = 7;
-            label_tradePnl.Text = "Trade PnL";
-            label_tradePnl.TextAlign = ContentAlignment.MiddleCenter;
-            // 
-            // label38
-            // 
-            label38.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            label38.AutoSize = true;
-            label38.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label38.Location = new Point(314, 3);
-            label38.Name = "label38";
-            label38.Size = new Size(146, 27);
-            label38.TabIndex = 8;
-            label38.Text = "Total PnL";
-            label38.TextAlign = ContentAlignment.MiddleCenter;
-            // 
-            // label_totalPnl
-            // 
-            label_totalPnl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            label_totalPnl.AutoSize = true;
-            label_totalPnl.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label_totalPnl.Location = new Point(314, 33);
-            label_totalPnl.Name = "label_totalPnl";
-            label_totalPnl.Size = new Size(146, 27);
-            label_totalPnl.TabIndex = 10;
-            label_totalPnl.Text = "0";
-            label_totalPnl.TextAlign = ContentAlignment.MiddleRight;
-            // 
-            // label40
-            // 
-            label40.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            label40.AutoSize = true;
-            label40.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label40.Location = new Point(160, 33);
-            label40.Name = "label40";
-            label40.Size = new Size(145, 27);
-            label40.TabIndex = 11;
-            label40.Text = "0";
-            label40.TextAlign = ContentAlignment.MiddleRight;
-            // 
-            // label_posPnl
-            // 
-            label_posPnl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            label_posPnl.AutoSize = true;
-            label_posPnl.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label_posPnl.Location = new Point(6, 33);
-            label_posPnl.Name = "label_posPnl";
-            label_posPnl.Size = new Size(145, 27);
-            label_posPnl.TabIndex = 12;
-            label_posPnl.Text = "0";
-            label_posPnl.TextAlign = ContentAlignment.MiddleRight;
+            buttonOMS.FlatStyle = FlatStyle.Popup;
+            buttonOMS.Font = new Font("Segoe UI", 11.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            buttonOMS.Location = new Point(602, 303);
+            buttonOMS.Name = "buttonOMS";
+            buttonOMS.Size = new Size(181, 40);
+            buttonOMS.TabIndex = 5;
+            buttonOMS.Text = "Initiate OMS";
+            buttonOMS.UseVisualStyleBackColor = true;
+            buttonOMS.Click += buttonOMS_Click;
             // 
             // Form1
             // 
@@ -1816,6 +1830,9 @@
             tableLayoutPanel1.PerformLayout();
             tabProduct.ResumeLayout(false);
             tabProduct.PerformLayout();
+            groupBox9.ResumeLayout(false);
+            tableLayoutPanel8.ResumeLayout(false);
+            tableLayoutPanel8.PerformLayout();
             groupBox8.ResumeLayout(false);
             tableLayoutPanel6.ResumeLayout(false);
             tableLayoutPanel6.PerformLayout();
@@ -1833,9 +1850,6 @@
             tabConfig.ResumeLayout(false);
             groupBox4.ResumeLayout(false);
             groupBox4.PerformLayout();
-            groupBox9.ResumeLayout(false);
-            tableLayoutPanel8.ResumeLayout(false);
-            tableLayoutPanel8.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -1972,5 +1986,6 @@
         private Label label36;
         private Label label_tradePnl;
         private Label label38;
+        private Button buttonOMS;
     }
 }
