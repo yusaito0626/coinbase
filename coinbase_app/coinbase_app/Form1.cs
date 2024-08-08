@@ -175,10 +175,12 @@ namespace coinbase_app
                     this.listeningThread = new Thread(new ThreadStart(this.connection.listen));
                     this.listeningThread.Start();
                     this.thManager.activateAllThreads();
+                    this.button_startListen.BackColor = System.Drawing.Color.LawnGreen;
+                    this.button_startListen.FlatStyle = FlatStyle.Flat;
+                    this.button_startListen.Enabled = false;
                 }
             }
         }
-
         private void readConfig(string filename)
         {
             using (StreamReader sr = new StreamReader(filename))
@@ -237,7 +239,6 @@ namespace coinbase_app
         System.Threading.Thread listeningThread;
 
         ConcurrentQueue<string> logQueue;
-
         private void display_update_Tick(object sender, EventArgs e)
         {
             switch (this.tabControl.SelectedTab.Name)
@@ -261,7 +262,6 @@ namespace coinbase_app
             this.label_feedQueue.Text = this.connection.msgQueue.Count().ToString("N0");
             this.writeLog();
         }
-
         private void display_update_product()
         {
             if (this.displayedCrypto != null)
@@ -335,6 +335,32 @@ namespace coinbase_app
                                     ++bididx;
                                 }
                             }
+                            while (true)
+                            {
+                                if(Interlocked.Exchange(ref cp.orderUpdating,1) == 0)
+                                {
+                                    int i = 0;
+                                    foreach(KeyValuePair<string,order> pair in cp.liveOrders)
+                                    {
+                                        if(this.dataGrid_orders.RowCount > i)
+                                        {
+                                            DataGridViewRow row = this.dataGrid_orders.Rows[0];
+                                            row.Cells["status"].Value = pair.Value.status;
+                                            row.Cells["side"].Value = pair.Value.side;
+                                            row.Cells["price"].Value = pair.Value.price.ToString("N2");
+                                            row.Cells["size"].Value = pair.Value.size.ToString();
+                                            row.Cells["filled"].Value = pair.Value.executed_size.ToString();
+                                            ++i;
+                                        }
+                                        else
+                                        {
+                                            this.dataGrid_orders.Rows.Add(pair.Value.status, pair.Value.side, pair.Value.price.ToString("N2"), pair.Value.size.ToString(), pair.Value.executed_size.ToString());
+                                        }
+                                    }
+                                    cp.orderUpdating = 0;
+                                    break;
+                                }
+                            }
                         }
                         this.updating = 0;
                         break;
@@ -357,7 +383,6 @@ namespace coinbase_app
             this.label_url.Text = this.url;
             this.label_apiInfo.Text = this.apiFilename;
         }
-
         private void tabControl_Selected(object sender, TabControlEventArgs e)
         {
             switch (e.TabPage.Name)
@@ -373,7 +398,6 @@ namespace coinbase_app
                     break;
             }
         }
-
         private void comboBox_symbols_SelectedIndexChanged(object sender, EventArgs e)
         {
             int count = 0;
@@ -401,7 +425,6 @@ namespace coinbase_app
             }
             this.display_update_product();
         }
-
         public void addLog(string str)
         {
             this.logQueue.Enqueue(str);
@@ -411,13 +434,15 @@ namespace coinbase_app
             string line;
             while (this.logQueue.TryDequeue(out line))
             {
-                this.mainLog.Text += line + "\n";
+                this.mainLog.Text += DateTime.Now.ToString() + "   " + line + "\n";
             }
         }
-
         private void buttonOMS_Click(object sender, EventArgs e)
         {
             this.OMS.initialize(this.apiFilename,this.url, this.cryptos, this.addLog);
+            this.buttonOMS.BackColor = System.Drawing.Color.LawnGreen;
+            this.buttonOMS.FlatStyle = FlatStyle.Flat;
+            this.buttonOMS.Enabled = false;
         }
     }
 }

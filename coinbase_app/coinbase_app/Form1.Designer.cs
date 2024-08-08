@@ -29,8 +29,12 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             tabControl = new TabControl();
             tabMain = new TabPage();
+            button_trading = new Button();
+            button_optimization = new Button();
+            buttonOMS = new Button();
             button_startListen = new Button();
             mainLog = new Label();
             groupBox3 = new GroupBox();
@@ -160,7 +164,12 @@
             label16 = new Label();
             label15 = new Label();
             display_update = new System.Windows.Forms.Timer(components);
-            buttonOMS = new Button();
+            dataGrid_orders = new DataGridView();
+            status = new DataGridViewTextBoxColumn();
+            side = new DataGridViewTextBoxColumn();
+            price = new DataGridViewTextBoxColumn();
+            size = new DataGridViewTextBoxColumn();
+            filled = new DataGridViewTextBoxColumn();
             tabControl.SuspendLayout();
             tabMain.SuspendLayout();
             groupBox3.SuspendLayout();
@@ -182,6 +191,7 @@
             groupBox5.SuspendLayout();
             tabConfig.SuspendLayout();
             groupBox4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dataGrid_orders).BeginInit();
             SuspendLayout();
             // 
             // tabControl
@@ -198,6 +208,8 @@
             // 
             // tabMain
             // 
+            tabMain.Controls.Add(button_trading);
+            tabMain.Controls.Add(button_optimization);
             tabMain.Controls.Add(buttonOMS);
             tabMain.Controls.Add(button_startListen);
             tabMain.Controls.Add(mainLog);
@@ -213,11 +225,49 @@
             tabMain.Text = "Main";
             tabMain.UseVisualStyleBackColor = true;
             // 
+            // button_trading
+            // 
+            button_trading.FlatAppearance.BorderSize = 2;
+            button_trading.FlatStyle = FlatStyle.Popup;
+            button_trading.Font = new Font("Segoe UI", 11.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            button_trading.Location = new Point(602, 350);
+            button_trading.Name = "button_trading";
+            button_trading.Size = new Size(181, 40);
+            button_trading.TabIndex = 7;
+            button_trading.Text = "Start Trading";
+            button_trading.UseVisualStyleBackColor = true;
+            // 
+            // button_optimization
+            // 
+            button_optimization.FlatAppearance.BorderSize = 2;
+            button_optimization.FlatStyle = FlatStyle.Popup;
+            button_optimization.Font = new Font("Segoe UI", 11.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            button_optimization.Location = new Point(603, 304);
+            button_optimization.Name = "button_optimization";
+            button_optimization.Size = new Size(181, 40);
+            button_optimization.TabIndex = 6;
+            button_optimization.Text = "Optimization";
+            button_optimization.UseVisualStyleBackColor = true;
+            // 
+            // buttonOMS
+            // 
+            buttonOMS.FlatAppearance.BorderSize = 2;
+            buttonOMS.FlatStyle = FlatStyle.Popup;
+            buttonOMS.Font = new Font("Segoe UI", 11.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            buttonOMS.Location = new Point(603, 214);
+            buttonOMS.Name = "buttonOMS";
+            buttonOMS.Size = new Size(181, 40);
+            buttonOMS.TabIndex = 5;
+            buttonOMS.Text = "Initiate OMS";
+            buttonOMS.UseVisualStyleBackColor = true;
+            buttonOMS.Click += buttonOMS_Click;
+            // 
             // button_startListen
             // 
+            button_startListen.FlatAppearance.BorderSize = 2;
             button_startListen.FlatStyle = FlatStyle.Popup;
             button_startListen.Font = new Font("Segoe UI", 11.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            button_startListen.Location = new Point(604, 349);
+            button_startListen.Location = new Point(603, 258);
             button_startListen.Name = "button_startListen";
             button_startListen.Size = new Size(181, 40);
             button_startListen.TabIndex = 4;
@@ -513,7 +563,7 @@
             // comboBox_mode
             // 
             comboBox_mode.FormattingEnabled = true;
-            comboBox_mode.Items.AddRange(new object[] { "Read Tick Files", "Market Feeds", "Live" });
+            comboBox_mode.Items.AddRange(new object[] { "Read Tick Files", "Vitual", "Live" });
             comboBox_mode.Location = new Point(3, 5);
             comboBox_mode.Name = "comboBox_mode";
             comboBox_mode.Size = new Size(252, 23);
@@ -731,6 +781,7 @@
             // 
             // tabProduct
             // 
+            tabProduct.Controls.Add(dataGrid_orders);
             tabProduct.Controls.Add(groupBox9);
             tabProduct.Controls.Add(groupBox8);
             tabProduct.Controls.Add(label_symbol);
@@ -1547,7 +1598,7 @@
             groupBox5.Controls.Add(label17);
             groupBox5.Location = new Point(562, 376);
             groupBox5.Name = "groupBox5";
-            groupBox5.Size = new Size(215, 309);
+            groupBox5.Size = new Size(215, 336);
             groupBox5.TabIndex = 3;
             groupBox5.TabStop = false;
             groupBox5.Text = "Status";
@@ -1797,17 +1848,54 @@
             display_update.Interval = 1000;
             display_update.Tick += display_update_Tick;
             // 
-            // buttonOMS
+            // dataGrid_orders
             // 
-            buttonOMS.FlatStyle = FlatStyle.Popup;
-            buttonOMS.Font = new Font("Segoe UI", 11.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            buttonOMS.Location = new Point(602, 303);
-            buttonOMS.Name = "buttonOMS";
-            buttonOMS.Size = new Size(181, 40);
-            buttonOMS.TabIndex = 5;
-            buttonOMS.Text = "Initiate OMS";
-            buttonOMS.UseVisualStyleBackColor = true;
-            buttonOMS.Click += buttonOMS_Click;
+            dataGrid_orders.BackgroundColor = SystemColors.Window;
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle1.BackColor = SystemColors.Control;
+            dataGridViewCellStyle1.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle1.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
+            dataGrid_orders.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGrid_orders.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGrid_orders.Columns.AddRange(new DataGridViewColumn[] { status, side, price, size, filled });
+            dataGrid_orders.Location = new Point(6, 376);
+            dataGrid_orders.Name = "dataGrid_orders";
+            dataGrid_orders.RowHeadersVisible = false;
+            dataGrid_orders.Size = new Size(550, 336);
+            dataGrid_orders.TabIndex = 9;
+            // 
+            // status
+            // 
+            status.HeaderText = "Status";
+            status.Name = "status";
+            status.Width = 80;
+            // 
+            // side
+            // 
+            side.HeaderText = "Side";
+            side.Name = "side";
+            side.Width = 80;
+            // 
+            // price
+            // 
+            price.HeaderText = "Price";
+            price.Name = "price";
+            price.Width = 130;
+            // 
+            // size
+            // 
+            size.HeaderText = "Size";
+            size.Name = "size";
+            size.Width = 130;
+            // 
+            // filled
+            // 
+            filled.HeaderText = "Filled";
+            filled.Name = "filled";
+            filled.Width = 130;
             // 
             // Form1
             // 
@@ -1850,6 +1938,7 @@
             tabConfig.ResumeLayout(false);
             groupBox4.ResumeLayout(false);
             groupBox4.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)dataGrid_orders).EndInit();
             ResumeLayout(false);
         }
 
@@ -1987,5 +2076,13 @@
         private Label label_tradePnl;
         private Label label38;
         private Button buttonOMS;
+        private Button button_optimization;
+        private Button button_trading;
+        private DataGridView dataGrid_orders;
+        private DataGridViewTextBoxColumn status;
+        private DataGridViewTextBoxColumn side;
+        private DataGridViewTextBoxColumn price;
+        private DataGridViewTextBoxColumn size;
+        private DataGridViewTextBoxColumn filled;
     }
 }

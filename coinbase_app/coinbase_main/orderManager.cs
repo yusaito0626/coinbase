@@ -1027,9 +1027,9 @@ namespace coinbase_main
             this.product_id = msg.product_id;
             this.side = msg.order_side;
             this.price = msg.limit_price;
-            this.size = msg.leaves_quantity + msg.filled_value;
+            this.size = msg.leaves_quantity + msg.cumulative_quantity;
             this.open_size = msg.leaves_quantity;
-            this.executed_size = msg.filled_value;
+            this.executed_size = msg.cumulative_quantity;
             this.updated_time = DateTime.Now;
         }
     }
