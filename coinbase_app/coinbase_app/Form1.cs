@@ -194,6 +194,10 @@ namespace coinbase_app
                     {
                         apiFilename = values[1];
                     }
+                    else if (values[0] == "orderLogPath")
+                    {
+                        orderLogPath = values[1];
+                    }
                     else if (values[0] == "url")
                     {
                         url = values[1];
@@ -220,6 +224,7 @@ namespace coinbase_app
 
         //Config
         string apiFilename;
+        string orderLogPath;
         string url;
         string[] symbols;
         int decodingThCount;
@@ -344,7 +349,7 @@ namespace coinbase_app
                                     {
                                         if(this.dataGrid_orders.RowCount > i)
                                         {
-                                            DataGridViewRow row = this.dataGrid_orders.Rows[0];
+                                            DataGridViewRow row = this.dataGrid_orders.Rows[i];
                                             row.Cells["status"].Value = pair.Value.status;
                                             row.Cells["side"].Value = pair.Value.side;
                                             row.Cells["price"].Value = pair.Value.price.ToString("N2");
@@ -356,6 +361,15 @@ namespace coinbase_app
                                         {
                                             this.dataGrid_orders.Rows.Add(pair.Value.status, pair.Value.side, pair.Value.price.ToString("N2"), pair.Value.size.ToString(), pair.Value.executed_size.ToString());
                                         }
+                                    }
+                                    for (int j = i; j < this.dataGrid_orders.RowCount;++j)
+                                    {
+                                        DataGridViewRow row = this.dataGrid_orders.Rows[j];
+                                        row.Cells["status"].Value = "";
+                                        row.Cells["side"].Value = "";
+                                        row.Cells["price"].Value = "";
+                                        row.Cells["size"].Value = "";
+                                        row.Cells["filled"].Value = "";
                                     }
                                     cp.orderUpdating = 0;
                                     break;
@@ -439,7 +453,7 @@ namespace coinbase_app
         }
         private void buttonOMS_Click(object sender, EventArgs e)
         {
-            this.OMS.initialize(this.apiFilename,this.url, this.cryptos, this.addLog);
+            this.OMS.initialize(this.apiFilename,this.url, this.cryptos,this.orderLogPath, this.addLog);
             this.buttonOMS.BackColor = System.Drawing.Color.LawnGreen;
             this.buttonOMS.FlatStyle = FlatStyle.Flat;
             this.buttonOMS.Enabled = false;

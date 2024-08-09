@@ -42,7 +42,10 @@ namespace coinbase_main
         private Thread orderListeningTh;
         private bool stopListening;
 
-        public void initialize(string apiFile,string url, Dictionary<string, crypto> cryptos, Action<string> logFunc = null)
+        private string order_log_path;
+        private StreamWriter order_log;
+
+        public void initialize(string apiFile,string url, Dictionary<string, crypto> cryptos,string logPath = "", Action<string> logFunc = null)
         {
             this.cryptos = cryptos;
             this.ws_order = new coinbase_connection.coinbase_connection();
@@ -84,6 +87,8 @@ namespace coinbase_main
                 this.addLog("[ERROR] The websocket is not open.");
                 return;
             }
+            this.order_log_path = logPath;
+            this.order_log = new StreamWriter(logPath + "coinbase" + DateTime.Now.ToString("yyyyMMddhhmmss") + "orderlog.txt");
         }
         public void readApiKey(string filename)
         {
@@ -928,19 +933,35 @@ namespace coinbase_main
                                             {
                                                 order obj = cp.liveOrders[ordMsg.client_order_id];
                                                 obj.setMsg(ordMsg);
+                                                if(obj.status == "CANCELLED" || obj.status == "FILLED")
+                                                {
+                                                    cp.liveOrders.Remove(ordMsg.client_order_id);
+                                                }
                                             }
                                             else
                                             {
-                                                order ord;
-                                                while(true)
+                                                if(cp.orders.ContainsKey(ordMsg.client_order_id))
                                                 {
-                                                    if(this.orderStack.TryPop(out ord))
+                                                    order ord = cp.orders[ordMsg.client_order_id];
+                                                    ord.setMsg(ordMsg);
+                                                }
+                                                else
+                                                {
+                                                    order ord;
+                                                    while (true)
                                                     {
-                                                        break;
+                                                        if (this.orderStack.TryPop(out ord))
+                                                        {
+                                                            break;
+                                                        }
+                                                    }
+                                                    ord.setMsg(ordMsg);
+                                                    if (ord.status != "CANCELLED" && ord.status != "FILLED")
+                                                    {
+                                                        cp.liveOrders.Add(ordMsg.client_order_id, ord);
+                                                        cp.orders.Add(ordMsg.client_order_id, ord);
                                                     }
                                                 }
-                                                ord.setMsg(ordMsg);
-                                                cp.liveOrders.Add(ordMsg.client_order_id, ord);
                                             }
                                             cp.orderUpdating = 0;
                                             break;
@@ -956,7 +977,12 @@ namespace coinbase_main
                                 start = msg.events.IndexOf("{", end);
                             }
                         }
+                        this.order_log.WriteAsync(message + "\n");
                     }
+                    else if (msg.channel == "heartbeats")
+                    {
+                        this.order_log.Flush();
+                    }    
                 }
                 if(this.stopListening)
                 {

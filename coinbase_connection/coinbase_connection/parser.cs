@@ -503,21 +503,48 @@ namespace cbMsg
 
         public void addMsg(jsOrder jso)
         {
-            this.avg_price = Double.Parse(jso.avg_price);
+            if(jso.avg_price != "")
+            {
+                this.avg_price = Double.Parse(jso.avg_price);
+            }
             this.cancel_reason = jso.cancel_reason;
             this.client_order_id = jso.client_order_id;
-            this.completion_percentage = Double.Parse(jso.completion_percentage);
+            if(jso.completion_percentage !="")
+            {
+                this.completion_percentage = Double.Parse(jso.completion_percentage);
+            }
             this.contract_expiry_type = jso.contract_expiry_type;
-            this.cumulative_quantity = Double.Parse(jso.cumulative_quantity);
-            this.filled_value = Double.Parse(jso.filled_value);
-            this.leaves_quantity = Double.Parse(jso.leaves_quantity);
-            this.limit_price = Double.Parse(jso.limit_price);
-            this.number_of_fills = Int32.Parse(jso.number_of_fills);
+            if(jso.cumulative_quantity !="")
+            {
+                this.cumulative_quantity = Double.Parse(jso.cumulative_quantity);
+            }
+            if(jso.filled_value != "")
+            {
+                this.filled_value = Double.Parse(jso.filled_value);
+            }
+            if(jso.leaves_quantity !="")
+            {
+                this.leaves_quantity = Double.Parse(jso.leaves_quantity);
+            }
+            if(jso.limit_price != "")
+            {
+                this.limit_price = Double.Parse(jso.limit_price);
+            }
+            if(jso.number_of_fills != "")
+            {
+                this.number_of_fills = Int32.Parse(jso.number_of_fills);
+            }
             this.order_id = jso.order_id;
             this.order_side = jso.order_side;
             this.order_type = jso.order_type;
-            this.outstanding_hold_amount = Double.Parse(jso.outstanding_hold_amount);
-            this.post_only = bool.Parse(jso.post_only);
+            if(jso.outstanding_hold_amount != "")
+            {
+                this.outstanding_hold_amount = Double.Parse(jso.outstanding_hold_amount);
+            }
+            if(jso.post_only != "")
+            {
+                this.post_only = bool.Parse(jso.post_only);
+            }
             this.product_id = jso.product_id;
             this.product_type = jso.product_type;
             this.reject_reason = jso.reject_reason;
@@ -533,8 +560,14 @@ namespace cbMsg
                 this.stop_price = -1;
             }
             this.time_in_force = jso.time_in_force;
-            this.total_fees = Double.Parse(jso.total_fees);
-            this.total_value_after_fees = Double.Parse(jso.total_value_after_fees);
+            if(jso.total_fees != "")
+            {
+                this.total_fees = Double.Parse(jso.total_fees);
+            }
+            if(jso.total_value_after_fees != "")
+            {
+                this.total_value_after_fees = Double.Parse(jso.total_value_after_fees);
+            }
             this.trigger_status = jso.trigger_status;
             this.creation_time = jso.creation_time;
             this.end_time = jso.end_time;
