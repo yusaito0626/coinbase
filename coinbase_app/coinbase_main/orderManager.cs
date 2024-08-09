@@ -25,6 +25,10 @@ namespace coinbase_main
                 this.orderStack.Push(new order());
             }
             this.stopListening = false;
+
+            this.orderQueue1sec = new Queue<order>();
+            this.orderQueue1min = new Queue<order>();
+            this.orderQueueAll = new Queue<order>();
         }
 
         public Action<string> addLog = (str) => { Console.WriteLine(str); };
@@ -102,7 +106,12 @@ namespace coinbase_main
                 this.addLog("[ERROR] Invalid product_id");
                 return null;
             }
-            if(!this.checkSide(ref side))
+            if (!this.checkOrderCount(cp))
+            {
+                this.addLog("[ERROR] Exceeded 1 sec new order limit.");
+                return null;
+            }
+            if (!this.checkSide(ref side))
             {
                 this.addLog("[ERROR] Invalid side");
                 return null;
@@ -141,6 +150,8 @@ namespace coinbase_main
                 ord.updated_time = ord.new_order_time;
                 cp.orders.Add(ord.client_order_id, ord);
                 cp.liveOrders.Add(ord.client_order_id, ord);
+                this.orderQueue1sec.Enqueue(ord);
+                cp.orderQueue1sec.Enqueue(ord);
                 //Decode the result and input to ord object
                 return res;
             }
@@ -157,6 +168,11 @@ namespace coinbase_main
             if (cp == null)
             {
                 this.addLog("[ERROR] Invalid product_id");
+                return null;
+            }
+            if (!this.checkOrderCount(cp))
+            {
+                this.addLog("[ERROR] Exceeded 1 sec new order limit.");
                 return null;
             }
             if (!this.checkSide(ref side))
@@ -203,6 +219,8 @@ namespace coinbase_main
                 ord.updated_time = ord.new_order_time;
                 cp.orders.Add(ord.client_order_id, ord);
                 cp.liveOrders.Add(ord.client_order_id, ord);
+                this.orderQueue1sec.Enqueue(ord);
+                cp.orderQueue1sec.Enqueue(ord);
                 //Decode the result and input to ord object
                 return res;
             }
@@ -219,6 +237,11 @@ namespace coinbase_main
             if (cp == null)
             {
                 this.addLog("[ERROR] Invalid product_id");
+                return null;
+            }
+            if (!this.checkOrderCount(cp))
+            {
+                this.addLog("[ERROR] Exceeded 1 sec new order limit.");
                 return null;
             }
             if (!this.checkSide(ref side))
@@ -270,6 +293,8 @@ namespace coinbase_main
                 ord.updated_time = ord.new_order_time;
                 cp.orders.Add(ord.client_order_id, ord);
                 cp.liveOrders.Add(ord.client_order_id, ord);
+                this.orderQueue1sec.Enqueue(ord);
+                cp.orderQueue1sec.Enqueue(ord);
                 //Decode the result and input to ord object
                 return res;
             }
@@ -286,6 +311,11 @@ namespace coinbase_main
             if (cp == null)
             {
                 this.addLog("[ERROR] Invalid product_id");
+                return null;
+            }
+            if (!this.checkOrderCount(cp))
+            {
+                this.addLog("[ERROR] Exceeded 1 sec new order limit.");
                 return null;
             }
             if (!this.checkSide(ref side))
@@ -342,6 +372,8 @@ namespace coinbase_main
                 ord.updated_time = ord.new_order_time;
                 cp.orders.Add(ord.client_order_id, ord);
                 cp.liveOrders.Add(ord.client_order_id, ord);
+                this.orderQueue1sec.Enqueue(ord);
+                cp.orderQueue1sec.Enqueue(ord);
                 //Decode the result and input to ord object
                 return res;
             }
@@ -358,6 +390,11 @@ namespace coinbase_main
             if (cp == null)
             {
                 this.addLog("[ERROR] Invalid product_id");
+                return null;
+            }
+            if (!this.checkOrderCount(cp))
+            {
+                this.addLog("[ERROR] Exceeded 1 sec new order limit.");
                 return null;
             }
             if (!this.checkSide(ref side))
@@ -404,6 +441,8 @@ namespace coinbase_main
                 ord.updated_time = ord.new_order_time;
                 cp.orders.Add(ord.client_order_id, ord);
                 cp.liveOrders.Add(ord.client_order_id, ord);
+                this.orderQueue1sec.Enqueue(ord);
+                cp.orderQueue1sec.Enqueue(ord);
                 //Decode the result and input to ord object
                 return res;
             }
@@ -420,6 +459,11 @@ namespace coinbase_main
             if (cp == null)
             {
                 this.addLog("[ERROR] Invalid product_id");
+                return null;
+            }
+            if (!this.checkOrderCount(cp))
+            {
+                this.addLog("[ERROR] Exceeded 1 sec new order limit.");
                 return null;
             }
             if (!this.checkSide(ref side))
@@ -466,6 +510,8 @@ namespace coinbase_main
                 ord.updated_time = ord.new_order_time;
                 cp.orders.Add(ord.client_order_id, ord);
                 cp.liveOrders.Add(ord.client_order_id, ord);
+                this.orderQueue1sec.Enqueue(ord);
+                cp.orderQueue1sec.Enqueue(ord);
                 //Decode the result and input to ord object
                 return res;
             }
@@ -482,6 +528,11 @@ namespace coinbase_main
             if (cp == null)
             {
                 this.addLog("[ERROR] Invalid product_id");
+                return null;
+            }
+            if (!this.checkOrderCount(cp))
+            {
+                this.addLog("[ERROR] Exceeded 1 sec new order limit.");
                 return null;
             }
             if (!this.checkSide(ref side))
@@ -533,6 +584,8 @@ namespace coinbase_main
                 ord.updated_time = ord.new_order_time;
                 cp.orders.Add(ord.client_order_id, ord);
                 cp.liveOrders.Add(ord.client_order_id, ord);
+                this.orderQueue1sec.Enqueue(ord);
+                cp.orderQueue1sec.Enqueue(ord);
                 //Decode the result and input to ord object
                 return res;
             }
@@ -549,6 +602,11 @@ namespace coinbase_main
             if (cp == null)
             {
                 this.addLog("[ERROR] Invalid product_id");
+                return null;
+            }
+            if (!this.checkOrderCount(cp))
+            {
+                this.addLog("[ERROR] Exceeded 1 sec new order limit.");
                 return null;
             }
             if (!this.checkSide(ref side))
@@ -595,6 +653,8 @@ namespace coinbase_main
                 ord.updated_time = ord.new_order_time;
                 cp.orders.Add(ord.client_order_id, ord);
                 cp.liveOrders.Add(ord.client_order_id, ord);
+                this.orderQueue1sec.Enqueue(ord);
+                cp.orderQueue1sec.Enqueue(ord);
                 //Decode the result and input to ord object
                 return res;
             }
@@ -611,6 +671,11 @@ namespace coinbase_main
             if (cp == null)
             {
                 this.addLog("[ERROR] Invalid product_id");
+                return null;
+            }
+            if(!this.checkOrderCount(cp))
+            {
+                this.addLog("[ERROR] Exceeded 1 sec new order limit.");
                 return null;
             }
             if (!this.checkSide(ref side))
@@ -662,6 +727,8 @@ namespace coinbase_main
                 ord.updated_time = ord.new_order_time;
                 cp.orders.Add(ord.client_order_id, ord);
                 cp.liveOrders.Add(ord.client_order_id, ord);
+                this.orderQueue1sec.Enqueue(ord);
+                cp.orderQueue1sec.Enqueue(ord);
                 //Decode the result and input to ord object
                 return res;
             }
@@ -848,10 +915,54 @@ namespace coinbase_main
             }
             return true;
         }
+        private bool checkOrderCount(crypto cp)
+        {
+            this.checkOrderQueue();
+            cp.checkOrderQueue();
+            if(cp.orderQueue1sec.Count >= cp.maxNewOrderCount1sec)
+            {
+                return false;
+            }
+            if(this.orderQueue1sec.Count >= this.maxNewOrderCount1sec)
+            {
+                return false;
+            }
+            return true;
+        }
         public string getOrderId(string symbol)
         {
             int current_no = Interlocked.Increment(ref this.order_no);
             return symbol + DateTime.Now.ToString("yyyyMMddHHmmss") + current_no.ToString("D8");
+        }
+        private void checkOrderQueue()
+        {
+            DateTime currentTime = DateTime.Now;
+            order ord = this.orderQueue1sec.Peek();
+            if(ord != null)
+            {
+                while((currentTime - ord.new_order_time).TotalSeconds > 1)
+                {
+                    this.orderQueue1min.Enqueue(this.orderQueue1sec.Dequeue());
+                    ord = this.orderQueue1sec.Peek();
+                    if(ord == null)
+                    {
+                        break;
+                    }
+                }
+            }
+            ord = this.orderQueue1min.Peek();
+            if (ord != null)
+            {
+                while ((currentTime - ord.new_order_time).TotalSeconds > 60)
+                {
+                    this.orderQueueAll.Enqueue(this.orderQueue1min.Dequeue());
+                    ord = this.orderQueue1min.Peek();
+                    if (ord == null)
+                    {
+                        break;
+                    }
+                }
+            }
         }
 
         private void listening()
@@ -959,8 +1070,8 @@ namespace coinbase_main
                                                     if (ord.status != "CANCELLED" && ord.status != "FILLED")
                                                     {
                                                         cp.liveOrders.Add(ordMsg.client_order_id, ord);
-                                                        cp.orders.Add(ordMsg.client_order_id, ord);
                                                     }
+                                                    cp.orders.Add(ordMsg.client_order_id, ord);
                                                 }
                                             }
                                             cp.orderUpdating = 0;
@@ -996,6 +1107,11 @@ namespace coinbase_main
 
         private double maxBaseSize = 1;
         private double maxQuoteSize = 10000;
+        private int maxNewOrderCount1sec = 10;
+        private int maxNewOrderAmount1min = 1;
+        public Queue<order> orderQueue1sec;
+        public Queue<order> orderQueue1min;
+        public Queue<order> orderQueueAll;
 
         private static orderManager _instance;
         private static readonly object _lockObject = new object();

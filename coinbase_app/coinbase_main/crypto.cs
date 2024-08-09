@@ -156,6 +156,37 @@ namespace coinbase_main
             this.quotesInitialized = true;
         }
 
+        public void checkOrderQueue()
+        {
+            DateTime currentTime = DateTime.Now;
+            order ord = this.orderQueue1sec.Peek();
+            if (ord != null)
+            {
+                while ((currentTime - ord.new_order_time).TotalSeconds > 1)
+                {
+                    this.orderQueue1min.Enqueue(this.orderQueue1sec.Dequeue());
+                    ord = this.orderQueue1sec.Peek();
+                    if (ord == null)
+                    {
+                        break;
+                    }
+                }
+            }
+            ord = this.orderQueue1min.Peek();
+            if (ord != null)
+            {
+                while ((currentTime - ord.new_order_time).TotalSeconds > 60)
+                {
+                    this.orderQueue1min.Dequeue();
+                    ord = this.orderQueue1min.Peek();
+                    if (ord == null)
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+
         public void setStatus(cbMsg.product_status status)
         {
             this.product_type = status.product_type;
@@ -198,6 +229,11 @@ namespace coinbase_main
         public int maxOrdPr;
         public double maxQuoteSize;
         public double maxBaseSize;
+        public int maxNewOrderCount1sec;
+        public int maxNewOrderAmount1min;
+        public double maxLiveAmount;
+        public Queue<order> orderQueue1sec;
+        public Queue<order> orderQueue1min;
 
         public int last;
         public int open;
@@ -226,6 +262,11 @@ namespace coinbase_main
             this.maxOrdPr = -1;
             this.maxQuoteSize = -1;
             this.maxBaseSize = -1;
+            this.maxNewOrderCount1sec = -1;
+            this.maxNewOrderAmount1min = -1;
+            this.maxLiveAmount = -1;
+            this.orderQueue1sec = new Queue<order>();
+            this.orderQueue1min = new Queue<order>();
 
             this.last = 0;
             this.open = 0;
