@@ -159,27 +159,25 @@ namespace coinbase_main
         public void checkOrderQueue()
         {
             DateTime currentTime = DateTime.Now;
-            order ord = this.orderQueue1sec.Peek();
-            if (ord != null)
+            order ord;
+                
+            if (this.orderQueue1sec.TryPeek(out ord))
             {
                 while ((currentTime - ord.new_order_time).TotalSeconds > 1)
                 {
                     this.orderQueue1min.Enqueue(this.orderQueue1sec.Dequeue());
-                    ord = this.orderQueue1sec.Peek();
-                    if (ord == null)
+                    if (!this.orderQueue1sec.TryPeek(out ord))
                     {
                         break;
                     }
                 }
             }
-            ord = this.orderQueue1min.Peek();
-            if (ord != null)
+            if (this.orderQueue1min.TryPeek(out ord))
             {
                 while ((currentTime - ord.new_order_time).TotalSeconds > 60)
                 {
                     this.orderQueue1min.Dequeue();
-                    ord = this.orderQueue1min.Peek();
-                    if (ord == null)
+                    if (!this.orderQueue1min.TryPeek(out ord))
                     {
                         break;
                     }

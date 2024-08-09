@@ -124,6 +124,7 @@ testing_cp.bestask = (int)(1900 / testing_cp.quote_increment);
 testing_cp.bestbid = (int)(1899 / testing_cp.quote_increment);
 testing_cp.maxBaseSize = 0.001;
 testing_cp.maxQuoteSize = 20;
+testing_cp.maxNewOrderCount1sec = 5;
 
 HttpResponseMessage res;
 
@@ -239,29 +240,80 @@ using (StreamWriter sw = new StreamWriter(restApiMsgFile))
             return;
         }
     }
-    Console.WriteLine("Sending a market order...");
-    res = await oms.sendMarketOrder(testing_cp.id, "BUY", 0.0005);
-    if (res != null)
+    Console.WriteLine("order count check");
+    int i = 0;
+    while(i < 10)
     {
-        Console.WriteLine(res.ToString());
-        sw.WriteLine(res.ToString());
-        sw.Flush();
-        if (res.IsSuccessStatusCode)
+        res = await oms.sendLimitGTC(testing_cp.id, "BUY", 0.0001, 1800.00, true);
+        if (res != null)
         {
-            Console.WriteLine("Order Success!.");
-            Console.WriteLine("Check the fill");
+            Console.WriteLine(res.ToString());
+            sw.WriteLine(res.ToString());
+            sw.Flush();
+            if (res.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Order Success!.");
+            }
+            else
+            {
+                Console.WriteLine("Order Failed.");
+            }
         }
         else
         {
-            Console.WriteLine("Order Failed.");
+            Console.WriteLine("The order didn't go through");
+        }
+        ++i;
+        Console.WriteLine(i.ToString());
+    }
+    Console.WriteLine("Cancell All.");
+    foreach (KeyValuePair<string, order> ord in testing_cp.liveOrders)
+    {
+        Console.WriteLine(ord.Key);
+        res = await oms.sendCanOrder(ord.Value);
+        if (res != null)
+        {
+            Console.WriteLine(res.ToString());
+            sw.WriteLine(res.ToString());
+            sw.Flush();
+            if (res.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Order Success!.");
+            }
+            else
+            {
+                Console.WriteLine("Order Failed.");
+            }
+        }
+        else
+        {
+            Console.WriteLine("The order didn't go through");
             return;
         }
     }
-    else
-    {
-        Console.WriteLine("The order didn't go through");
-        return;
-    }
+    //Console.WriteLine("Sending a market order...");
+    //res = await oms.sendMarketOrder(testing_cp.id, "BUY", 0.0005);
+    //if (res != null)
+    //{
+    //    Console.WriteLine(res.ToString());
+    //    sw.WriteLine(res.ToString());
+    //    sw.Flush();
+    //    if (res.IsSuccessStatusCode)
+    //    {
+    //        Console.WriteLine("Order Success!.");
+    //        Console.WriteLine("Check the fill");
+    //    }
+    //    else
+    //    {
+    //        Console.WriteLine("Order Failed.");
+    //        return;
+    //    }
+    //}
+    //else
+    //{
+    //    Console.WriteLine("The order didn't go through");
+    //    return;
+    //}
 }
 while(true)
 {
