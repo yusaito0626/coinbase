@@ -137,6 +137,14 @@ namespace coinbase_connection
         {
             obj = JsonSerializer.Deserialize<cbMsg.jsOrder>(str);
         }
+        static public void parsePerpetualPos(string str,ref cbMsg.jsPerpetualPosition obj)
+        {
+            obj = JsonSerializer.Deserialize<cbMsg.jsPerpetualPosition>(str);
+        }
+        static public void parseFuturePos(string str, ref cbMsg.jsFuturePosition obj)
+        {
+            obj = JsonSerializer.Deserialize<cbMsg.jsFuturePosition>(str);
+        }
 
         static public void jsUpdateToTrades(string symbol,cbMsg.jsUpdate jsup, ref cbMsg.trades obj)
         {
@@ -603,5 +611,212 @@ namespace cbMsg
         public string creation_time;
         public string end_time;
         public string start_time;
+    }
+
+    public struct jsPerpetualPosition
+    {
+        public string product_id {  get; set; }
+        public string portfolio_uuid { get; set; }
+        public string vwap { get; set; }
+        public string entry_vwap { get; set; }
+        public string position_side { get; set; }
+        public string margin_type { get; set; }
+        public string net_size { get; set; }
+        public string buy_order_size { get; set; }
+        public string sell_order_size { get; set; }
+        public string leverage { get; set; }
+        public string mark_price { get; set; }
+        public string liquidation_price { get; set; }
+        public string im_notional { get; set; }
+        public string mm_notional { get; set; }
+        public string position_notional { get; set; }
+        public string unrealized_pnl { get; set; }
+        public string aggregated_pnl { get; set; }
+    }
+    public struct perpetualPosition
+    {
+        public void addMsg(jsPerpetualPosition jspp)
+        {
+            this.product_id = jspp.product_id;
+            this.portfolio_uuid = jspp.portfolio_uuid;
+            if(jspp.vwap != "")
+            {
+                this.vwap = Double.Parse(jspp.vwap);
+            }
+            else
+            {
+                this.vwap = -1;
+            }
+            if (jspp.entry_vwap != "")
+            {
+                this.entry_vwap = Double.Parse(jspp.entry_vwap);
+            }
+            else
+            {
+                this.entry_vwap = -1;
+            }
+            this.position_side = jspp.position_side;
+            this.margin_type = jspp.margin_type;
+            if (jspp.net_size != "")
+            {
+                this.net_size = Double.Parse(jspp.net_size);
+            }
+            else
+            {
+                this.net_size = 0;
+            }
+            if (jspp.buy_order_size != "")
+            {
+                this.buy_order_size = Double.Parse(jspp.buy_order_size);
+            }
+            else
+            {
+                this.buy_order_size = -1;
+            }
+            if (jspp.sell_order_size != "")
+            {
+                this.sell_order_size = Double.Parse(jspp.sell_order_size);
+            }
+            else
+            {
+                this.sell_order_size = -1;
+            }
+            if (jspp.leverage != "")
+            {
+                this.leverage = Double.Parse(jspp.leverage);
+            }
+            else
+            {
+                this.leverage = 1;
+            }
+            if (jspp.mark_price != "")
+            {
+                this.mark_price = Double.Parse(jspp.mark_price);
+            }
+            else
+            {
+                this.mark_price = -1;
+            }
+            if (jspp.liquidation_price != "")
+            {
+                this.liquidation_price = Double.Parse(jspp.liquidation_price);
+            }
+            else
+            {
+                this.liquidation_price = -1;
+            }
+            if (jspp.im_notional != "")
+            {
+                this.im_notional = Double.Parse(jspp.im_notional);
+            }
+            else
+            {
+                this.im_notional = 0;
+            }
+            if (jspp.mm_notional != "")
+            {
+                this.mm_notional = Double.Parse(jspp.mm_notional);
+            }
+            else
+            {
+                this.mm_notional = 0;
+            }
+            if (jspp.position_notional != "")
+            {
+                this.position_notional = Double.Parse(jspp.position_notional);
+            }
+            else
+            {
+                this.position_notional = 0;
+            }
+            if (jspp.unrealized_pnl != "")
+            {
+                this.unrealized_pnl = Double.Parse(jspp.unrealized_pnl);
+            }
+            else
+            {
+                this.unrealized_pnl = 0;
+            }
+            if (jspp.aggregated_pnl != "")
+            {
+                this.aggregated_pnl = Double.Parse(jspp.aggregated_pnl);
+            }
+            else
+            {
+                this.aggregated_pnl = 0;
+            }
+        }
+        public string product_id;
+        public string portfolio_uuid;
+        public double vwap;
+        public double entry_vwap;
+        public string position_side;
+        public string margin_type;
+        public double net_size;
+        public double buy_order_size;
+        public double sell_order_size;
+        public double leverage;
+        public double mark_price;
+        public double liquidation_price;
+        public double im_notional;
+        public double mm_notional;
+        public double position_notional;
+        public double unrealized_pnl;
+        public double aggregated_pnl;
+    }
+    public struct jsFuturePosition
+    {
+        public string product_id { get; set; }
+        public string side { get; set; }
+        public string number_of_contracts { get; set; }
+        public string realized_pnl { get; set; }
+        public string unrealized_pnl { get; set; }
+        public string entry_price { get; set; }
+    }
+    public struct futurePosition
+    {
+        public void addMsg(jsFuturePosition jsfp)
+        {
+            this.product_id = jsfp.product_id;
+            this.side = jsfp.side;
+            if (jsfp.number_of_contracts != "")
+            {
+                this.number_of_contracts = Double.Parse(jsfp.number_of_contracts);
+            }
+            else
+            {
+                this.number_of_contracts = -1;
+            }
+            if (jsfp.realized_pnl != "")
+            {
+                this.realized_pnl = Double.Parse(jsfp.realized_pnl);
+            }
+            else
+            {
+                this.realized_pnl = 0;
+            }
+            if (jsfp.unrealized_pnl != "")
+            {
+                this.unrealized_pnl = Double.Parse(jsfp.unrealized_pnl);
+            }
+            else
+            {
+                this.unrealized_pnl = 0;
+            }
+            if (jsfp.entry_price != "")
+            {
+                this.entry_price = Double.Parse(jsfp.entry_price);
+            }
+            else
+            {
+                this.entry_price = -1;
+            }
+        }
+        public string product_id;
+        public string side;
+        public double number_of_contracts;
+        public double realized_pnl;
+        public double unrealized_pnl;
+        public double entry_price;
     }
 }

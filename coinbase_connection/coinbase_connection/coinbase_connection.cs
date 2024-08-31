@@ -833,16 +833,24 @@ namespace coinbase_connection
         {
             return "{\"trigger_bracket_gtd\":{\"base_size\": \"" + base_size + "\",\"limit_price\": \"" + limit_price + "\",\"stop_trigger_price\": \"" + stop_trigger_price + ",\"end_time\": \"" + end_time + "\"}}";
         }
-        public void readApiJson(string jsonfile)
+        public bool readApiJson(string jsonfile)
         {
-            Dictionary<string,string> dict = new Dictionary<string,string>();
-            using (StreamReader r = new StreamReader(jsonfile))
+            if(File.Exists(jsonfile))
             {
-                string json = r.ReadToEnd();
-                dict = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
-                this.name = dict["name"];
-                this.privateKey = parseKey(dict["privateKey"]);
+                Dictionary<string, string> dict = new Dictionary<string, string>();
+                using (StreamReader r = new StreamReader(jsonfile))
+                {
+                    string json = r.ReadToEnd();
+                    dict = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+                    this.name = dict["name"];
+                    this.privateKey = parseKey(dict["privateKey"]);
+                }
+                if(this.name != "" && this.privateKey != "")
+                {
+                    return true;
+                }
             }
+            return false;
         }
 
         string parseKey(string key)

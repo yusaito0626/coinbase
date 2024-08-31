@@ -202,6 +202,17 @@ namespace coinbase_app
                     {
                         url = values[1];
                     }
+                    else if (values[0] == "live")
+                    {
+                        if (values[1] == "true")
+                        {
+                            live = true;
+                        }
+                        else
+                        {
+                            live = false;
+                        }
+                    }
                     else if (values[0] == "symbolList")
                     {
                         symbols = values[1].Replace("[", "").Replace("]", "").Split(",");
@@ -230,6 +241,7 @@ namespace coinbase_app
         int decodingThCount;
         int quotesThCount;
         int optThCount;
+        bool live = false;
 
         Dictionary<string, crypto> cryptos;
         int updating;
@@ -295,7 +307,7 @@ namespace coinbase_app
                             this.label_open.Text = (cp.open * cp.quote_increment).ToString("N2");
                             this.label_high.Text = (cp.high * cp.quote_increment).ToString("N2");
                             this.label_low.Text = (cp.low * cp.quote_increment).ToString("N2");
-                            this.label_volume.Text = (cp.executedBaseAmount).ToString("N2");
+                            this.label_volume.Text = (cp.baseTradedVolume).ToString("N2");
                             int askidx = cp.bestask;
                             int bididx = cp.bestbid;
                             int aski = 0;
@@ -342,12 +354,12 @@ namespace coinbase_app
                             }
                             while (true)
                             {
-                                if(Interlocked.Exchange(ref cp.orderUpdating,1) == 0)
+                                if (Interlocked.Exchange(ref cp.orderUpdating, 1) == 0)
                                 {
                                     int i = 0;
-                                    foreach(KeyValuePair<string,order> pair in cp.liveOrders)
+                                    foreach (KeyValuePair<string, order> pair in cp.liveOrders)
                                     {
-                                        if(this.dataGrid_orders.RowCount > i)
+                                        if (this.dataGrid_orders.RowCount > i)
                                         {
                                             DataGridViewRow row = this.dataGrid_orders.Rows[i];
                                             row.Cells["status"].Value = pair.Value.status;
@@ -362,7 +374,7 @@ namespace coinbase_app
                                             this.dataGrid_orders.Rows.Add(pair.Value.status, pair.Value.side, pair.Value.price.ToString("N2"), pair.Value.size.ToString(), pair.Value.executed_size.ToString());
                                         }
                                     }
-                                    for (int j = i; j < this.dataGrid_orders.RowCount;++j)
+                                    for (int j = i; j < this.dataGrid_orders.RowCount; ++j)
                                     {
                                         DataGridViewRow row = this.dataGrid_orders.Rows[j];
                                         row.Cells["status"].Value = "";
@@ -453,10 +465,54 @@ namespace coinbase_app
         }
         private void buttonOMS_Click(object sender, EventArgs e)
         {
-            this.OMS.initialize(this.apiFilename,this.url, this.cryptos,this.orderLogPath, this.addLog);
+            if (this.live)
+            {
+                string msg = "Are you willing to start live trading?";
+                string caption = "Warning";
+                MessageBoxButtons buttons = MessageBoxButtons.YesNoCancel;
+                DialogResult result = MessageBox.Show(msg, caption, buttons, MessageBoxIcon.Question);
+                if (result == DialogResult.No)
+                {
+                    this.addLog("Starting as a virtual mode");
+                    this.live = false;
+                }
+                else if (result == DialogResult.Cancel)
+                {
+                    this.addLog("Process has been cancelled.");
+                    return;
+                }
+                else if (result == DialogResult.Yes)
+                {
+                    this.addLog("Starting live trading.");
+                }
+                else
+                {
+                    this.addLog("ERROR!!!");
+                    return;
+                }
+            }
+            this.OMS.initialize(this.live, this.apiFilename, this.url, this.cryptos, this.orderLogPath, this.addLog);
             this.buttonOMS.BackColor = System.Drawing.Color.LawnGreen;
             this.buttonOMS.FlatStyle = FlatStyle.Flat;
             this.buttonOMS.Enabled = false;
+        }
+
+        private void comboBox_mode_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if(this.comboBox_mode.SelectedItem == "Virtual")
+            {
+                this.live = false;
+                this.addLog("Mode:Virtual");
+            }
+            else if (this.comboBox_mode.SelectedItem == "Live")
+            {
+                this.live = true;
+                this.addLog("Mode:Live");
+            }
+            else
+            {
+                this.addLog("[ERROR] Only live/virtual mode is available for now");
+            }
         }
     }
 }

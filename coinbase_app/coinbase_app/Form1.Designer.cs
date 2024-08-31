@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             tabControl = new TabControl();
             tabMain = new TabPage();
             button_trading = new Button();
@@ -76,6 +76,12 @@
             label_sumBuyOrd = new Label();
             label_sumBuyExeAmt = new Label();
             tabProduct = new TabPage();
+            dataGrid_orders = new DataGridView();
+            status = new DataGridViewTextBoxColumn();
+            side = new DataGridViewTextBoxColumn();
+            price = new DataGridViewTextBoxColumn();
+            size = new DataGridViewTextBoxColumn();
+            filled = new DataGridViewTextBoxColumn();
             groupBox9 = new GroupBox();
             tableLayoutPanel8 = new TableLayoutPanel();
             label_posPnl = new Label();
@@ -164,12 +170,8 @@
             label16 = new Label();
             label15 = new Label();
             display_update = new System.Windows.Forms.Timer(components);
-            dataGrid_orders = new DataGridView();
-            status = new DataGridViewTextBoxColumn();
-            side = new DataGridViewTextBoxColumn();
-            price = new DataGridViewTextBoxColumn();
-            size = new DataGridViewTextBoxColumn();
-            filled = new DataGridViewTextBoxColumn();
+            label37 = new Label();
+            label_Fee = new Label();
             tabControl.SuspendLayout();
             tabMain.SuspendLayout();
             groupBox3.SuspendLayout();
@@ -179,6 +181,7 @@
             groupBox1.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
             tabProduct.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dataGrid_orders).BeginInit();
             groupBox9.SuspendLayout();
             tableLayoutPanel8.SuspendLayout();
             groupBox8.SuspendLayout();
@@ -191,7 +194,6 @@
             groupBox5.SuspendLayout();
             tabConfig.SuspendLayout();
             groupBox4.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)dataGrid_orders).BeginInit();
             SuspendLayout();
             // 
             // tabControl
@@ -563,11 +565,12 @@
             // comboBox_mode
             // 
             comboBox_mode.FormattingEnabled = true;
-            comboBox_mode.Items.AddRange(new object[] { "Read Tick Files", "Vitual", "Live" });
+            comboBox_mode.Items.AddRange(new object[] { "Read Tick Files", "Virtual", "Live" });
             comboBox_mode.Location = new Point(3, 5);
             comboBox_mode.Name = "comboBox_mode";
             comboBox_mode.Size = new Size(252, 23);
             comboBox_mode.TabIndex = 1;
+            comboBox_mode.SelectedIndexChanged += comboBox_mode_SelectedIndexChanged;
             // 
             // groupBox1
             // 
@@ -797,6 +800,55 @@
             tabProduct.Text = "Product";
             tabProduct.UseVisualStyleBackColor = true;
             // 
+            // dataGrid_orders
+            // 
+            dataGrid_orders.BackgroundColor = SystemColors.Window;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle2.BackColor = SystemColors.Control;
+            dataGridViewCellStyle2.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
+            dataGrid_orders.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
+            dataGrid_orders.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGrid_orders.Columns.AddRange(new DataGridViewColumn[] { status, side, price, size, filled });
+            dataGrid_orders.Location = new Point(6, 376);
+            dataGrid_orders.Name = "dataGrid_orders";
+            dataGrid_orders.RowHeadersVisible = false;
+            dataGrid_orders.Size = new Size(550, 336);
+            dataGrid_orders.TabIndex = 9;
+            // 
+            // status
+            // 
+            status.HeaderText = "Status";
+            status.Name = "status";
+            status.Width = 80;
+            // 
+            // side
+            // 
+            side.HeaderText = "Side";
+            side.Name = "side";
+            side.Width = 80;
+            // 
+            // price
+            // 
+            price.HeaderText = "Price";
+            price.Name = "price";
+            price.Width = 130;
+            // 
+            // size
+            // 
+            size.HeaderText = "Size";
+            size.Name = "size";
+            size.Width = 130;
+            // 
+            // filled
+            // 
+            filled.HeaderText = "Filled";
+            filled.Name = "filled";
+            filled.Width = 130;
+            // 
             // groupBox9
             // 
             groupBox9.Controls.Add(tableLayoutPanel8);
@@ -810,16 +862,19 @@
             // tableLayoutPanel8
             // 
             tableLayoutPanel8.CellBorderStyle = TableLayoutPanelCellBorderStyle.OutsetDouble;
-            tableLayoutPanel8.ColumnCount = 3;
-            tableLayoutPanel8.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33F));
-            tableLayoutPanel8.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33F));
-            tableLayoutPanel8.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.34F));
+            tableLayoutPanel8.ColumnCount = 4;
+            tableLayoutPanel8.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            tableLayoutPanel8.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            tableLayoutPanel8.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            tableLayoutPanel8.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
             tableLayoutPanel8.Controls.Add(label_posPnl, 0, 1);
             tableLayoutPanel8.Controls.Add(label40, 0, 1);
-            tableLayoutPanel8.Controls.Add(label_totalPnl, 0, 1);
             tableLayoutPanel8.Controls.Add(label36, 0, 0);
             tableLayoutPanel8.Controls.Add(label_tradePnl, 1, 0);
-            tableLayoutPanel8.Controls.Add(label38, 2, 0);
+            tableLayoutPanel8.Controls.Add(label38, 3, 0);
+            tableLayoutPanel8.Controls.Add(label_totalPnl, 3, 1);
+            tableLayoutPanel8.Controls.Add(label37, 2, 0);
+            tableLayoutPanel8.Controls.Add(label_Fee, 2, 1);
             tableLayoutPanel8.Location = new Point(3, 19);
             tableLayoutPanel8.Name = "tableLayoutPanel8";
             tableLayoutPanel8.RowCount = 2;
@@ -833,9 +888,9 @@
             label_posPnl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             label_posPnl.AutoSize = true;
             label_posPnl.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label_posPnl.Location = new Point(6, 33);
+            label_posPnl.Location = new Point(121, 33);
             label_posPnl.Name = "label_posPnl";
-            label_posPnl.Size = new Size(145, 27);
+            label_posPnl.Size = new Size(106, 27);
             label_posPnl.TabIndex = 12;
             label_posPnl.Text = "0";
             label_posPnl.TextAlign = ContentAlignment.MiddleRight;
@@ -845,9 +900,9 @@
             label40.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             label40.AutoSize = true;
             label40.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label40.Location = new Point(160, 33);
+            label40.Location = new Point(6, 33);
             label40.Name = "label40";
-            label40.Size = new Size(145, 27);
+            label40.Size = new Size(106, 27);
             label40.TabIndex = 11;
             label40.Text = "0";
             label40.TextAlign = ContentAlignment.MiddleRight;
@@ -857,9 +912,9 @@
             label_totalPnl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             label_totalPnl.AutoSize = true;
             label_totalPnl.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label_totalPnl.Location = new Point(314, 33);
+            label_totalPnl.Location = new Point(351, 33);
             label_totalPnl.Name = "label_totalPnl";
-            label_totalPnl.Size = new Size(146, 27);
+            label_totalPnl.Size = new Size(109, 27);
             label_totalPnl.TabIndex = 10;
             label_totalPnl.Text = "0";
             label_totalPnl.TextAlign = ContentAlignment.MiddleRight;
@@ -871,7 +926,7 @@
             label36.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
             label36.Location = new Point(6, 3);
             label36.Name = "label36";
-            label36.Size = new Size(145, 27);
+            label36.Size = new Size(106, 27);
             label36.TabIndex = 6;
             label36.Text = "Position PnL";
             label36.TextAlign = ContentAlignment.MiddleCenter;
@@ -881,9 +936,9 @@
             label_tradePnl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             label_tradePnl.AutoSize = true;
             label_tradePnl.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label_tradePnl.Location = new Point(160, 3);
+            label_tradePnl.Location = new Point(121, 3);
             label_tradePnl.Name = "label_tradePnl";
-            label_tradePnl.Size = new Size(145, 27);
+            label_tradePnl.Size = new Size(106, 27);
             label_tradePnl.TabIndex = 7;
             label_tradePnl.Text = "Trade PnL";
             label_tradePnl.TextAlign = ContentAlignment.MiddleCenter;
@@ -893,9 +948,9 @@
             label38.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             label38.AutoSize = true;
             label38.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label38.Location = new Point(314, 3);
+            label38.Location = new Point(351, 3);
             label38.Name = "label38";
-            label38.Size = new Size(146, 27);
+            label38.Size = new Size(109, 27);
             label38.TabIndex = 8;
             label38.Text = "Total PnL";
             label38.TextAlign = ContentAlignment.MiddleCenter;
@@ -1848,54 +1903,29 @@
             display_update.Interval = 1000;
             display_update.Tick += display_update_Tick;
             // 
-            // dataGrid_orders
+            // label37
             // 
-            dataGrid_orders.BackgroundColor = SystemColors.Window;
-            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle1.BackColor = SystemColors.Control;
-            dataGridViewCellStyle1.Font = new Font("Segoe UI", 9F);
-            dataGridViewCellStyle1.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
-            dataGrid_orders.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-            dataGrid_orders.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGrid_orders.Columns.AddRange(new DataGridViewColumn[] { status, side, price, size, filled });
-            dataGrid_orders.Location = new Point(6, 376);
-            dataGrid_orders.Name = "dataGrid_orders";
-            dataGrid_orders.RowHeadersVisible = false;
-            dataGrid_orders.Size = new Size(550, 336);
-            dataGrid_orders.TabIndex = 9;
+            label37.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label37.AutoSize = true;
+            label37.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label37.Location = new Point(236, 3);
+            label37.Name = "label37";
+            label37.Size = new Size(106, 27);
+            label37.TabIndex = 13;
+            label37.Text = "Fee";
+            label37.TextAlign = ContentAlignment.MiddleCenter;
             // 
-            // status
+            // label_Fee
             // 
-            status.HeaderText = "Status";
-            status.Name = "status";
-            status.Width = 80;
-            // 
-            // side
-            // 
-            side.HeaderText = "Side";
-            side.Name = "side";
-            side.Width = 80;
-            // 
-            // price
-            // 
-            price.HeaderText = "Price";
-            price.Name = "price";
-            price.Width = 130;
-            // 
-            // size
-            // 
-            size.HeaderText = "Size";
-            size.Name = "size";
-            size.Width = 130;
-            // 
-            // filled
-            // 
-            filled.HeaderText = "Filled";
-            filled.Name = "filled";
-            filled.Width = 130;
+            label_Fee.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            label_Fee.AutoSize = true;
+            label_Fee.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label_Fee.Location = new Point(236, 33);
+            label_Fee.Name = "label_Fee";
+            label_Fee.Size = new Size(106, 27);
+            label_Fee.TabIndex = 14;
+            label_Fee.Text = "0";
+            label_Fee.TextAlign = ContentAlignment.MiddleRight;
             // 
             // Form1
             // 
@@ -1918,6 +1948,7 @@
             tableLayoutPanel1.PerformLayout();
             tabProduct.ResumeLayout(false);
             tabProduct.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)dataGrid_orders).EndInit();
             groupBox9.ResumeLayout(false);
             tableLayoutPanel8.ResumeLayout(false);
             tableLayoutPanel8.PerformLayout();
@@ -1938,7 +1969,6 @@
             tabConfig.ResumeLayout(false);
             groupBox4.ResumeLayout(false);
             groupBox4.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)dataGrid_orders).EndInit();
             ResumeLayout(false);
         }
 
@@ -2084,5 +2114,7 @@
         private DataGridViewTextBoxColumn price;
         private DataGridViewTextBoxColumn size;
         private DataGridViewTextBoxColumn filled;
+        private Label label37;
+        private Label label_Fee;
     }
 }

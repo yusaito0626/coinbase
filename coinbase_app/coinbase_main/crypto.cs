@@ -2,10 +2,16 @@
 using coinbase_connection;
 using System.Collections.Concurrent;
 using System.Collections.Specialized;
+using System.Diagnostics;
 namespace coinbase_main
 {
     public class quote
     {
+        public quote()
+        {
+            this.ordQueue = new Queue<order>();
+        }
+
         public void update(cbMsg.trades qt,double increment)
         {
             this.price = (int)(qt.price / increment);
@@ -20,10 +26,123 @@ namespace coinbase_main
                 this.side = qt.side;
             }
         }
+        public double updateOrders(cbMsg.trades qt,double increment)
+        {
+            double consumedQty = 0;
+            double executedQty = 0;
+            if(this.ordQueue.Count > 0)
+            {
+                if (this.price == (int)(qt.price / increment))
+                {
+                    int i = 0;
+                    order ord = null;
+                    order initOrd = null;
+                    while (this.ordQueue.Count > 0)
+                    {
+                        ord = this.ordQueue.Dequeue();
+                        if (i == 0)
+                        {
+                            if (ord.status != "FILLED" && ord.status != "CANCELLED" && (int)(ord.price / increment) == this.price)
+                            {
+                                ++i;
+                                initOrd = ord;
+                                if (ord.priorQuantity > qt.size)
+                                {
+                                    ord.priorQuantity -= qt.size;
+                                    consumedQty += qt.size;
+                                }
+                                else
+                                {
+                                    double exceededQty = qt.size - ord.priorQuantity;
+                                    consumedQty += ord.priorQuantity;
+                                    ord.priorQuantity = 0;
+                                    if (ord.open_size > exceededQty)
+                                    {
+                                        ord.open_size -= exceededQty;
+                                        ord.executed_size += exceededQty;
+                                        executedQty += exceededQty;
+                                        ord.status = "PARTIAL";
+                                    }
+                                    else
+                                    {
+                                        executedQty += ord.open_size;
+                                        ord.executed_size += ord.open_size;
+                                        ord.open_size = 0;
+                                        ord.status = "FILLED";
+                                    }
+                                }
+                                this.ordQueue.Enqueue(ord);
+                            }
+                        }
+                        else
+                        {
+                            if (ord == initOrd)
+                            {
+                                break;
+                            }
+                            if (ord.status != "FILLED" && ord.status != "CANCELLED" && (int)(ord.price / increment) == this.price)
+                            {
+                                if (ord.priorQuantity > qt.size)
+                                {
+                                    consumedQty += (qt.size - consumedQty);
+                                    ord.priorQuantity -= qt.size;
+                                }
+                                else
+                                {
+                                    double exceededQty = qt.size - ord.priorQuantity;
+                                    consumedQty += (ord.priorQuantity - consumedQty);
+                                    ord.priorQuantity = 0;
+                                    if (exceededQty > qt.size - (consumedQty + executedQty))
+                                    {
+                                        exceededQty = qt.size - (consumedQty + executedQty);
+                                    }
+                                    if (ord.open_size > exceededQty)
+                                    {
+                                        ord.open_size -= exceededQty;
+                                        ord.executed_size += exceededQty;
+                                        executedQty += exceededQty;
+                                        ord.status = "PARTIAL";
+                                    }
+                                    else
+                                    {
+                                        executedQty += ord.open_size;
+                                        ord.executed_size += ord.open_size;
+                                        ord.open_size = 0;
+                                        ord.status = "FILLED";
+                                    }
+                                }
+                                this.ordQueue.Enqueue(ord);
+                            }
+                        }
+                    }
+                }
+                else if((qt.side == "SELL" && this.price > (int)(qt.price / increment)) || (qt.side == "BUY" && this.price < (int)(qt.price / increment)))
+                {
+                    //Execute All
+                    order ord = null;
+                    while (this.ordQueue.Count > 0)
+                    {
+                        ord = this.ordQueue.Dequeue();
+                        if ((int)(ord.price / increment) == this.price)
+                        {
+                            executedQty += ord.open_size;
+                            ord.executed_size += ord.open_size;
+                            ord.open_size = 0;
+                            ord.status = "FILLED";
+                        }
+                    }
+                }
+            }
+            return executedQty;
+        }
+
         public string side;
         public int price;
         public double quantity;
         public string updated_time;
+
+        //For sim
+        public Queue<order> ordQueue;
     }
     public class crypto
     {
@@ -54,8 +173,8 @@ namespace coinbase_main
 
         public void updateTrade(cbMsg.trades trade)
         {
-            this.executedBaseAmount += trade.size;
-            this.executedQuoteAmount += trade.size * trade.price;
+            this.baseTradedVolume += trade.size;
+            this.quoteTradedVolume += trade.size * trade.price;
 
             this.last = (int)(trade.price / this.quote_increment);
             if(this.open == 0)
@@ -185,6 +304,164 @@ namespace coinbase_main
             }
         }
 
+        //Market order/limit order taking the quotes
+        public void executeOrder(order ord)
+        {
+            int i = 0;
+            while(true)
+            {
+                if (Interlocked.Exchange(ref this.updating, 1) == 0)
+                {
+                    quote q;
+                    if(ord.side == "SELL")
+                    {
+                        int idx = this.bestbid;
+                        q = this.quotes[idx];
+                        int iOrderPrice = (int)(ord.price / this.quote_increment);
+                        while (q.price > iOrderPrice)
+                        {
+                            if(q.quantity < ord.open_size)
+                            {
+                                ord.open_size -= q.quantity;
+                                ord.executed_size += q.quantity;
+                                --idx;
+                                if(idx < this.minPr)
+                                {
+                                    break;
+                                }
+                                q = this.quotes[idx];
+                            }
+                            else
+                            {
+                                ord.executed_size += ord.open_size;
+                                ord.open_size = 0;
+                                break;
+                            }
+                        }
+                    }
+                    else if(ord.side == "BUY")
+                    {
+                        int idx = this.bestask;
+                        q = this.quotes[idx];
+                        int iOrderPrice = (int)(ord.price / this.quote_increment);
+                        if(iOrderPrice == 0)
+                        {
+                            iOrderPrice = this.maxPr;
+                        }
+                        while (q.price < iOrderPrice)
+                        {
+                            if (q.quantity < ord.open_size)
+                            {
+                                ord.open_size -= q.quantity;
+                                ord.executed_size += q.quantity;
+                                ++idx;
+                                if (idx > this.maxPr)
+                                {
+                                    break;
+                                }
+                                q = this.quotes[idx];
+                            }
+                            else
+                            {
+                                ord.executed_size += ord.open_size;
+                                ord.open_size = 0;
+                                break;
+                            }
+                        }
+                    }
+                    this.updating = 0;
+                    break;
+                }
+                else
+                {
+                    ++i;
+                    if(i > 100000)
+                    {
+                        i = 0;
+                        System.Threading.Thread.Sleep(0);
+                    }
+                }
+            }
+            
+        }
+
+        //Orders taken by other trades
+        public void executeLimitOrder(cbMsg.trades trd)
+        {
+            if(trd.msg_type != "trades")
+            {
+                return;
+            }
+            int i = 0;
+            int tradedPr = (int)(trd.price / this.quote_increment);
+            double executedBaseAmount = 0;
+            while (true)
+            {
+                if (Interlocked.Exchange(ref this.orderUpdating, 1) == 0)
+                {
+                    if(trd.side == "SELL")
+                    {
+                        int idx = this.bestbid;
+                        quote qt = this.quotes[idx];
+                        int currentPr = qt.price;
+                        
+                        while(currentPr >= tradedPr)
+                        {
+                            executedBaseAmount = qt.updateOrders(trd, this.quote_increment);
+                            this.baseExecutionBuy += executedBaseAmount;
+                            this.quoteExecutionBuy += executedBaseAmount * (double)qt.price * this.quote_increment;
+                            --idx;
+                            if (idx < this.minPr)
+                            {
+                                break;
+                            }
+                            qt = this.quotes[idx];
+                            currentPr = qt.price;
+                        }
+                    }
+                    else if(trd.side == "BUY")
+                    {
+                        int idx = this.bestask;
+                        quote qt = this.quotes[idx];
+                        int currentPr = qt.price;
+                        while (currentPr <= tradedPr)
+                        {
+                            executedBaseAmount = qt.updateOrders(trd, this.quote_increment);
+                            this.baseExecutionSell += executedBaseAmount;
+                            this.quoteExecutionSell += executedBaseAmount * (double)qt.price * this.quote_increment;
+                            ++idx;
+                            if (idx > this.maxPr)
+                            {
+                                break;
+                            }
+                            qt = this.quotes[idx];
+                            currentPr = qt.price;
+                        }
+                    }
+                    this.orderUpdating = 0;
+                    break;
+                }
+                else
+                {
+                    ++i;
+                    if (i > 100000)
+                    {
+                        i = 0;
+                        System.Threading.Thread.Sleep(0);
+                    }
+                }
+            }
+        }
+
+        public void updatePerpetual(cbMsg.perpetualPosition pp)
+        {
+
+        }
+        public void updateFuture(cbMsg.futurePosition fp)
+        {
+
+        }
+
         public void setStatus(cbMsg.product_status status)
         {
             this.product_type = status.product_type;
@@ -223,6 +500,15 @@ namespace coinbase_main
         public Dictionary<string, order> liveOrders;
         public Dictionary<string, order> orders;
 
+        public double baseExecutionSell;
+        public double baseExecutionBuy;
+        public double quoteExecutionSell;
+        public double quoteExecutionBuy;
+
+        public double basePosition;
+        public double basePosPr;
+        public double fee;
+
         public int minOrdPr;
         public int maxOrdPr;
         public double maxQuoteSize;
@@ -238,8 +524,8 @@ namespace coinbase_main
         public int high;
         public int low;
 
-        public double executedBaseAmount;
-        public double executedQuoteAmount;
+        public double baseTradedVolume;
+        public double quoteTradedVolume;
 
         public crypto()
         {
@@ -256,6 +542,11 @@ namespace coinbase_main
             this.liveOrders = new Dictionary<string, order>();
             this.orders = new Dictionary<string, order>();
 
+            this.baseExecutionSell = 0.0;
+            this.baseExecutionBuy = 0.0;
+            this.quoteExecutionSell = 0.0;
+            this.quoteExecutionBuy = 0.0;
+
             this.minOrdPr = -1;
             this.maxOrdPr = -1;
             this.maxQuoteSize = -1;
@@ -271,8 +562,8 @@ namespace coinbase_main
             this.high = 0;
             this.low = 0;
 
-            this.executedBaseAmount = 0;
-            this.executedQuoteAmount = 0;
+            this.baseTradedVolume = 0;
+            this.quoteTradedVolume = 0;
         }
     }
 }
