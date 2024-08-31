@@ -455,11 +455,21 @@ namespace coinbase_main
 
         public void updatePerpetual(cbMsg.perpetualPosition pp)
         {
-
+            this.basePosition = pp.net_size;
+            this.basePosPr = pp.vwap;  
         }
         public void updateFuture(cbMsg.futurePosition fp)
         {
-
+            if(fp.side == "Short")
+            {
+                this.basePosition = - fp.number_of_contracts;
+                this.basePosPr = fp.entry_price;
+            }
+            else
+            {
+                this.basePosition = fp.number_of_contracts;
+                this.basePosPr = fp.entry_price;
+            }
         }
 
         public void setStatus(cbMsg.product_status status)
