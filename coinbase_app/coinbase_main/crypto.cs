@@ -304,28 +304,27 @@ namespace coinbase_main
             }
         }
 
-        //Market order/limit order taking the quotes
-        public void executeOrder(order ord)
+        public void executeOrder(ref order ord)
         {
             int i = 0;
-            while(true)
+            while (true)
             {
                 if (Interlocked.Exchange(ref this.updating, 1) == 0)
                 {
                     quote q;
-                    if(ord.side == "SELL")
+                    if (ord.side == "SELL")
                     {
                         int idx = this.bestbid;
                         q = this.quotes[idx];
                         int iOrderPrice = (int)(ord.price / this.quote_increment);
                         while (q.price > iOrderPrice)
                         {
-                            if(q.quantity < ord.open_size)
+                            if (q.quantity < ord.open_size)
                             {
                                 ord.open_size -= q.quantity;
                                 ord.executed_size += q.quantity;
                                 --idx;
-                                if(idx < this.minPr)
+                                if (idx < this.minPr)
                                 {
                                     break;
                                 }
@@ -339,12 +338,12 @@ namespace coinbase_main
                             }
                         }
                     }
-                    else if(ord.side == "BUY")
+                    else if (ord.side == "BUY")
                     {
                         int idx = this.bestask;
                         q = this.quotes[idx];
                         int iOrderPrice = (int)(ord.price / this.quote_increment);
-                        if(iOrderPrice == 0)
+                        if (iOrderPrice == 0)
                         {
                             iOrderPrice = this.maxPr;
                         }
@@ -375,75 +374,6 @@ namespace coinbase_main
                 else
                 {
                     ++i;
-                    if(i > 100000)
-                    {
-                        i = 0;
-                        System.Threading.Thread.Sleep(0);
-                    }
-                }
-            }
-            
-        }
-
-        //Orders taken by other trades
-        public void executeLimitOrder(cbMsg.trades trd)
-        {
-            if(trd.msg_type != "trades")
-            {
-                return;
-            }
-            int i = 0;
-            int tradedPr = (int)(trd.price / this.quote_increment);
-            double executedBaseAmount = 0;
-            while (true)
-            {
-                if (Interlocked.Exchange(ref this.orderUpdating, 1) == 0)
-                {
-                    if(trd.side == "SELL")
-                    {
-                        int idx = this.bestbid;
-                        quote qt = this.quotes[idx];
-                        int currentPr = qt.price;
-                        
-                        while(currentPr >= tradedPr)
-                        {
-                            executedBaseAmount = qt.updateOrders(trd, this.quote_increment);
-                            this.baseExecutionBuy += executedBaseAmount;
-                            this.quoteExecutionBuy += executedBaseAmount * (double)qt.price * this.quote_increment;
-                            --idx;
-                            if (idx < this.minPr)
-                            {
-                                break;
-                            }
-                            qt = this.quotes[idx];
-                            currentPr = qt.price;
-                        }
-                    }
-                    else if(trd.side == "BUY")
-                    {
-                        int idx = this.bestask;
-                        quote qt = this.quotes[idx];
-                        int currentPr = qt.price;
-                        while (currentPr <= tradedPr)
-                        {
-                            executedBaseAmount = qt.updateOrders(trd, this.quote_increment);
-                            this.baseExecutionSell += executedBaseAmount;
-                            this.quoteExecutionSell += executedBaseAmount * (double)qt.price * this.quote_increment;
-                            ++idx;
-                            if (idx > this.maxPr)
-                            {
-                                break;
-                            }
-                            qt = this.quotes[idx];
-                            currentPr = qt.price;
-                        }
-                    }
-                    this.orderUpdating = 0;
-                    break;
-                }
-                else
-                {
-                    ++i;
                     if (i > 100000)
                     {
                         i = 0;
@@ -451,6 +381,7 @@ namespace coinbase_main
                     }
                 }
             }
+
         }
 
         public void updatePerpetual(cbMsg.perpetualPosition pp)

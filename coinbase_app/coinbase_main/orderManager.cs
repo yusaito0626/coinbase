@@ -14,6 +14,8 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
+using coinbase_enum;
+
 namespace coinbase_main
 {
     public class orderManager
@@ -28,6 +30,8 @@ namespace coinbase_main
             }
             this.stopListening = false;
 
+            this.msgQueue = new Queue<string>();
+
             this.orderQueue1sec = new Queue<order>();
             this.orderQueue1min = new Queue<order>();
             this.orderQueueAll = new Queue<order>();
@@ -38,11 +42,35 @@ namespace coinbase_main
         //Virtual Mode
         public int latency = 0;
 
-        public Action<string> addLog = (str) => { Console.WriteLine(str); };
+        public Action<string> _addLog = (str) => { Console.WriteLine(str); };
+        public void addLog(string str, logType type=logType.NONE)
+        {
+            switch (type)
+            {
+                case logType.INFO:
+                    this._addLog("[INFO] " + str);
+                    break;
+                case logType.WARNING:
+                    this._addLog("[WARNING] " + str);
+                    break;
+                case logType.ERROR:
+                    this._addLog("[ERROR] " + str);
+                    break;
+                case logType.CRITICAL:
+                    this._addLog("[CRITICAL] " + str);
+                    break;
+                case logType.NONE:
+                default:
+                    this._addLog(str);
+                    break;
+            }
+        }
 
         private int STACK_SIZE = 100000;
         public ConcurrentStack<order> orderStack;
         public ConcurrentStack<cbMsg.order> msgStack;
+
+        public Queue<string> msgQueue;
 
         public Dictionary<string, crypto> cryptos;
 
@@ -51,6 +79,7 @@ namespace coinbase_main
         private string ws_url;
 
         private Thread orderListeningTh;
+        private Thread parsingTh;
         private bool stopListening;
 
         private string order_log_path;
@@ -68,13 +97,15 @@ namespace coinbase_main
                 this.api.readApiJson(apiFile);
                 if (logFunc != null)
                 {
-                    this.addLog = logFunc;
-                    this.ws_order.addLog = logFunc;
-                    this.api.addLog = logFunc;
+                    this._addLog = logFunc;
+                    this.ws_order._addLog = logFunc;
+                    this.api._addLog = logFunc;
                 }
                 this.ws_url = url;
                 this.ws_order.connect(url);
                 WebSocketState st;
+                this.order_log_path = logPath;
+                this.order_log = new StreamWriter(logPath + "coinbase" + DateTime.Now.ToString("yyyyMMddhhmmss") + "orderlog.txt");
                 st = this.ws_order.getState();
                 int i = 0;
                 while (st.ToString() != "Open")
@@ -84,21 +115,24 @@ namespace coinbase_main
                     ++i;
                     if (i > 50)
                     {
-                        this.addLog("[ERROR] Failed to connect.");
+                        this.addLog("Failed to connect.",logType.ERROR);
                         return;
                     }
                 }
                 if (st.ToString() == "Open")
                 {
-                    this.addLog("[INFO] Connected Successfully");
+                    this.addLog("Connected Successfully",logType.INFO);
                     this.ws_order.startListen(cbChannels.heartbeats);
                     this.ws_order.startListen(cbChannels.user);
                     this.orderListeningTh = new Thread(new ThreadStart(this.listening));
                     this.orderListeningTh.Start();
+                    this.parsingTh = new Thread(new ThreadStart(this.parseMsg));
+                    this.parsingTh.Start();
+                    
                 }
                 else
                 {
-                    this.addLog("[ERROR] The websocket is not open.");
+                    this.addLog("The websocket is not open.", logType.ERROR);
                     return;
                 }
             }
@@ -106,12 +140,11 @@ namespace coinbase_main
             {
                 if (logFunc != null)
                 {
-                    this.addLog = logFunc;
+                    this._addLog = logFunc;
                 }
+                this.parsingTh = new Thread(new ThreadStart(this.parseMsg));
+                this.parsingTh.Start();
             }
-            
-            this.order_log_path = logPath;
-            this.order_log = new StreamWriter(logPath + "coinbase" + DateTime.Now.ToString("yyyyMMddhhmmss") + "orderlog.txt");
         }
         public void readApiKey(string filename)
         {
@@ -125,22 +158,18 @@ namespace coinbase_main
             crypto cp = this.checkProductId(product_id);
             if(cp == null)
             {
-                this.addLog("[ERROR] Invalid product_id");
                 return null;
             }
             if (!this.checkOrderCount(cp))
             {
-                this.addLog("[ERROR] Exceeded 1 sec new order limit.");
                 return null;
             }
             if (!this.checkSide(ref side))
             {
-                this.addLog("[ERROR] Invalid side");
                 return null;
             }
             if(!this.checkSize(cp,base_size,0,side))
             {
-                this.addLog("[ERROR] Invalid size");
                 return null;
             }
             
@@ -181,8 +210,8 @@ namespace coinbase_main
                 }
                 else
                 {
-                    this.addLog("[ERROR] The server returned unsuccessful result.");
-                    this.addLog("[ERROR]" + res.ToString());
+                    this.addLog("The server returned unsuccessful result.", logType.ERROR);
+                    this.addLog(res.ToString(), logType.ERROR);
                     return res;
                 }
             }
@@ -200,11 +229,13 @@ namespace coinbase_main
                 ord.open_size = base_size;
                 ord.new_order_time = DateTime.Now;
                 ord.updated_time = ord.new_order_time;
+                this.msgQueue.Enqueue(ord.ToString());
                 cp.orders.Add(ord.client_order_id, ord);
                 cp.liveOrders.Add(ord.client_order_id, ord);
                 this.orderQueue1sec.Enqueue(ord);
                 cp.orderQueue1sec.Enqueue(ord);
-                cp.executeOrder(ord);
+                cp.executeOrder(ref ord);
+                this.msgQueue.Enqueue(ord.ToString());
                 return null;
             }
         }
@@ -213,27 +244,22 @@ namespace coinbase_main
             crypto cp = this.checkProductId(product_id);
             if (cp == null)
             {
-                this.addLog("[ERROR] Invalid product_id");
                 return null;
             }
             if (!this.checkOrderCount(cp))
             {
-                this.addLog("[ERROR] Exceeded 1 sec new order limit.");
                 return null;
             }
             if (!this.checkSide(ref side))
             {
-                this.addLog("[ERROR] Invalid side");
                 return null;
             }
             if(!this.checkLimitPrice(cp,limit_price))
             {
-                this.addLog("[ERROR] Invalid limit price");
                 return null;
             }
             if (!this.checkSize(cp, base_size,limit_price,side))
             {
-                this.addLog("[ERROR] Invalid size");
                 return null;
             }
 
@@ -274,14 +300,14 @@ namespace coinbase_main
                 }
                 else
                 {
-                    this.addLog("[ERROR] The server returned unsuccessful result.");
-                    this.addLog("[ERROR]" + res.ToString());
+                    this.addLog("The server returned unsuccessful result.", logType.ERROR);
+                    this.addLog(res.ToString(), logType.ERROR);
                     return res;
                 }
             }
             else
             {
-                this.addLog("[ERROR] Currently the virtual mode only accepts market or GTC orders.");
+                this.addLog("Currently the virtual mode only accepts market or GTC orders.", logType.ERROR);
                 return null;
             }
         }
@@ -290,27 +316,22 @@ namespace coinbase_main
             crypto cp = this.checkProductId(product_id);
             if (cp == null)
             {
-                this.addLog("[ERROR] Invalid product_id");
                 return null;
             }
             if (!this.checkOrderCount(cp))
             {
-                this.addLog("[ERROR] Exceeded 1 sec new order limit.");
                 return null;
             }
             if (!this.checkSide(ref side))
             {
-                this.addLog("[ERROR] Invalid side");
                 return null;
             }
             if(!this.checkLimitPrice(cp,limit_price))
             {
-                this.addLog("[ERROR] Invalid limit price");
                 return null;
             }
             if (!this.checkSize(cp, base_size, limit_price, side))
             {
-                this.addLog("[ERROR] Invalid size");
                 return null;
             }
 
@@ -356,8 +377,8 @@ namespace coinbase_main
                 }
                 else
                 {
-                    this.addLog("[ERROR] The server returned unsuccessful result.");
-                    this.addLog("[ERROR]" + res.ToString());
+                    this.addLog("The server returned unsuccessful result.", logType.ERROR);
+                    this.addLog(res.ToString(), logType.ERROR);
                     return res;
                 }
             }
@@ -382,6 +403,7 @@ namespace coinbase_main
                 cp.liveOrders.Add(ord.client_order_id, ord);
                 this.orderQueue1sec.Enqueue(ord);
                 cp.orderQueue1sec.Enqueue(ord);
+                this.msgQueue.Enqueue(ord.ToString());
                 return null;
             }
         }
@@ -390,32 +412,26 @@ namespace coinbase_main
             crypto cp = this.checkProductId(product_id);
             if (cp == null)
             {
-                this.addLog("[ERROR] Invalid product_id");
                 return null;
             }
             if (!this.checkOrderCount(cp))
             {
-                this.addLog("[ERROR] Exceeded 1 sec new order limit.");
                 return null;
             }
             if (!this.checkSide(ref side))
             {
-                this.addLog("[ERROR] Invalid side");
                 return null;
             }
             if (!this.checkLimitPrice(cp, limit_price))
             {
-                this.addLog("[ERROR] Invalid limit price");
                 return null;
             }
             if (!this.checkSize(cp, base_size, limit_price, side))
             {
-                this.addLog("[ERROR] Invalid size");
                 return null;
             }
             if(!this.checkEndTime(end_time))
             {
-                this.addLog("[ERROR] Invalid end_time");
                 return null;
             }
 
@@ -461,14 +477,14 @@ namespace coinbase_main
                 }
                 else
                 {
-                    this.addLog("[ERROR] The server returned unsuccessful result.");
-                    this.addLog("[ERROR]" + res.ToString());
+                    this.addLog("The server returned unsuccessful result.",logType.ERROR);
+                    this.addLog(res.ToString(), logType.ERROR);
                     return res;
                 }
             }
             else
             {
-                this.addLog("[ERROR] Currently the virtual mode only accepts market or GTC orders.");
+                this.addLog("Currently the virtual mode only accepts market or GTC orders.", logType.ERROR);
                 return null;
             }
         }
@@ -477,27 +493,22 @@ namespace coinbase_main
             crypto cp = this.checkProductId(product_id);
             if (cp == null)
             {
-                this.addLog("[ERROR] Invalid product_id");
                 return null;
             }
             if (!this.checkOrderCount(cp))
             {
-                this.addLog("[ERROR] Exceeded 1 sec new order limit.");
                 return null;
             }
             if (!this.checkSide(ref side))
             {
-                this.addLog("[ERROR] Invalid side");
                 return null;
             }
             if (!this.checkLimitPrice(cp, limit_price))
             {
-                this.addLog("[ERROR] Invalid limit price");
                 return null;
             }
             if (!this.checkSize(cp, base_size, limit_price, side))
             {
-                this.addLog("[ERROR] Invalid size");
                 return null;
             }
 
@@ -538,14 +549,14 @@ namespace coinbase_main
                 }
                 else
                 {
-                    this.addLog("[ERROR] The server returned unsuccessful result.");
-                    this.addLog("[ERROR]" + res.ToString());
+                    this.addLog("The server returned unsuccessful result.", logType.ERROR);
+                    this.addLog(res.ToString(), logType.ERROR);
                     return res;
                 }
             }
             else
             {
-                this.addLog("[ERROR] Currently the virtual mode only accepts market or GTC orders.");
+                this.addLog("Currently the virtual mode only accepts market or GTC orders.", logType.ERROR);
                 return null;
             }
         }
@@ -554,27 +565,22 @@ namespace coinbase_main
             crypto cp = this.checkProductId(product_id);
             if (cp == null)
             {
-                this.addLog("[ERROR] Invalid product_id");
                 return null;
             }
             if (!this.checkOrderCount(cp))
             {
-                this.addLog("[ERROR] Exceeded 1 sec new order limit.");
                 return null;
             }
             if (!this.checkSide(ref side))
             {
-                this.addLog("[ERROR] Invalid side");
                 return null;
             }
             if (!this.checkLimitPrice(cp, limit_price))
             {
-                this.addLog("[ERROR] Invalid limit price");
                 return null;
             }
             if (!this.checkSize(cp, base_size, limit_price, side))
             {
-                this.addLog("[ERROR] Invalid size");
                 return null;
             }
 
@@ -615,14 +621,14 @@ namespace coinbase_main
                 }
                 else
                 {
-                    this.addLog("[ERROR] The server returned unsuccessful result.");
-                    this.addLog("[ERROR]" + res.ToString());
+                    this.addLog("The server returned unsuccessful result.", logType.ERROR);
+                    this.addLog(res.ToString(), logType.ERROR);
                     return res;
                 }
             }
             else
             {
-                this.addLog("[ERROR] Currently the virtual mode only accepts market or GTC orders.");
+                this.addLog("Currently the virtual mode only accepts market or GTC orders.", logType.ERROR);
                 return null;
             }
         }
@@ -631,32 +637,26 @@ namespace coinbase_main
             crypto cp = this.checkProductId(product_id);
             if (cp == null)
             {
-                this.addLog("[ERROR] Invalid product_id");
                 return null;
             }
             if (!this.checkOrderCount(cp))
             {
-                this.addLog("[ERROR] Exceeded 1 sec new order limit.");
                 return null;
             }
             if (!this.checkSide(ref side))
             {
-                this.addLog("[ERROR] Invalid side");
                 return null;
             }
             if (!this.checkLimitPrice(cp, limit_price))
             {
-                this.addLog("[ERROR] Invalid limit price");
                 return null;
             }
             if (!this.checkSize(cp, base_size, limit_price, side))
             {
-                this.addLog("[ERROR] Invalid size");
                 return null;
             }
             if(!this.checkEndTime(end_time))
             {
-                this.addLog("[ERROR] Invalid end time");
                 return null;
             }
 
@@ -697,14 +697,14 @@ namespace coinbase_main
                 }
                 else
                 {
-                    this.addLog("[ERROR] The server returned unsuccessful result.");
-                    this.addLog("[ERROR]" + res.ToString());
+                    this.addLog("The server returned unsuccessful result.", logType.ERROR);
+                    this.addLog(res.ToString(), logType.ERROR);
                     return res;
                 }
             }
             else
             {
-                this.addLog("[ERROR] Currently the virtual mode only accepts market or GTC orders.");
+                this.addLog("Currently the virtual mode only accepts market or GTC orders.", logType.ERROR);
                 return null;
             }
         }
@@ -713,27 +713,22 @@ namespace coinbase_main
             crypto cp = this.checkProductId(product_id);
             if (cp == null)
             {
-                this.addLog("[ERROR] Invalid product_id");
                 return null;
             }
             if (!this.checkOrderCount(cp))
             {
-                this.addLog("[ERROR] Exceeded 1 sec new order limit.");
                 return null;
             }
             if (!this.checkSide(ref side))
             {
-                this.addLog("[ERROR] Invalid side");
                 return null;
             }
             if (!this.checkLimitPrice(cp, limit_price))
             {
-                this.addLog("[ERROR] Invalid limit price");
                 return null;
             }
             if (!this.checkSize(cp, base_size, limit_price, side))
             {
-                this.addLog("[ERROR] Invalid size");
                 return null;
             }
 
@@ -774,14 +769,14 @@ namespace coinbase_main
                 }
                 else
                 {
-                    this.addLog("[ERROR] The server returned unsuccessful result.");
-                    this.addLog("[ERROR]" + res.ToString());
+                    this.addLog("The server returned unsuccessful result.", logType.ERROR);
+                    this.addLog(res.ToString(), logType.ERROR);
                     return res;
                 }
             }
             else
             {
-                this.addLog("[ERROR] Currently the virtual mode only accepts market or GTC orders.");
+                this.addLog("Currently the virtual mode only accepts market or GTC orders.", logType.ERROR);
                 return null;
             }
         }
@@ -790,32 +785,26 @@ namespace coinbase_main
             crypto cp = this.checkProductId(product_id);
             if (cp == null)
             {
-                this.addLog("[ERROR] Invalid product_id");
                 return null;
             }
-            if(!this.checkOrderCount(cp))
+            if (!this.checkOrderCount(cp))
             {
-                this.addLog("[ERROR] Exceeded 1 sec new order limit.");
                 return null;
             }
             if (!this.checkSide(ref side))
             {
-                this.addLog("[ERROR] Invalid side");
                 return null;
             }
             if (!this.checkLimitPrice(cp, limit_price))
             {
-                this.addLog("[ERROR] Invalid limit price");
                 return null;
             }
             if (!this.checkSize(cp, base_size,limit_price,side))
             {
-                this.addLog("[ERROR] Invalid size");
                 return null;
             }
             if (!this.checkEndTime(end_time))
             {
-                this.addLog("[ERROR] Invalid end time");
                 return null;
             }
 
@@ -856,14 +845,14 @@ namespace coinbase_main
                 }
                 else
                 {
-                    this.addLog("[ERROR] The server returned unsuccessful result.");
-                    this.addLog("[ERROR]" + res.ToString());
+                    this.addLog("The server returned unsuccessful result.", logType.ERROR);
+                    this.addLog(res.ToString(), logType.ERROR);
                     return res;
                 }
             }
             else
             {
-                this.addLog("[ERROR] Currently the virtual mode only accepts market or GTC orders.");
+                this.addLog("Currently the virtual mode only accepts market or GTC orders.", logType.ERROR);
                 return null;
             }
         }
@@ -874,14 +863,12 @@ namespace coinbase_main
             string strSize = "";
             if (cp == null)
             {
-                this.addLog("[ERROR] Invalid product_id");
                 return null;
             }
             if (newPr > 0 && newPr != orgOrd.price)
             {
                 if (!this.checkLimitPrice(cp, newPr))
                 {
-                    this.addLog("[ERROR] Invalid limit price");
                     return null;
                 }
                 strPr = newPr.ToString();
@@ -899,7 +886,6 @@ namespace coinbase_main
                 }
                 if (!this.checkSize(cp, newSize, pr, orgOrd.side))
                 {
-                    this.addLog("[ERROR] Invalid size");
                     return null;
                 }
                 strSize = newSize.ToString();
@@ -932,8 +918,8 @@ namespace coinbase_main
                 }
                 else
                 {
-                    this.addLog("[ERROR] The server returned unsuccessful result.");
-                    this.addLog("[ERROR]" + res.ToString());
+                    this.addLog("The server returned unsuccessful result.", logType.ERROR);
+                    this.addLog(res.ToString(), logType.ERROR);
                     return res;
                 }
             }
@@ -984,6 +970,8 @@ namespace coinbase_main
                         }
                     }
                 }
+
+                this.msgQueue.Enqueue(orgOrd.ToString());
                 return null;
             }
         }
@@ -1002,8 +990,8 @@ namespace coinbase_main
                 }
                 else
                 {
-                    this.addLog("[ERROR] The server returned unsuccessful result.");
-                    this.addLog("[ERROR]" + res.ToString());
+                    this.addLog("The server returned unsuccessful result.", logType.ERROR);
+                    this.addLog(res.ToString(), logType.ERROR);
                     return res;
                 }
             }
@@ -1038,8 +1026,9 @@ namespace coinbase_main
                 }
                 else
                 {
-                    this.addLog("[ERROR] Invalid symbol for a cancel order");
+                    this.addLog("Invalid symbol for a cancel order",logType.ERROR);
                 }
+                this.msgQueue.Enqueue(orgOrd.ToString());
                 return null;
             }
         }
@@ -1052,6 +1041,7 @@ namespace coinbase_main
             }
             else
             {
+                this.addLog("Invalid product_id", logType.ERROR);
                 return null;
             }
         }
@@ -1071,20 +1061,24 @@ namespace coinbase_main
                 side = "BUY";
                 return true;
             }
+            this.addLog("Invalid side", logType.ERROR);
             return false;
         }
         private bool checkLimitPrice(crypto cp, double limit_price)
         {
             if(cp.maxOrdPr > 0 && (int)(limit_price / cp.quote_increment) > cp.maxOrdPr)
             {
+                this.addLog("Invalid limit price", logType.ERROR);
                 return false;
             }
             else if(cp.minOrdPr > 0 && (int)(limit_price / cp.quote_increment) < cp.minOrdPr)
             {
+                this.addLog("Invalid limit price", logType.ERROR);
                 return false;
             }
             else if((int)(limit_price / cp.quote_increment) < cp.minPr || (int)(limit_price / cp.quote_increment) > cp.maxPr)
             {
+                this.addLog("Invalid limit price", logType.ERROR);
                 return false;
             }
             else
@@ -1096,6 +1090,7 @@ namespace coinbase_main
         {
             if(base_size > cp.maxBaseSize || base_size > this.maxBaseSize)
             {
+                this.addLog("Invalid size", logType.ERROR);
                 return false;
             }
             double price;
@@ -1113,12 +1108,14 @@ namespace coinbase_main
             }
             else
             {
-                addLog(cp.bestask.ToString() + " " + cp.bestbid.ToString());
+                this.addLog("Invalid size", logType.ERROR);
+                this.addLog(cp.bestask.ToString() + " " + cp.bestbid.ToString(),logType.ERROR);
                 return false;
             }
             if(base_size * price > cp.maxQuoteSize || base_size * price > this.maxQuoteSize)
             {
-                addLog(base_size.ToString() + " " + price.ToString());
+                this.addLog("Invalid size", logType.ERROR);
+                this.addLog(base_size.ToString() + " " + price.ToString(),logType.ERROR);
                 return false;
             }
             return true;
@@ -1127,6 +1124,7 @@ namespace coinbase_main
         {
             if(end_time < DateTime.Now)
             {
+                this.addLog("Invalid end_time", logType.ERROR);
                 return false;
             }
             return true;
@@ -1137,13 +1135,14 @@ namespace coinbase_main
             cp.checkOrderQueue();
             if(cp.orderQueue1sec.Count >= cp.maxNewOrderCount1sec)
             {
+                this.addLog("Exceeded 1 sec new order limit.", logType.ERROR);
                 return false;
             }
             if(this.orderQueue1sec.Count >= this.maxNewOrderCount1sec)
             {
+                this.addLog("Exceeded 1 sec new order limit.", logType.ERROR);
                 return false;
             }
-            this.addLog(cp.orderQueue1sec.Count.ToString());
             return true;
         }
         public string getOrderId(string symbol)
@@ -1181,14 +1180,7 @@ namespace coinbase_main
 
         private void listening()
         {
-            this.addLog("Start listening order messages...");
-            cbMsg.message msg = new cbMsg.message();
-            cbMsg.jsOrder jso = new cbMsg.jsOrder();
-            cbMsg.order ordMsg = new cbMsg.order();
-            cbMsg.jsPerpetualPosition jspp = new cbMsg.jsPerpetualPosition();
-            cbMsg.jsFuturePosition jsfp = new cbMsg.jsFuturePosition();
-            cbMsg.perpetualPosition pp = new cbMsg.perpetualPosition();
-            cbMsg.futurePosition fp = new cbMsg.futurePosition();
+            this.addLog("Start listening order messages...",logType.INFO);
             byte[] buffer = new byte[1073741824];
             while (true)
             {
@@ -1198,13 +1190,13 @@ namespace coinbase_main
                 {
                     if (result.Result.MessageType == WebSocketMessageType.Close)
                     {
-                        this.addLog("Endpoint Closed");
+                        this.addLog("Endpoint Closed",logType.INFO);
                         break;
                     }
 
                     if (result.Result.MessageType == WebSocketMessageType.Binary)
                     {
-                        this.addLog("Result Binary");
+                        this.addLog("Result Binary",logType.ERROR);
                         break;
                     }
 
@@ -1217,7 +1209,7 @@ namespace coinbase_main
                         }
                         if (count >= buffer.Length)
                         {
-                            this.addLog("Too Large Message   " + count.ToString());
+                            this.addLog("Too Large Message   " + count.ToString(),logType.ERROR);
                             break;
                         }
                         segment = new ArraySegment<byte>(buffer, count, buffer.Length - count);
@@ -1232,254 +1224,301 @@ namespace coinbase_main
 
                     var message = Encoding.UTF8.GetString(buffer, 0, count);
 
-                    parser.parseMsg(message, ref msg);
-                    if (msg.channel == "user")
-                    {
-                        string temp;
-                        string target = "\"type\":";
-                        int start = msg.events.IndexOf(target) + target.Length + 1;
-                        int end = msg.events.IndexOf(",", start) - 1;
-
-                        if (msg.events.Substring(start, end - start) == "update")
-                        {
-                            target = "\"orders\":[";
-                            start = msg.events.IndexOf(target) + target.Length;
-                            int endBracket = msg.events.IndexOf("]", start);
-                            while (start > 0 && start < endBracket)
-                            {
-                                end = msg.events.IndexOf("}", start) + 1;
-                                temp = msg.events.Substring(start, end - start);
-                                coinbase_connection.parser.parseOrder(temp, ref jso);
-                                ordMsg.addMsg(jso);
-                                if (cryptos.ContainsKey(ordMsg.product_id))
-                                {
-                                    crypto cp = cryptos[ordMsg.product_id];
-                                    while(true)
-                                    {
-                                        if(Interlocked.Exchange(ref cp.orderUpdating,1) == 0)
-                                        {
-                                            if (cp.liveOrders.ContainsKey(ordMsg.client_order_id))
-                                            {
-                                                order obj = cp.liveOrders[ordMsg.client_order_id];
-                                                double filledQty = ordMsg.cumulative_quantity - obj.executed_size;
-                                                double filledQuoteQty = ordMsg.filled_value - obj.executed_size * obj.avg_price;
-                                                obj.setMsg(ordMsg);
-                                                if(ordMsg.filled_value > 0)
-                                                {
-                                                    if(ordMsg.order_side == "SELL")
-                                                    {
-                                                        cp.baseExecutionSell += filledQty;
-                                                        cp.quoteExecutionSell += filledQuoteQty;
-                                                    }
-                                                    else if(ordMsg.order_side == "BUY")
-                                                    {
-                                                        cp.baseExecutionBuy += filledQty;
-                                                        cp.quoteExecutionBuy += filledQuoteQty;
-                                                    }
-                                                }
-                                                if(obj.status == "CANCELLED" || obj.status == "FILLED")
-                                                {
-                                                    cp.liveOrders.Remove(ordMsg.client_order_id);
-                                                }
-                                            }
-                                            else
-                                            {
-                                                if(cp.orders.ContainsKey(ordMsg.client_order_id))
-                                                {
-                                                    order ord = cp.orders[ordMsg.client_order_id];
-                                                    ord.setMsg(ordMsg);
-                                                }
-                                                else
-                                                {
-                                                    order ord;
-                                                    while (true)
-                                                    {
-                                                        if (this.orderStack.TryPop(out ord))
-                                                        {
-                                                            break;
-                                                        }
-                                                    }
-                                                    ord.setMsg(ordMsg);
-                                                    if(ord.executed_size > 0)
-                                                    {
-                                                        if(ord.side == "SELL")
-                                                        {
-                                                            cp.baseExecutionSell += ord.executed_size;
-                                                            cp.quoteExecutionSell += ord.executed_size * ord.avg_price;
-                                                        }
-                                                        else if (ord.side == "BUY")
-                                                        {
-                                                            cp.baseExecutionBuy += ord.executed_size;
-                                                            cp.quoteExecutionBuy += ord.executed_size * ord.avg_price;
-                                                        }
-                                                    }
-                                                    if (ord.status != "CANCELLED" && ord.status != "FILLED")
-                                                    {
-                                                        cp.liveOrders.Add(ordMsg.client_order_id, ord);
-                                                    }
-                                                    cp.orders.Add(ordMsg.client_order_id, ord);
-                                                }
-                                            }
-                                            cp.orderUpdating = 0;
-                                            break;
-                                        }
-                                    }
-
-
-                                }
-                                else
-                                {
-                                    this.addLog("[ERROR] product not found id:" + ordMsg.product_id);
-                                }
-                                start = msg.events.IndexOf("{", end);
-                            }
-                        }
-                        else
-                        {
-                            target = "\"orders\":[";
-                            start = msg.events.IndexOf(target) + target.Length;
-                            int endBracket = msg.events.IndexOf("]", start);
-                            while (start > 0 && start < endBracket)
-                            {
-                                end = msg.events.IndexOf("}", start) + 1;
-                                temp = msg.events.Substring(start, end - start);
-                                coinbase_connection.parser.parseOrder(temp, ref jso);
-                                ordMsg.addMsg(jso);
-                                if (cryptos.ContainsKey(ordMsg.product_id))
-                                {
-                                    crypto cp = cryptos[ordMsg.product_id];
-                                    while (true)
-                                    {
-                                        if (Interlocked.Exchange(ref cp.orderUpdating, 1) == 0)
-                                        {
-                                            if (cp.liveOrders.ContainsKey(ordMsg.client_order_id))
-                                            {
-                                                order obj = cp.liveOrders[ordMsg.client_order_id];
-                                                double filledQty = ordMsg.cumulative_quantity - obj.executed_size;
-                                                double filledQuoteQty = ordMsg.filled_value - obj.executed_size * obj.avg_price;
-                                                obj.setMsg(ordMsg);
-                                                if (ordMsg.filled_value > 0)
-                                                {
-                                                    if (ordMsg.order_side == "SELL")
-                                                    {
-                                                        cp.baseExecutionSell += filledQty;
-                                                        cp.quoteExecutionSell += filledQuoteQty;
-                                                    }
-                                                    else if (ordMsg.order_side == "BUY")
-                                                    {
-                                                        cp.baseExecutionBuy += filledQty;
-                                                        cp.quoteExecutionBuy += filledQuoteQty;
-                                                    }
-                                                }
-                                                if (obj.status == "CANCELLED" || obj.status == "FILLED")
-                                                {
-                                                    cp.liveOrders.Remove(ordMsg.client_order_id);
-                                                }
-                                            }
-                                            else
-                                            {
-                                                if (cp.orders.ContainsKey(ordMsg.client_order_id))
-                                                {
-                                                    order ord = cp.orders[ordMsg.client_order_id];
-                                                    ord.setMsg(ordMsg);
-                                                }
-                                                else
-                                                {
-                                                    order ord;
-                                                    while (true)
-                                                    {
-                                                        if (this.orderStack.TryPop(out ord))
-                                                        {
-                                                            break;
-                                                        }
-                                                    }
-                                                    ord.setMsg(ordMsg);
-                                                    if (ord.executed_size > 0)
-                                                    {
-                                                        if (ord.side == "SELL")
-                                                        {
-                                                            cp.baseExecutionSell += ord.executed_size;
-                                                            cp.quoteExecutionSell += ord.executed_size * ord.avg_price;
-                                                        }
-                                                        else if (ord.side == "BUY")
-                                                        {
-                                                            cp.baseExecutionBuy += ord.executed_size;
-                                                            cp.quoteExecutionBuy += ord.executed_size * ord.avg_price;
-                                                        }
-                                                    }
-                                                    if (ord.status != "CANCELLED" && ord.status != "FILLED")
-                                                    {
-                                                        cp.liveOrders.Add(ordMsg.client_order_id, ord);
-                                                    }
-                                                    cp.orders.Add(ordMsg.client_order_id, ord);
-                                                }
-                                            }
-                                            cp.orderUpdating = 0;
-                                            break;
-                                        }
-                                    }
-
-
-                                }
-                                else
-                                {
-                                    this.addLog("[ERROR] product not found id:" + ordMsg.product_id);
-                                }
-                                start = msg.events.IndexOf("{", end);
-                            }
-
-                            //Position
-                            target = "\"perpetual_futures_positions\":[";
-                            start = msg.events.IndexOf(target) + target.Length;
-                            endBracket = msg.events.IndexOf("]", start);
-                            while (start > 0 && start < endBracket)
-                            {
-                                end = msg.events.IndexOf("}", start) + 1;
-                                temp = msg.events.Substring(start, end - start);
-                                coinbase_connection.parser.parsePerpetualPos(temp, ref jspp);
-                                pp.addMsg(jspp);
-                                if (cryptos.ContainsKey(pp.product_id))
-                                {
-                                    crypto cp = cryptos[pp.product_id];
-                                    cp.updatePerpetual(pp);
-                                }
-                                else
-                                {
-                                    this.addLog("[ERROR] product not found id:" + pp.product_id);
-                                }
-                                start = msg.events.IndexOf("{", end);
-                            }
-                            target = "\"expiring_futures_positions\":[";
-                            start = msg.events.IndexOf(target) + target.Length;
-                            endBracket = msg.events.IndexOf("]", start);
-                            while (start > 0 && start < endBracket)
-                            {
-                                end = msg.events.IndexOf("}", start) + 1;
-                                temp = msg.events.Substring(start, end - start);
-                                coinbase_connection.parser.parseFuturePos(temp, ref jsfp);
-                                fp.addMsg(jsfp);
-                                if (cryptos.ContainsKey(fp.product_id))
-                                {
-                                    crypto cp = cryptos[fp.product_id];
-                                    cp.updateFuture(fp);
-                                }
-                                else
-                                {
-                                    this.addLog("[ERROR] product not found id:" + pp.product_id);
-                                }
-                                start = msg.events.IndexOf("{", end);
-                            }
-                        }
-                        this.order_log.WriteAsync(message + "\n");
-                    }
-                    else if (msg.channel == "heartbeats")
-                    {
-                        this.order_log.Flush();
-                    }    
+                    this.msgQueue.Enqueue(message); 
                 }
                 if(this.stopListening)
                 {
                     break;
+                }
+            }
+        }
+
+        private void parseMsg()
+        {
+            string message;
+            int i = 0;
+            if(this.live)
+            {
+                cbMsg.message msg = new cbMsg.message();
+                cbMsg.jsOrder jso = new cbMsg.jsOrder();
+                cbMsg.order ordMsg = new cbMsg.order();
+                cbMsg.jsPerpetualPosition jspp = new cbMsg.jsPerpetualPosition();
+                cbMsg.jsFuturePosition jsfp = new cbMsg.jsFuturePosition();
+                cbMsg.perpetualPosition pp = new cbMsg.perpetualPosition();
+                cbMsg.futurePosition fp = new cbMsg.futurePosition();
+                while (true)
+                {
+                    if (this.msgQueue.TryDequeue(out message))
+                    {
+                        parser.parseMsg(message, ref msg);
+                        if (msg.channel == "user")
+                        {
+                            string temp;
+                            string target = "\"type\":";
+                            int start = msg.events.IndexOf(target) + target.Length + 1;
+                            int end = msg.events.IndexOf(",", start) - 1;
+
+                            if (msg.events.Substring(start, end - start) == "update")
+                            {
+                                target = "\"orders\":[";
+                                start = msg.events.IndexOf(target) + target.Length;
+                                int endBracket = msg.events.IndexOf("]", start);
+                                while (start > 0 && start < endBracket)
+                                {
+                                    end = msg.events.IndexOf("}", start) + 1;
+                                    temp = msg.events.Substring(start, end - start);
+                                    coinbase_connection.parser.parseOrder(temp, ref jso);
+                                    ordMsg.addMsg(jso);
+                                    if (cryptos.ContainsKey(ordMsg.product_id))
+                                    {
+                                        crypto cp = cryptos[ordMsg.product_id];
+                                        while (true)
+                                        {
+                                            if (Interlocked.Exchange(ref cp.orderUpdating, 1) == 0)
+                                            {
+                                                if (cp.liveOrders.ContainsKey(ordMsg.client_order_id))
+                                                {
+                                                    order obj = cp.liveOrders[ordMsg.client_order_id];
+                                                    double filledQty = ordMsg.cumulative_quantity - obj.executed_size;
+                                                    double filledQuoteQty = ordMsg.filled_value - obj.executed_size * obj.avg_price;
+                                                    obj.setMsg(ordMsg);
+                                                    if (ordMsg.filled_value > 0)
+                                                    {
+                                                        if (ordMsg.order_side == "SELL")
+                                                        {
+                                                            cp.baseExecutionSell += filledQty;
+                                                            cp.quoteExecutionSell += filledQuoteQty;
+                                                        }
+                                                        else if (ordMsg.order_side == "BUY")
+                                                        {
+                                                            cp.baseExecutionBuy += filledQty;
+                                                            cp.quoteExecutionBuy += filledQuoteQty;
+                                                        }
+                                                    }
+                                                    if (obj.status == "CANCELLED" || obj.status == "FILLED")
+                                                    {
+                                                        cp.liveOrders.Remove(ordMsg.client_order_id);
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (cp.orders.ContainsKey(ordMsg.client_order_id))
+                                                    {
+                                                        order ord = cp.orders[ordMsg.client_order_id];
+                                                        ord.setMsg(ordMsg);
+                                                    }
+                                                    else
+                                                    {
+                                                        order ord;
+                                                        while (true)
+                                                        {
+                                                            if (this.orderStack.TryPop(out ord))
+                                                            {
+                                                                break;
+                                                            }
+                                                        }
+                                                        ord.setMsg(ordMsg);
+                                                        if (ord.executed_size > 0)
+                                                        {
+                                                            if (ord.side == "SELL")
+                                                            {
+                                                                cp.baseExecutionSell += ord.executed_size;
+                                                                cp.quoteExecutionSell += ord.executed_size * ord.avg_price;
+                                                            }
+                                                            else if (ord.side == "BUY")
+                                                            {
+                                                                cp.baseExecutionBuy += ord.executed_size;
+                                                                cp.quoteExecutionBuy += ord.executed_size * ord.avg_price;
+                                                            }
+                                                        }
+                                                        if (ord.status != "CANCELLED" && ord.status != "FILLED")
+                                                        {
+                                                            cp.liveOrders.Add(ordMsg.client_order_id, ord);
+                                                        }
+                                                        cp.orders.Add(ordMsg.client_order_id, ord);
+                                                    }
+                                                }
+                                                cp.orderUpdating = 0;
+                                                break;
+                                            }
+                                        }
+
+
+                                    }
+                                    else
+                                    {
+                                        this.addLog("product not found id:" + ordMsg.product_id, logType.ERROR);
+                                    }
+                                    start = msg.events.IndexOf("{", end);
+                                }
+                            }
+                            else
+                            {
+                                target = "\"orders\":[";
+                                start = msg.events.IndexOf(target) + target.Length;
+                                int endBracket = msg.events.IndexOf("]", start);
+                                while (start > 0 && start < endBracket)
+                                {
+                                    end = msg.events.IndexOf("}", start) + 1;
+                                    temp = msg.events.Substring(start, end - start);
+                                    coinbase_connection.parser.parseOrder(temp, ref jso);
+                                    ordMsg.addMsg(jso);
+                                    if (cryptos.ContainsKey(ordMsg.product_id))
+                                    {
+                                        crypto cp = cryptos[ordMsg.product_id];
+                                        while (true)
+                                        {
+                                            if (Interlocked.Exchange(ref cp.orderUpdating, 1) == 0)
+                                            {
+                                                if (cp.liveOrders.ContainsKey(ordMsg.client_order_id))
+                                                {
+                                                    order obj = cp.liveOrders[ordMsg.client_order_id];
+                                                    double filledQty = ordMsg.cumulative_quantity - obj.executed_size;
+                                                    double filledQuoteQty = ordMsg.filled_value - obj.executed_size * obj.avg_price;
+                                                    obj.setMsg(ordMsg);
+                                                    if (ordMsg.filled_value > 0)
+                                                    {
+                                                        if (ordMsg.order_side == "SELL")
+                                                        {
+                                                            cp.baseExecutionSell += filledQty;
+                                                            cp.quoteExecutionSell += filledQuoteQty;
+                                                        }
+                                                        else if (ordMsg.order_side == "BUY")
+                                                        {
+                                                            cp.baseExecutionBuy += filledQty;
+                                                            cp.quoteExecutionBuy += filledQuoteQty;
+                                                        }
+                                                    }
+                                                    if (obj.status == "CANCELLED" || obj.status == "FILLED")
+                                                    {
+                                                        cp.liveOrders.Remove(ordMsg.client_order_id);
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (cp.orders.ContainsKey(ordMsg.client_order_id))
+                                                    {
+                                                        order ord = cp.orders[ordMsg.client_order_id];
+                                                        ord.setMsg(ordMsg);
+                                                    }
+                                                    else
+                                                    {
+                                                        order ord;
+                                                        while (true)
+                                                        {
+                                                            if (this.orderStack.TryPop(out ord))
+                                                            {
+                                                                break;
+                                                            }
+                                                        }
+                                                        ord.setMsg(ordMsg);
+                                                        if (ord.executed_size > 0)
+                                                        {
+                                                            if (ord.side == "SELL")
+                                                            {
+                                                                cp.baseExecutionSell += ord.executed_size;
+                                                                cp.quoteExecutionSell += ord.executed_size * ord.avg_price;
+                                                            }
+                                                            else if (ord.side == "BUY")
+                                                            {
+                                                                cp.baseExecutionBuy += ord.executed_size;
+                                                                cp.quoteExecutionBuy += ord.executed_size * ord.avg_price;
+                                                            }
+                                                        }
+                                                        if (ord.status != "CANCELLED" && ord.status != "FILLED")
+                                                        {
+                                                            cp.liveOrders.Add(ordMsg.client_order_id, ord);
+                                                        }
+                                                        cp.orders.Add(ordMsg.client_order_id, ord);
+                                                    }
+                                                }
+                                                cp.orderUpdating = 0;
+                                                break;
+                                            }
+                                        }
+
+
+                                    }
+                                    else
+                                    {
+                                        this.addLog("product not found id:" + ordMsg.product_id, logType.ERROR);
+                                    }
+                                    start = msg.events.IndexOf("{", end);
+                                }
+
+                                //Position
+                                target = "\"perpetual_futures_positions\":[";
+                                start = msg.events.IndexOf(target) + target.Length;
+                                endBracket = msg.events.IndexOf("]", start);
+                                while (start > 0 && start < endBracket)
+                                {
+                                    end = msg.events.IndexOf("}", start) + 1;
+                                    temp = msg.events.Substring(start, end - start);
+                                    coinbase_connection.parser.parsePerpetualPos(temp, ref jspp);
+                                    pp.addMsg(jspp);
+                                    if (cryptos.ContainsKey(pp.product_id))
+                                    {
+                                        crypto cp = cryptos[pp.product_id];
+                                        cp.updatePerpetual(pp);
+                                    }
+                                    else
+                                    {
+                                        this.addLog("product not found id:" + pp.product_id, logType.ERROR);
+                                    }
+                                    start = msg.events.IndexOf("{", end);
+                                }
+                                target = "\"expiring_futures_positions\":[";
+                                start = msg.events.IndexOf(target) + target.Length;
+                                endBracket = msg.events.IndexOf("]", start);
+                                while (start > 0 && start < endBracket)
+                                {
+                                    end = msg.events.IndexOf("}", start) + 1;
+                                    temp = msg.events.Substring(start, end - start);
+                                    coinbase_connection.parser.parseFuturePos(temp, ref jsfp);
+                                    fp.addMsg(jsfp);
+                                    if (cryptos.ContainsKey(fp.product_id))
+                                    {
+                                        crypto cp = cryptos[fp.product_id];
+                                        cp.updateFuture(fp);
+                                    }
+                                    else
+                                    {
+                                        this.addLog("product not found id:" + pp.product_id, logType.ERROR);
+                                    }
+                                    start = msg.events.IndexOf("{", end);
+                                }
+                            }
+                            this.order_log.WriteAsync(message + "\n");
+                        }
+                        else if (msg.channel == "heartbeats")
+                        {
+                            this.order_log.Flush();
+                        }
+                    }
+                    else
+                    {
+                        ++i;
+                        if(i > 1000000)
+                        {
+                            i = 0;
+                            System.Threading.Thread.Sleep(0);
+                        }
+                        if(this.stopListening)
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                while (true)
+                {
+                    if (this.msgQueue.TryDequeue(out message))
+                    {
+                        this.order_log.WriteLine(message);
+                        this.order_log.Flush();
+                    }
                 }
             }
         }
@@ -1559,6 +1598,23 @@ namespace coinbase_main
             this.open_size = msg.leaves_quantity;
             this.executed_size = msg.cumulative_quantity;
             this.updated_time = DateTime.Now;
+        }
+
+        public override string ToString()
+        {
+            return this.order_id + "," +
+                this.client_order_id + "," +
+                this.product_id + "," +
+                this.status + "," +
+                this.side + "," +
+                this.price.ToString() + "," +
+                this.size.ToString() + "," +
+                this.open_size.ToString() + "," +
+                this.avg_price.ToString() + "," +
+                this.executed_size.ToString() + "," +
+                this.new_order_time.ToString() + "," +
+                this.updated_time.ToString() + "," +
+                this.priorQuantity.ToString();
         }
     }
 }

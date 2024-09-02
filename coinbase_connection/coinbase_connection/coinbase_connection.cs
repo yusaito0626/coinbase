@@ -14,6 +14,8 @@ using System;
 using System.Net.Http.Headers;
 using System.Globalization;
 
+using coinbase_enum;
+
 namespace coinbase_connection
 {
     public class coinbase_connection
@@ -30,7 +32,29 @@ namespace coinbase_connection
 
         public ConcurrentQueue<string> msgQueue;
 
-        public Action<string> addLog = (str) => { Console.WriteLine(str); };
+        public Action<string> _addLog = (str) => { Console.WriteLine(str); };
+        public void addLog(string str, logType type = logType.NONE)
+        {
+            switch (type)
+            {
+                case logType.INFO:
+                    this._addLog("[INFO] " + str);
+                    break;
+                case logType.WARNING:
+                    this._addLog("[WARNING] " + str);
+                    break;
+                case logType.ERROR:
+                    this._addLog("[ERROR] " + str);
+                    break;
+                case logType.CRITICAL:
+                    this._addLog("[CRITICAL] " + str);
+                    break;
+                case logType.NONE:
+                default:
+                    this._addLog(str);
+                    break;
+            }
+        }
         public coinbase_connection()
         {
             this.ws = new ClientWebSocket();
@@ -72,40 +96,40 @@ namespace coinbase_connection
             switch (channel)
             {
                 case cbChannels.heartbeats:
-                    this.addLog("Start listening heartbeats...");
+                    this.addLog("Start listening heartbeats...",logType.INFO);
                     strChannel += "\"heartbeats\",";
                     break;
                 case cbChannels.candles:
-                    this.addLog("Start listening candles...");
+                    this.addLog("Start listening candles...", logType.INFO);
                     strChannel += "\"candle\",";
                     break;
                 case cbChannels.status:
-                    this.addLog("Start listening status...");
+                    this.addLog("Start listening status...", logType.INFO);
                     strChannel += "\"status\",";
                     break;
                 case cbChannels.ticker:
-                    this.addLog("Start listening ticker...");
+                    this.addLog("Start listening ticker...", logType.INFO);
                     strChannel += "\"ticker\",";
                     break;
                 case cbChannels.ticker_batch:
-                    this.addLog("Start listening ticker_batch...");
+                    this.addLog("Start listening ticker_batch...", logType.INFO);
                     strChannel += "\"ticker_batch\",";
                     break;
                 case cbChannels.level2:
-                    this.addLog("Start listening level 2...");
+                    this.addLog("Start listening level 2...", logType.INFO);
                     strChannel += "\"level2\",";
                     break;
                 case cbChannels.user:
-                    this.addLog("Start listening user...");
+                    this.addLog("Start listening user...", logType.INFO);
                     strChannel += "\"user\",";
                     break;
                 case cbChannels.market_trades:
-                    this.addLog("Start listening market_trades...");
+                    this.addLog("Start listening market_trades...", logType.INFO);
                     strChannel += "\"market_trades\",";
                     break;
                 case cbChannels.NONE:
                 default:
-                    this.addLog("[ERROR] Channel not specified");
+                    this.addLog("Channel not specified", logType.ERROR);
                     strChannel = "";
                     return false;
                     break;
@@ -137,13 +161,13 @@ namespace coinbase_connection
             }
             else
             {
-                this.addLog("[ERROR] The name or the key is unknown.");
+                this.addLog("The name or the key is unknown.", logType.ERROR);
                 return false;
             }
         }
         public void listen()
         {
-            this.addLog("Listening thread started.");
+            this.addLog("Listening thread started.",logType.INFO);
             byte[] buffer = new byte[1073741824];
             while (true)
             {
@@ -310,7 +334,6 @@ namespace coinbase_connection
                 }
             }
             str += "]}";
-            this.addLog(str);
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://" + this.url_cancelOrder);
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", this.generateToken(this.name, this.privateKey, "POST " + this.url_cancelOrder));
             StringContent content = new StringContent(str, null, "application/json");
@@ -329,7 +352,6 @@ namespace coinbase_connection
                 str += ",\"size\":\"" + size + "\"";
             }
             str += "}";
-            this.addLog(str);
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://" + this.url_editOrder);
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", this.generateToken(this.name, this.privateKey, "POST " + this.url_editOrder));
             StringContent content = new StringContent(str, null, "application/json");
@@ -922,19 +944,29 @@ namespace coinbase_connection
         private string url_previewOrder;
         private string url_closePosition;
 
-        public Action<string> addLog = (str) => { Console.WriteLine(str); };
-    }
-    public enum cbChannels
-    {
-        NONE = 0,
-        heartbeats,
-        candles,
-        status,
-        ticker,
-        ticker_batch,
-        level2,
-        user,
-        market_trades
+        public Action<string> _addLog = (str) => { Console.WriteLine(str); };
+        public void addLog(string str, logType type = logType.NONE)
+        {
+            switch (type)
+            {
+                case logType.INFO:
+                    this._addLog("[INFO] " + str);
+                    break;
+                case logType.WARNING:
+                    this._addLog("[WARNING] " + str);
+                    break;
+                case logType.ERROR:
+                    this._addLog("[ERROR] " + str);
+                    break;
+                case logType.CRITICAL:
+                    this._addLog("[CRITICAL] " + str);
+                    break;
+                case logType.NONE:
+                default:
+                    this._addLog(str);
+                    break;
+            }
+        }
     }
 }
 

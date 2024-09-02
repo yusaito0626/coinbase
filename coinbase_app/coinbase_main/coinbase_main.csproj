@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\coinbase_connection\coinbase_connection\coinbase_connection.csproj" />
+    <ProjectReference Include="..\..\coinbase_utils\coinbase_utils.csproj" />
   </ItemGroup>
 
 </Project>

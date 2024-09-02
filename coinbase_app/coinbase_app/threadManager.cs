@@ -12,6 +12,7 @@ using System.Runtime.Remoting;
 using System.Security.AccessControl;
 using coinbase_connection;
 using coinbase_main;
+using coinbase_enum;
 
 namespace coinbase_app
 {
@@ -39,6 +40,10 @@ namespace coinbase_app
             }
 
             this.qtManager.feedStack = this.feedStack;
+            if(!this.ordManager.live)
+            {
+                this.qtManager.msgQueue = this.ordManager.msgQueue;
+            }
 
             this.decodingThreads = new List<decodingThread>();
             this.updateQuotesThreads = new List<updateQuotesThread>();
@@ -82,22 +87,22 @@ namespace coinbase_app
         {
             foreach (var th in this.decodingThreads)
             {
-                th.addLog = this.addLog;
-                this.addLog("Starting decoding thread");
+                th._addLog = this._addLog;
+                this.addLog("Starting decoding thread",logType.INFO);
                 th.th = new Thread(new ThreadStart(th.threadStart));
                 th.th.Start();
             }
             foreach (var th in this.updateQuotesThreads)
             {
-                th.addLog = this.addLog;
-                this.addLog("Starting updating thread");
+                th._addLog = this._addLog;
+                this.addLog("Starting updating thread", logType.INFO);
                 th.th = new Thread(new ThreadStart(th.threadStart));
                 th.th.Start();
             }
             foreach (var th in this.optimizingThreads)
             {
-                th.addLog = this.addLog;
-                this.addLog("Starting optimizing thread");
+                th._addLog = this._addLog;
+                this.addLog("Starting optimizing thread", logType.INFO);
                 th.th = new Thread(new ThreadStart(th.threadStart));
                 th.th.Start();
             }
@@ -163,8 +168,31 @@ namespace coinbase_app
         public Dictionary<string, crypto> cryptos;
 
         public quoteManager qtManager = coinbase_main.quoteManager.GetInstance();
+        public orderManager ordManager = coinbase_main.orderManager.GetInstance();
 
-        public Action<string> addLog = (str) => { Console.WriteLine(str); };
+        public Action<string> _addLog = (str) => { Console.WriteLine(str); };
+        public void addLog(string str, logType type = logType.NONE)
+        {
+            switch (type)
+            {
+                case logType.INFO:
+                    this._addLog("[INFO] " + str);
+                    break;
+                case logType.WARNING:
+                    this._addLog("[WARNING] " + str);
+                    break;
+                case logType.ERROR:
+                    this._addLog("[ERROR] " + str);
+                    break;
+                case logType.CRITICAL:
+                    this._addLog("[CRITICAL] " + str);
+                    break;
+                case logType.NONE:
+                default:
+                    this._addLog(str);
+                    break;
+            }
+        }
 
         private static threadManager _instance;
         private static readonly object _lockObject = new object();
@@ -195,7 +223,29 @@ namespace coinbase_app
 
         public Thread th;
         public delegate void func();
-        public Action<string> addLog = (str) => { Console.WriteLine(str); };
+        public Action<string> _addLog = (str) => { Console.WriteLine(str); };
+        public void addLog(string str, logType type = logType.NONE)
+        {
+            switch (type)
+            {
+                case logType.INFO:
+                    this._addLog("[INFO] " + str);
+                    break;
+                case logType.WARNING:
+                    this._addLog("[WARNING] " + str);
+                    break;
+                case logType.ERROR:
+                    this._addLog("[ERROR] " + str);
+                    break;
+                case logType.CRITICAL:
+                    this._addLog("[CRITICAL] " + str);
+                    break;
+                case logType.NONE:
+                default:
+                    this._addLog(str);
+                    break;
+            }
+        }
 
         public virtual void threadStart() { }
         public virtual void threadStop() 
@@ -236,13 +286,13 @@ namespace coinbase_app
         public override void threadStart()
         {
             this.started = true;
-            this.addLog("Decoding thread started");
+            this.addLog("Decoding thread started", logType.INFO);
             while (true)
             {
                 this.mutex.WaitOne();
                 if(this.active > 0)
                 {
-                    this.addLog("Decoding thread activated");
+                    this.addLog("Decoding thread activated", logType.INFO);
                     this.decoding();
                     this.mutex.ReleaseMutex();
                 }
@@ -390,14 +440,14 @@ namespace coinbase_app
         }
         public override void threadStart()
         {
-            this.addLog("Updating thread started");
+            this.addLog("Updating thread started", logType.INFO);
             this.started = true;
             while (true)
             {
                 this.mutex.WaitOne();
                 if (this.active > 0)
                 {
-                    this.addLog("Updating thread activated");
+                    this.addLog("Updating thread activated", logType.INFO);
                     this.updatingQuotes();
                     this.mutex.ReleaseMutex();
                 }
@@ -478,14 +528,14 @@ namespace coinbase_app
         }
         public override void threadStart()
         {
-            this.addLog("Optimizing thread started");
+            this.addLog("Optimizing thread started", logType.INFO);
             this.started = true;
             while (true)
             {
                 this.mutex.WaitOne();
                 if (this.active > 0)
                 {
-                    this.addLog("Optimizing thread activated");
+                    this.addLog("Optimizing thread activated", logType.INFO);
                     this.optimizing();
                     this.mutex.ReleaseMutex();
                 }

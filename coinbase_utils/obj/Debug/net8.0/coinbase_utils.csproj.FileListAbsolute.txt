@@ -1,0 +1,12 @@
+C:\Users\yusai\source\repos\coinbase\coinbase_utils\bin\Debug\net8.0\coinbase_utils.deps.json
+C:\Users\yusai\source\repos\coinbase\coinbase_utils\bin\Debug\net8.0\coinbase_utils.dll
+C:\Users\yusai\source\repos\coinbase\coinbase_utils\bin\Debug\net8.0\coinbase_utils.pdb
+C:\Users\yusai\source\repos\coinbase\coinbase_utils\obj\Debug\net8.0\coinbase_utils.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\yusai\source\repos\coinbase\coinbase_utils\obj\Debug\net8.0\coinbase_utils.AssemblyInfoInputs.cache
+C:\Users\yusai\source\repos\coinbase\coinbase_utils\obj\Debug\net8.0\coinbase_utils.AssemblyInfo.cs
+C:\Users\yusai\source\repos\coinbase\coinbase_utils\obj\Debug\net8.0\coinbase_utils.csproj.CoreCompileInputs.cache
+C:\Users\yusai\source\repos\coinbase\coinbase_utils\obj\Debug\net8.0\coinbase_utils.sourcelink.json
+C:\Users\yusai\source\repos\coinbase\coinbase_utils\obj\Debug\net8.0\coinbase_utils.dll
+C:\Users\yusai\source\repos\coinbase\coinbase_utils\obj\Debug\net8.0\refint\coinbase_utils.dll
+C:\Users\yusai\source\repos\coinbase\coinbase_utils\obj\Debug\net8.0\coinbase_utils.pdb
+C:\Users\yusai\source\repos\coinbase\coinbase_utils\obj\Debug\net8.0\ref\coinbase_utils.dll

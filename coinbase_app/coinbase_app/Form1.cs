@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using System.Text;
 using coinbase_connection;
+using coinbase_enum;
 using coinbase_main;
 
 namespace coinbase_app
@@ -31,10 +32,10 @@ namespace coinbase_app
             readConfig(configFile);
             Action<string> addLogFunc = this.addLog;
             this.connection = new coinbase_connection.coinbase_connection();
-            this.connection.addLog = addLogFunc;
+            this.connection._addLog = addLogFunc;
             this.connection.readApiJson(this.apiFilename);
             this.thManager = coinbase_app.threadManager.GetInstance();
-            this.thManager.addLog = addLogFunc;
+            this.thManager._addLog = addLogFunc;
             this.thManager.initialzeThreadManager(this.decodingThCount, this.quotesThCount, this.optThCount);
             this.thManager.setQueues(this.connection.msgQueue);
             this.thManager.startThreads();
@@ -89,7 +90,7 @@ namespace coinbase_app
                                 }
                                 if (count >= buffer.Length)
                                 {
-                                    this.addLog("[ERROR] The message is too large.");
+                                    this.addLog("The message is too large.",logType.ERROR);
                                     return;
                                 }
                                 segment = new ArraySegment<byte>(buffer, count, buffer.Length - count);
@@ -162,13 +163,13 @@ namespace coinbase_app
                     ++i;
                     if (i > 50)
                     {
-                        this.addLog("[ERROR] Failed to connect.");
+                        this.addLog("Failed to connect.",logType.ERROR);
                         return;
                     }
                 }
                 if (st.ToString() == "Open")
                 {
-                    this.addLog("[INFO] Connected Successfully");
+                    this.addLog("Connected Successfully", logType.INFO);
                     this.connection.startListen(cbChannels.heartbeats);
                     this.connection.startListen(cbChannels.level2, this.symbols);
                     this.connection.startListen(cbChannels.market_trades, this.symbols);
@@ -300,6 +301,20 @@ namespace coinbase_app
                         this.label_status.Text = cp.status;
                         this.label_statusMsg.Text = cp.status_message;
                         this.label_minMktFund.Text = cp.min_market_funds;
+
+                        this.label_CurrPos.Text = (cp.basePosition + cp.baseExecutionBuy - cp.baseExecutionSell).ToString();
+                        this.label_P_buyVol.Text = cp.baseExecutionBuy.ToString();
+                        this.label_P_sellVol.Text = cp.baseExecutionSell.ToString();
+                        this.label_P_buyAvgPr.Text = (cp.quoteExecutionBuy / cp.baseExecutionBuy).ToString();
+                        this.label_P_sellAvgPr.Text = (cp.quoteExecutionSell / cp.baseExecutionSell).ToString();
+
+                        double posPnl = cp.basePosition * (cp.last - cp.basePosPr);
+                        double tradePnl = (cp.baseExecutionBuy * cp.last - cp.quoteExecutionBuy) + (cp.quoteExecutionSell - cp.baseExecutionSell * cp.last);
+
+                        this.label_posPnl.Text = posPnl.ToString();
+                        this.label_tradePnl.Text = tradePnl.ToString();
+                        this.label_Fee.Text = cp.fee.ToString();
+                        this.label_totalPnl.Text = (posPnl + tradePnl - cp.fee).ToString();
 
                         if (cp.quotesInitialized)
                         {
@@ -455,6 +470,28 @@ namespace coinbase_app
         {
             this.logQueue.Enqueue(str);
         }
+        public void addLog(string str, logType type = logType.NONE)
+        {
+            switch (type)
+            {
+                case logType.INFO:
+                    this.addLog("[INFO] " + str);
+                    break;
+                case logType.WARNING:
+                    this.addLog("[WARNING] " + str);
+                    break;
+                case logType.ERROR:
+                    this.addLog("[ERROR] " + str);
+                    break;
+                case logType.CRITICAL:
+                    this.addLog("[CRITICAL] " + str);
+                    break;
+                case logType.NONE:
+                default:
+                    this.addLog(str);
+                    break;
+            }
+        }
         public void writeLog()
         {
             string line;
@@ -473,21 +510,21 @@ namespace coinbase_app
                 DialogResult result = MessageBox.Show(msg, caption, buttons, MessageBoxIcon.Question);
                 if (result == DialogResult.No)
                 {
-                    this.addLog("Starting as a virtual mode");
+                    this.addLog("Starting as a virtual mode",logType.INFO);
                     this.live = false;
                 }
                 else if (result == DialogResult.Cancel)
                 {
-                    this.addLog("Process has been cancelled.");
+                    this.addLog("Process has been cancelled.", logType.INFO);
                     return;
                 }
                 else if (result == DialogResult.Yes)
                 {
-                    this.addLog("Starting live trading.");
+                    this.addLog("Starting live trading.", logType.INFO);
                 }
                 else
                 {
-                    this.addLog("ERROR!!!");
+                    this.addLog("ERROR!!!",logType.ERROR);
                     return;
                 }
             }
@@ -495,6 +532,7 @@ namespace coinbase_app
             this.buttonOMS.BackColor = System.Drawing.Color.LawnGreen;
             this.buttonOMS.FlatStyle = FlatStyle.Flat;
             this.buttonOMS.Enabled = false;
+            this.comboBox_mode.Enabled = false;
         }
 
         private void comboBox_mode_SelectedIndexChanged(object sender, EventArgs e)
@@ -502,16 +540,16 @@ namespace coinbase_app
             if(this.comboBox_mode.SelectedItem == "Virtual")
             {
                 this.live = false;
-                this.addLog("Mode:Virtual");
+                this.addLog("Mode:Virtual", logType.INFO);
             }
             else if (this.comboBox_mode.SelectedItem == "Live")
             {
                 this.live = true;
-                this.addLog("Mode:Live");
+                this.addLog("Mode:Live", logType.INFO);
             }
             else
             {
-                this.addLog("[ERROR] Only live/virtual mode is available for now");
+                this.addLog("Only live/virtual mode is available for now", logType.ERROR);
             }
         }
     }

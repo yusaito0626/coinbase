@@ -7,14 +7,21 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "coinbase_app", "coinbase_ap
 	ProjectSection(ProjectDependencies) = postProject
 		{3D269D12-A772-451B-B0B5-501ADE20DD75} = {3D269D12-A772-451B-B0B5-501ADE20DD75}
 		{8245D1D0-CD1E-44D7-8E17-55983D8E4E64} = {8245D1D0-CD1E-44D7-8E17-55983D8E4E64}
+		{B3FDFC16-2364-4032-A67D-6113F79A9825} = {B3FDFC16-2364-4032-A67D-6113F79A9825}
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "coinbase_main", "coinbase_main\coinbase_main.csproj", "{8245D1D0-CD1E-44D7-8E17-55983D8E4E64}"
 	ProjectSection(ProjectDependencies) = postProject
 		{3D269D12-A772-451B-B0B5-501ADE20DD75} = {3D269D12-A772-451B-B0B5-501ADE20DD75}
+		{B3FDFC16-2364-4032-A67D-6113F79A9825} = {B3FDFC16-2364-4032-A67D-6113F79A9825}
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "coinbase_connection", "..\coinbase_connection\coinbase_connection\coinbase_connection.csproj", "{3D269D12-A772-451B-B0B5-501ADE20DD75}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B3FDFC16-2364-4032-A67D-6113F79A9825} = {B3FDFC16-2364-4032-A67D-6113F79A9825}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "coinbase_utils", "..\coinbase_utils\coinbase_utils.csproj", "{B3FDFC16-2364-4032-A67D-6113F79A9825}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,6 +41,10 @@ Global
 		{3D269D12-A772-451B-B0B5-501ADE20DD75}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D269D12-A772-451B-B0B5-501ADE20DD75}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3D269D12-A772-451B-B0B5-501ADE20DD75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3FDFC16-2364-4032-A67D-6113F79A9825}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3FDFC16-2364-4032-A67D-6113F79A9825}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3FDFC16-2364-4032-A67D-6113F79A9825}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3FDFC16-2364-4032-A67D-6113F79A9825}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
