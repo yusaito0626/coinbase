@@ -31,10 +31,18 @@ namespace coinbase_main
                         switch(td.msg_type)
                         {
                             case "l2_data":
+                                if (!this.live)
+                                {
+                                    this.updatePriorQuantity(ref cp, td);
+                                }
                                 cp.updateOneQuote(td);
                                 break;
                             case "trades":
                                 cp.updateTrade(td);
+                                if(!this.live)
+                                {
+                                    this.executeLimitOrder(ref cp, td);
+                                }
                                 break;
                         }
                         this.feedStack.Push(td);
@@ -50,10 +58,18 @@ namespace coinbase_main
                         switch (td.msg_type)
                         {
                             case "l2_data":
+                                if (!this.live)
+                                {
+                                    this.updatePriorQuantity(ref cp, td);
+                                }
                                 cp.updateOneQuote(td);
                                 break;
                             case "trades":
                                 cp.updateTrade(td);
+                                if (!this.live)
+                                {
+                                    this.executeLimitOrder(ref cp, td);
+                                }
                                 break;
                         }
                         this.feedStack.Push(td);
@@ -138,8 +154,69 @@ namespace coinbase_main
             }
         }
 
+        public void updatePriorQuantity(ref crypto cp,cbMsg.trades qt)
+        {
+            if (qt.msg_type == "trades")
+            {
+                return;
+            }
+            int i = 0;
+            int quotePr = (int)(qt.price / cp.quote_increment);
+            if(cp.quotes.ContainsKey(quotePr))
+            {
+                quote q = cp.quotes[quotePr];
+                if(q.side == qt.side)
+                {
+                    if(q.quantity > qt.size)//Including qt.size == 0
+                    {
+                        while (true)
+                        {
+                            if (Interlocked.Exchange(ref cp.orderUpdating, 1) == 0)
+                            {
+                                q.checkPriorQuantity(cp.quote_increment, qt.size);  
+                                cp.orderUpdating = 0;
+                            }
+                            else
+                            {
+                                ++i;
+                                if (i > 100000)
+                                {
+                                    i = 0;
+                                    System.Threading.Thread.Sleep(0);
+                                }
+                            }
+                        }
+                    }
+                }
+                else if(q.side != "")
+                {
+                    while (true)
+                    {
+                        if (Interlocked.Exchange(ref cp.orderUpdating, 1) == 0)
+                        {
+                            q.checkPriorQuantity(cp.quote_increment, 0);
+                            cp.orderUpdating = 0;
+                        }
+                        else
+                        {
+                            ++i;
+                            if (i > 100000)
+                            {
+                                i = 0;
+                                System.Threading.Thread.Sleep(0);
+                            }
+                        }
+                    }
+                }
+                
+            }
+            
+        }
+
         public ConcurrentStack<cbMsg.trades> feedStack;
         public Queue<string> msgQueue;
+
+        public bool live = false;
 
         public Action<string> _addLog = (str) => { Console.WriteLine(str); };
         public void addLog(string str, logType type = logType.NONE)

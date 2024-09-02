@@ -47,6 +47,7 @@ namespace coinbase_app
             }
             this.getCryptoStatus();
             this.OMS = orderManager.GetInstance();
+            this.qtManager = quoteManager.GetInstance();
         }
 
         async Task getCryptoStatus()
@@ -254,6 +255,7 @@ namespace coinbase_app
         coinbase_connection.coinbase_connection connection;
         threadManager thManager;
         orderManager OMS;
+        quoteManager qtManager;
         System.Threading.Thread listeningThread;
 
         ConcurrentQueue<string> logQueue;
@@ -529,6 +531,7 @@ namespace coinbase_app
                 }
             }
             this.OMS.initialize(this.live, this.apiFilename, this.url, this.cryptos, this.orderLogPath, this.addLog);
+            this.qtManager.live = this.live;
             this.buttonOMS.BackColor = System.Drawing.Color.LawnGreen;
             this.buttonOMS.FlatStyle = FlatStyle.Flat;
             this.buttonOMS.Enabled = false;

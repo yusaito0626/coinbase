@@ -136,6 +136,46 @@ namespace coinbase_main
             return executedQty;
         }
 
+        public void checkPriorQuantity(double increment, double size)
+        {
+            int i = 0;
+            order ord = null;
+            order initOrd = null;
+            while (this.ordQueue.Count > 0)
+            {
+                ord = this.ordQueue.Dequeue();
+                if (i == 0)
+                {
+                    ++i;
+                    if (ord.status != "FILLED" && ord.status != "CANCELLED" && (int)(ord.price / increment) == this.price)
+                    {
+                        initOrd = ord;
+                        if(ord.priorQuantity > size)
+                        {
+                            ord.priorQuantity = size;
+                        }
+                        this.ordQueue.Enqueue(ord);
+                    }
+                }
+                else
+                {
+                    if (ord == initOrd)
+                    {
+                        break;
+                    }
+                    if (ord.status != "FILLED" && ord.status != "CANCELLED" && (int)(ord.price / increment) == this.price)
+                    {
+                        initOrd = ord;
+                        if (ord.priorQuantity > size)
+                        {
+                            ord.priorQuantity = size;
+                        }
+                        this.ordQueue.Enqueue(ord);
+                    }
+                }
+            }
+        }
+
         public string side;
         public int price;
         public double quantity;
