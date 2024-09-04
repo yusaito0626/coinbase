@@ -5,9 +5,11 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
 
+using coinbase_enum;
+
 Dictionary<string,crypto> cryptos = new Dictionary<string,crypto>();
 string[] symbols = new string[1];
-symbols[0] = "ETH-GBP";
+symbols[0] = "ETH-PERP-INTX";
 Dictionary<string, string> dict;
 
 coinbase_connection.coinbase_connection cc = new coinbase_connection.coinbase_connection();
@@ -112,54 +114,57 @@ while (true)
 }
 
 
-oms.initialize(apiFilename, url, cryptos, order_log_path);
-crypto testing_cp = cryptos["ETH-GBP"];
+oms.initialize(true,apiFilename, url, cryptos, order_log_path);
+crypto testing_cp = cryptos[symbols[0]];
 double order_size = testing_cp.base_increment;
 
-testing_cp.minOrdPr = (int)(1700 / testing_cp.quote_increment);
-testing_cp.maxOrdPr = (int)(2500 / testing_cp.quote_increment);
-testing_cp.minPr = (int)(1700 / testing_cp.quote_increment);
-testing_cp.maxPr = (int)(2600 / testing_cp.quote_increment);
-testing_cp.bestask = (int)(1900 / testing_cp.quote_increment);
-testing_cp.bestbid = (int)(1899 / testing_cp.quote_increment);
+testing_cp.minOrdPr = (int)(2000 / testing_cp.quote_increment);
+testing_cp.maxOrdPr = (int)(3000 / testing_cp.quote_increment);
+testing_cp.minPr = (int)(1900 / testing_cp.quote_increment);
+testing_cp.maxPr = (int)(3100 / testing_cp.quote_increment);
+testing_cp.bestask = (int)(2500 / testing_cp.quote_increment);
+testing_cp.bestbid = (int)(2550 / testing_cp.quote_increment);
 testing_cp.maxBaseSize = 0.001;
 testing_cp.maxQuoteSize = 20;
 testing_cp.maxNewOrderCount1sec = 5;
 
 HttpResponseMessage res;
 
+double pr = 2450;
+double qty = 0.0005;
+
 using (StreamWriter sw = new StreamWriter(restApiMsgFile))
 {
     Console.WriteLine("Sending Invalid Symbol...");
-    res = await oms.sendLimitGTC("test", "BUY", 0.0005, 1801.00, true);
+    res = await oms.sendLimitGTC("test", "BUY", qty, pr, true);
     if (res != null)
     {
         Console.WriteLine("Failed to filter an invalid order");
         return;
     }
     Console.WriteLine("Sending Invalid Side...");
-    res = await oms.sendLimitGTC(testing_cp.id, "test", 0.0005, 1801.00, true);
+    res = await oms.sendLimitGTC(testing_cp.id, "test", qty, pr, true);
     if (res != null)
     {
         Console.WriteLine("Failed to filter an invalid order");
         return;
     }
     Console.WriteLine("Sending Invalid Size...");
-    res = await oms.sendLimitGTC(testing_cp.id, "BUY", 0.0011, 1801.00, true);
+    res = await oms.sendLimitGTC(testing_cp.id, "BUY", testing_cp.maxBaseSize + 0.0001, pr, true);
     if (res != null)
     {
         Console.WriteLine("Failed to filter an invalid order");
         return;
     }
     Console.WriteLine("Sending Invalid Price...");
-    res = await oms.sendLimitGTC(testing_cp.id, "BUY", 0.0005, 1699.00, true);
+    res = await oms.sendLimitGTC(testing_cp.id, "BUY", qty, testing_cp.minOrdPr - 1, true);
     if (res != null)
     {
         Console.WriteLine("Failed to filter an invalid order");
         return;
     }
     Console.WriteLine("Sending a proper order...");
-    res = await oms.sendLimitGTC(testing_cp.id, "BUY", 0.0005, 1800.00, true);
+    res = await oms.sendLimitGTC(testing_cp.id, "BUY", qty, pr, true);
     if (res != null)
     {
         Console.WriteLine(res.ToString());
@@ -187,7 +192,7 @@ using (StreamWriter sw = new StreamWriter(restApiMsgFile))
         Console.WriteLine(ord.Key);
         if(ord.Value.status == "OPEN")
         {
-            res = await oms.sendModOrder(ord.Value, 0.0001, 0);
+            res = await oms.sendModOrder(ord.Value, qty - 0.0001, 0);
             if (res != null)
             {
                 Console.WriteLine(res.ToString());
@@ -240,57 +245,57 @@ using (StreamWriter sw = new StreamWriter(restApiMsgFile))
             return;
         }
     }
-    Console.WriteLine("order count check");
-    int i = 0;
-    while(i < 10)
-    {
-        res = await oms.sendLimitGTC(testing_cp.id, "BUY", 0.0001, 1800.00, true);
-        if (res != null)
-        {
-            Console.WriteLine(res.ToString());
-            sw.WriteLine(res.ToString());
-            sw.Flush();
-            if (res.IsSuccessStatusCode)
-            {
-                Console.WriteLine("Order Success!.");
-            }
-            else
-            {
-                Console.WriteLine("Order Failed.");
-            }
-        }
-        else
-        {
-            Console.WriteLine("The order didn't go through");
-        }
-        ++i;
-        Console.WriteLine(i.ToString());
-    }
-    Console.WriteLine("Cancell All.");
-    foreach (KeyValuePair<string, order> ord in testing_cp.liveOrders)
-    {
-        Console.WriteLine(ord.Key);
-        res = await oms.sendCanOrder(ord.Value);
-        if (res != null)
-        {
-            Console.WriteLine(res.ToString());
-            sw.WriteLine(res.ToString());
-            sw.Flush();
-            if (res.IsSuccessStatusCode)
-            {
-                Console.WriteLine("Order Success!.");
-            }
-            else
-            {
-                Console.WriteLine("Order Failed.");
-            }
-        }
-        else
-        {
-            Console.WriteLine("The order didn't go through");
-            return;
-        }
-    }
+    //Console.WriteLine("order count check");
+    //int i = 0;
+    //while(i < 10)
+    //{
+    //    res = await oms.sendLimitGTC(testing_cp.id, "BUY", 0.0001, pr, true);
+    //    if (res != null)
+    //    {
+    //        Console.WriteLine(res.ToString());
+    //        sw.WriteLine(res.ToString());
+    //        sw.Flush();
+    //        if (res.IsSuccessStatusCode)
+    //        {
+    //            Console.WriteLine("Order Success!.");
+    //        }
+    //        else
+    //        {
+    //            Console.WriteLine("Order Failed.");
+    //        }
+    //    }
+    //    else
+    //    {
+    //        Console.WriteLine("The order didn't go through");
+    //    }
+    //    ++i;
+    //    Console.WriteLine(i.ToString());
+    //}
+    //Console.WriteLine("Cancell All.");
+    //foreach (KeyValuePair<string, order> ord in testing_cp.liveOrders)
+    //{
+    //    Console.WriteLine(ord.Key);
+    //    res = await oms.sendCanOrder(ord.Value);
+    //    if (res != null)
+    //    {
+    //        Console.WriteLine(res.ToString());
+    //        sw.WriteLine(res.ToString());
+    //        sw.Flush();
+    //        if (res.IsSuccessStatusCode)
+    //        {
+    //            Console.WriteLine("Order Success!.");
+    //        }
+    //        else
+    //        {
+    //            Console.WriteLine("Order Failed.");
+    //        }
+    //    }
+    //    else
+    //    {
+    //        Console.WriteLine("The order didn't go through");
+    //        return;
+    //    }
+    //}
     //Console.WriteLine("Sending a market order...");
     //res = await oms.sendMarketOrder(testing_cp.id, "BUY", 0.0005);
     //if (res != null)

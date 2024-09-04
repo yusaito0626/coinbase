@@ -175,6 +175,7 @@ namespace coinbase_main
                             {
                                 q.checkPriorQuantity(cp.quote_increment, qt.size);  
                                 cp.orderUpdating = 0;
+                                break;
                             }
                             else
                             {
@@ -196,6 +197,7 @@ namespace coinbase_main
                         {
                             q.checkPriorQuantity(cp.quote_increment, 0);
                             cp.orderUpdating = 0;
+                            break;
                         }
                         else
                         {

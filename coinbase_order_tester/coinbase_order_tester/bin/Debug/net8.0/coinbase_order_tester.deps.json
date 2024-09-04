@@ -307,6 +307,7 @@
         "dependencies": {
           "Microsoft.IdentityModel.Tokens": "8.0.1",
           "System.IdentityModel.Tokens.Jwt": "8.0.1",
+          "coinbase_utils": "1.0.0",
           "jose-jwt": "5.0.0"
         },
         "runtime": {
@@ -315,10 +316,16 @@
       },
       "coinbase_main/1.0.0": {
         "dependencies": {
-          "coinbase_connection": "1.0.0"
+          "coinbase_connection": "1.0.0",
+          "coinbase_utils": "1.0.0"
         },
         "runtime": {
           "coinbase_main.dll": {}
+        }
+      },
+      "coinbase_utils/1.0.0": {
+        "runtime": {
+          "coinbase_utils.dll": {}
         }
       }
     }
@@ -643,6 +650,11 @@
       "sha512": ""
     },
     "coinbase_main/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "coinbase_utils/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

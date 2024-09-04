@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("coinbase_utils")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8bff2aeea6b9728b72666a63e69a9463c677ec5e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f91f3b31d63b032fc477e608c70ccb3dd1fc0c28")]
 [assembly: System.Reflection.AssemblyProductAttribute("coinbase_utils")]
 [assembly: System.Reflection.AssemblyTitleAttribute("coinbase_utils")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

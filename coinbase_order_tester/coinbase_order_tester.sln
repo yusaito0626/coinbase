@@ -7,11 +7,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "coinbase_order_tester", "co
 	ProjectSection(ProjectDependencies) = postProject
 		{464E6647-7B9E-4CD9-8C66-AD6E1F86D922} = {464E6647-7B9E-4CD9-8C66-AD6E1F86D922}
 		{C4D1E796-D39A-44DD-AE40-339EF7A1E855} = {C4D1E796-D39A-44DD-AE40-339EF7A1E855}
+		{E4BF53E7-97A0-4A58-AEB8-2DA3D0D61597} = {E4BF53E7-97A0-4A58-AEB8-2DA3D0D61597}
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "coinbase_connection", "..\coinbase_connection\coinbase_connection\coinbase_connection.csproj", "{C4D1E796-D39A-44DD-AE40-339EF7A1E855}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "coinbase_main", "..\coinbase_app\coinbase_main\coinbase_main.csproj", "{464E6647-7B9E-4CD9-8C66-AD6E1F86D922}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "coinbase_utils", "..\coinbase_utils\coinbase_utils.csproj", "{E4BF53E7-97A0-4A58-AEB8-2DA3D0D61597}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +34,10 @@ Global
 		{464E6647-7B9E-4CD9-8C66-AD6E1F86D922}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{464E6647-7B9E-4CD9-8C66-AD6E1F86D922}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{464E6647-7B9E-4CD9-8C66-AD6E1F86D922}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E4BF53E7-97A0-4A58-AEB8-2DA3D0D61597}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4BF53E7-97A0-4A58-AEB8-2DA3D0D61597}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4BF53E7-97A0-4A58-AEB8-2DA3D0D61597}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4BF53E7-97A0-4A58-AEB8-2DA3D0D61597}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
